@@ -1,6 +1,6 @@
-# MarsRover2018-firmware
+# MarsRover2019-firmware
 
-Firmware for the 2018 University of Waterloo Mars Rover. Will contain:
+Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 - mbed library
 - additional libraries written by the team
 - application code running on each board
