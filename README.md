@@ -11,7 +11,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 
 1. Download source code 
     
-    `git clone https://github.com/uwrobotics/MarsRover2018-firmware.git`
+    `git clone https://github.com/uwrobotics/MarsRover2019-firmware.git`
 
 2. Download toolchain (gcc and make)
    
@@ -35,7 +35,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 	
 3. change directory into app/blinky
 
-    `cd MarsRover2018-firmware/app/blinky`
+    `cd MarsRover2019-firmware/app/blinky`
 4. run make
 
     `make`
