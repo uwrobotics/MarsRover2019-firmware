@@ -122,29 +122,28 @@ typedef enum {
     ADC_VREF = 0xF1,
     ADC_VBAT = 0xF2,
 
-    // Arduino connector namings
-    A0          = PA_0,
-    A1          = PA_1,
-    A2          = PA_4,
-    A3          = PB_0,
-    A4          = PC_1,
-    A5          = PC_0,
-    D0          = PA_3,
-    D1          = PA_2,
-    D2          = PA_10,
-    D3          = PB_3,
-    D4          = PB_5,
-    D5          = PB_4,
-    D6          = PB_10,
-    D7          = PA_8,
-    D8          = PA_9,
-    D9          = PC_7,
-    D10         = PB_6,
-    D11         = PA_7,
-    D12         = PA_6,
-    D13         = PA_5,
-    D14         = PB_9,
-    D15         = PB_8,
+    // COMMON PIN MAPPINGS FOR ROVER BOARDS
+#ifdef ROVERBOARD_COMMON_PINMAP
+    LED1 = PC_0,
+    LED2 = PC_1,
+    LED3 = PC_2,
+    LED4 = PC_3,
+#endif
+
+    // ARM BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_ARM_PINMAP
+#endif
+
+    // SCIENCE BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_SCIENCE_PINMAP
+#endif
+
+    // SAFETY BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_SAFETY_PINMAP
+#endif
+
+    // NUCLEO BOARD PIN MAPPINGS
+#ifdef NUCLEO_PINMAP
 
     // STDIO for console print
 #ifdef MBED_CONF_TARGET_STDIO_UART_TX
@@ -193,6 +192,8 @@ typedef enum {
     SYS_WKUP5 = PC_5,
     SYS_WKUP6 = PB_5,
     SYS_WKUP7 = PB_15,
+
+#endif
 
     // Not connected
     NC = (int)0xFFFFFFFF
