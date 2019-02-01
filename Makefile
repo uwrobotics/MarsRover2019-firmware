@@ -51,7 +51,7 @@ PROJECT := mbed_blinky
 ###############################################################################
 # Objects and Paths
 
-OBJECTS += test/blinky/main.o
+OBJECTS += app/test_blinky/src/main.o
 
  SYS_OBJECTS += $(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM/PeripheralPins.o
  SYS_OBJECTS += $(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM/analogin_api.o
