@@ -3,6 +3,7 @@
 
 APP_PATH := app/$(APP)
 BUILD_PATH := build
+APP_OUT_PATH := $(BUILD_PATH)/$(APP)
 LIB_DIR := lib
 CONFIG_DIR := config
 
@@ -21,7 +22,6 @@ endif
 
 OBJDIR := $(BUILD_PATH)
 
-$(info $(APP)) 
 # Move to the build directory
 ifeq (,$(filter $(BUILD_PATH),$(notdir $(CURDIR))))
 .SUFFIXES:
@@ -86,6 +86,8 @@ LD      = arm-none-eabi-gcc
 ELF2BIN = arm-none-eabi-objcopy
 PREPROC = arm-none-eabi-cpp -E -P -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,_malloc_r -Wl,--wrap,_free_r -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb
 
+COMMON_FLAGS += -include
+COMMON_FLAGS += ../../$(CONFIG_DIR)/mbed_config.h
 COMMON_FLAGS += -c
 COMMON_FLAGS += -Wall
 COMMON_FLAGS += -Wextra
@@ -106,8 +108,6 @@ COMMON_FLAGS += -mcpu=cortex-m0
 COMMON_FLAGS += -mthumb
 
 C_FLAGS += -std=gnu99
-C_FLAGS += -include
-C_FLAGS += ../../$(CONFIG_DIR)/mbed_config.h
 C_FLAGS += -DROVERBOARD_COMMON_PINMAP
 C_FLAGS += -D__CORTEX_M0
 C_FLAGS += -DMBED_BUILD_TIMESTAMP=1548889013.95
@@ -157,15 +157,11 @@ C_FLAGS += -DDEVICE_SERIAL=1
 C_FLAGS += -DTARGET_STM32F091RC
 C_FLAGS += -DDEVICE_FLASH=1
 C_FLAGS += -DTARGET_LIKE_CORTEX_M0
-C_FLAGS += -include
-C_FLAGS += ../../$(CONFIG_DIR)/mbed_config.h
 C_FLAGS += $(COMMON_FLAGS)
 
 CXX_FLAGS += -std=gnu++98
 CXX_FLAGS += -fno-rtti
 CXX_FLAGS += -Wvla
-CXX_FLAGS += -include
-CXX_FLAGS += ../../$(CONFIG_DIR)/mbed_config.h
 CXX_FLAGS += -DROVERBOARD_COMMON_PINMAP
 CXX_FLAGS += -D__CORTEX_M0
 CXX_FLAGS += -DMBED_BUILD_TIMESTAMP=1548889013.95
@@ -215,8 +211,6 @@ CXX_FLAGS += -DDEVICE_SERIAL=1
 CXX_FLAGS += -DTARGET_STM32F091RC
 CXX_FLAGS += -DDEVICE_FLASH=1
 CXX_FLAGS += -DTARGET_LIKE_CORTEX_M0
-CXX_FLAGS += -include
-CXX_FLAGS += ../../$(CONFIG_DIR)/mbed_config.h
 CXX_FLAGS += -std=gnu++98
 CXX_FLAGS += -fno-rtti
 CXX_FLAGS += -Wvla
@@ -231,21 +225,7 @@ ASM_FLAGS += -DARM_MATH_CM0
 ASM_FLAGS += -D__MBED_CMSIS_RTOS_CM
 ASM_FLAGS += -DCMSIS_VECTAB_VIRTUAL_HEADER_FILE="cmsis_nvic.h"
 ASM_FLAGS += -D__CMSIS_RTOS
-ASM_FLAGS += -I../$(CONFIG_DIR)/.
-ASM_FLAGS += -I../$(LIB_DIR)/.
-ASM_FLAGS += -I../$(LIB_DIR)/mbed
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/device
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/device
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/drivers
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/hal
-ASM_FLAGS += -I../$(LIB_DIR)/mbed/platform
-ASM_FLAGS += -include
-ASM_FLAGS += -x
-ASM_FLAGS += assembler-with-cpp
+ASM_FLAGS += INCLUDE_PATHS
 ASM_FLAGS += $(COMMON_FLAGS)
 
 
@@ -265,17 +245,12 @@ all: $(PROJECT).bin $(PROJECT).hex size
 .s.o:
 	+@$(call MAKEDIR,$(dir $@))
 	+@echo "Assemble: $(notdir $<)"
-  
 	@$(AS) -c $(ASM_FLAGS) -o $@ $<
-  
-
 
 .S.o:
 	+@$(call MAKEDIR,$(dir $@))
 	+@echo "Assemble: $(notdir $<)"
-  
 	@$(AS) -c $(ASM_FLAGS) -o $@ $<
-  
 
 .c.o:
 	+@$(call MAKEDIR,$(dir $@))
