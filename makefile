@@ -9,16 +9,15 @@ CONFIG_PATH  := ../config
 
 
 ###############################################################################
-# Boiler-plate
 
 # cross-platform directory manipulation
 ifeq ($(shell echo $$OS),$$OS)
-    MAKED_DIR = if not exist "$(1)" mkdir "$(1)"
+    MAKE_DIR = if not exist "$(1)" mkdir "$(1)"
     RM_DIR = rmdir /S /Q "$(1)"
     RM_FILE_TYPE = del /S /Q "$(1)"
 
 else
-    MAKED_DIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
+    MAKE_DIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
     RM_DIR = '$(SHELL)' -c "rm -rfv \"$(1)\""
     RM_FILE_TYPE = '$(SHELL)' -c "find $(1) -name \"$(2)\" -delete -print"
 endif
@@ -31,10 +30,15 @@ MAKETARGET = '$(MAKE)' --no-print-directory -C $(BUILD_PATH) -f '$(mkfile_path)'
 		'SRCDIR=$(CURDIR)' $(MAKECMDGOALS)
 .PHONY: $(BUILD_PATH) clean
 all:
-	+@$(call MAKED_DIR,$(BUILD_PATH))
+ifeq ($(APP),)
+	$(error APP is not set. Select an app to build with APP=app_name $(APP))
+endif
+	+@$(call MAKE_DIR,$(BUILD_PATH)/$(APP))
 	+@$(MAKETARGET)
 $(BUILD_PATH): all
 Makefile : ;
+% :: $(BUILD_PATH) ; :
+makefile : ;
 % :: $(BUILD_PATH) ; :
 clean :
 	$(call RM_DIR,$(BUILD_PATH))
@@ -50,8 +54,7 @@ VPATH = ..
 ###############################################################################
 # Project settings
 
-PROJECT := mbed_blinky
-
+PROJECT := $(APP)
 
 # Project settings
 ###############################################################################
@@ -256,45 +259,45 @@ LD_SYS_LIBS := -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys -lmbed 
 .PHONY: all lst size
 
 
-all: $(PROJECT).bin $(PROJECT).hex size
+all: $(APP_OUT_PATH)/$(PROJECT).bin $(APP_OUT_PATH)/$(PROJECT).hex size
 
 
 .s.o:
-	+@$(call MAKED_DIR,$(dir $@))
+	+@$(call MAKE_DIR,$(dir $@))
 	+@echo "Assemble: $(notdir $<)"
 	@$(AS) -c $(ASM_FLAGS) -o $@ $<
 
 .S.o:
-	+@$(call MAKED_DIR,$(dir $@))
+	+@$(call MAKE_DIR,$(dir $@))
 	+@echo "Assemble: $(notdir $<)"
 	@$(AS) -c $(ASM_FLAGS) -o $@ $<
 
 .c.o:
-	+@$(call MAKED_DIR,$(dir $@))
+	+@$(call MAKE_DIR,$(dir $@))
 	+@echo "Compile: $(notdir $<)"
 	@$(CC) $(C_FLAGS) $(INCLUDE_PATHS) -o $@ $<
 
 .cpp.o:
-	+@$(call MAKED_DIR,$(dir $@))
+	+@$(call MAKE_DIR,$(dir $@))
 	+@echo "Compile: $(notdir $<)"
 	@$(CPP) $(CXX_FLAGS) $(INCLUDE_PATHS) -o $@ $<
 
 
-$(PROJECT).link_script.ld: $(LINKER_SCRIPT)
+$(APP_OUT_PATH)/$(PROJECT).link_script.ld: $(LINKER_SCRIPT)
 	@$(PREPROC) $< -o $@
 
 
 
-$(PROJECT).elf: $(OBJECTS) $(MBED_OBJECTS) $(PROJECT).link_script.ld 
+$(APP_OUT_PATH)/$(PROJECT).elf: $(OBJECTS) $(MBED_OBJECTS) $(APP_OUT_PATH)/$(PROJECT).link_script.ld 
 	+@echo "link: $(notdir $@)"
 	@$(LD) $(LD_FLAGS) -T $(filter-out %.o, $^) $(LIBRARY_PATHS) --output $@ $(filter %.o, $^) $(LIBRARIES) $(LD_SYS_LIBS)
 
 
-$(PROJECT).bin: $(PROJECT).elf
+$(APP_OUT_PATH)/$(PROJECT).bin: $(APP_OUT_PATH)/$(PROJECT).elf
 	$(ELF2BIN) -O binary $< $@
 	+@echo "===== bin file ready to flash: $(BUILD_PATH)/$@ =====" 
 
-$(PROJECT).hex: $(PROJECT).elf
+$(APP_OUT_PATH)/$(PROJECT).hex: $(APP_OUT_PATH)/$(PROJECT).elf
 	$(ELF2BIN) -O ihex $< $@
 
 
