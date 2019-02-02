@@ -1,3 +1,9 @@
 *~
 .vscode
-build/
+
+build
+
+*.o
+*.d
+
+!lib
