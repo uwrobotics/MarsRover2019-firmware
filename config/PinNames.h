@@ -129,10 +129,22 @@ typedef enum {
 
     // COMMON PIN MAPPINGS FOR ROVER BOARDS
 #ifdef ROVERBOARD_COMMON_PINMAP
+
+    // LEDs
     LED1 = PC_0,
     LED2 = PC_1,
     LED3 = PC_2,
     LED4 = PC_3,
+
+    // CAN
+    CAN_RX = PB_8,
+    CAN_TX = PB_9,
+
+    // Serial
+    SERIAL_TX = PC_10,
+    SERIAL_RX = PC_11,
+    SERIAL_RTS = PD_2,
+
 #endif
 
     // ARM BOARD PIN MAPPINGS
