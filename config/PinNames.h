@@ -38,6 +38,11 @@
 extern "C" {
 #endif
 
+// GPIO definitions
+#define CAN_GPIO_RX_PIN     GPIO_PIN_8
+#define CAN_GPIO_TX_PIN     GPIO_PIN_9
+#define CAN_GPIO_PORT       GPIOB
+
 typedef enum {
     ALT0  = 0x100,
     ALT1  = 0x200,

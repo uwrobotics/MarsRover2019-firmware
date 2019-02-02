@@ -69,8 +69,8 @@ LIB_SRC_CPP = $(wildcard $(LIB_PATH)/*/src/*.cpp)
 APP_INC = -I$(APP_PATH)/inc
 LIB_INC = $(addprefix -I,$(wildcard $(LIB_PATH)/*/inc))
 
-SRC_FILES_C   = $(APP_SRC_C)   $(LIB_SRC_C)   $(MBED_SRC_C)
-SRC_FILES_CPP = $(APP_SRC_CPP) $(LIB_SRC_CPP) $(MBED_SRC_CPP)
+SRC_FILES_C   = $(APP_SRC_C)   $(LIB_SRC_C)
+SRC_FILES_CPP = $(APP_SRC_CPP) $(LIB_SRC_CPP)
 
 OBJECTS += $(SRC_FILES_C:.c=.o) $(SRC_FILES_CPP:.cpp=.o)
 
