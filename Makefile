@@ -40,7 +40,7 @@ clean :
 
 else
 
-# trick rules into thinking we are in the root, when we are in the bulid dir
+# Trick rules into thinking we are in the root, when we are in the bulid dir
 VPATH = ..
 
 # Boiler-plate
@@ -54,22 +54,36 @@ PROJECT := mbed_blinky
 ###############################################################################
 # Objects and Paths
 
-OBJECTS += app/test_blinky/src/main.o
+APP_SRC_C = $(wildcard ../$(APP_PATH)/src/*.c)
+LIB_SRC_C = $(wildcard ../$(LIB_PATH)/*/src/*.c)
 
-SYS_OBJECTS += $(wildcard ../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM/*.o)
+APP_SRC_CPP = $(wildcard ../$(APP_PATH)/src/*.cpp)
+LIB_SRC_CPP = $(wildcard ../$(LIB_PATH)/*/src/*.cpp)
+
+APP_INC = -I../$(APP_PATH)/inc
+LIB_INC = $(addprefix -I,$(wildcard ../$(LIB_PATH)/*/inc))
+
+SRC_FILES_C   = $(APP_SRC_C)   $(LIB_SRC_C)   $(MBED_SRC_C)
+SRC_FILES_CPP = $(APP_SRC_CPP) $(LIB_SRC_CPP) $(MBED_SRC_CPP)
+
+OBJECTS += $(SRC_FILES_C:.c=.o) $(SRC_FILES_CPP:.cpp=.o)
+
+MBED_OBJECTS += $(wildcard ../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM/*.o)
+
+MBED_INC += -I../$(LIB_DIR)/mbed
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/device
+MBED_INC += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/device
+MBED_INC += -I../$(LIB_DIR)/mbed/drivers
+MBED_INC += -I../$(LIB_DIR)/mbed/hal
+MBED_INC += -I../$(LIB_DIR)/mbed/platform
 
 INCLUDE_PATHS += -I../$(CONFIG_DIR)/.
 INCLUDE_PATHS += -I../$(LIB_DIR)/.
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/device
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/device
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/drivers
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/hal
-INCLUDE_PATHS += -I../$(LIB_DIR)/mbed/platform
+INCLUDE_PATHS += $(MBED_INC) $(LIB_INC) $(MBED_INC)
 
 LIBRARY_PATHS := -L../$(LIB_DIR)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM 
 LIBRARIES := -lmbed 
@@ -268,7 +282,7 @@ $(PROJECT).link_script.ld: $(LINKER_SCRIPT)
 
 
 
-$(PROJECT).elf: $(OBJECTS) $(SYS_OBJECTS) $(PROJECT).link_script.ld 
+$(PROJECT).elf: $(OBJECTS) $(MBED_OBJECTS) $(PROJECT).link_script.ld 
 	+@echo "link: $(notdir $@)"
 	@$(LD) $(LD_FLAGS) -T $(filter-out %.o, $^) $(LIBRARY_PATHS) --output $@ $(filter %.o, $^) $(LIBRARIES) $(LD_SYS_LIBS)
 
@@ -285,7 +299,7 @@ $(PROJECT).hex: $(PROJECT).elf
 ###############################################################################
 # Dependencies
 
-DEPS = $(OBJECTS:.o=.d) $(SYS_OBJECTS:.o=.d)
+DEPS = $(OBJECTS:.o=.d) $(MBED_OBJECTS:.o=.d)
 -include $(DEPS)
 endif
 
