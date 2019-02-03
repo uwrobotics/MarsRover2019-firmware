@@ -56,10 +56,10 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
     `make APP=science PINMAP=science`
 
     Ex. Compile the CAN test application for the nucleo development board:  
-    `make APP=test_can PINMAP=nucleo`
+    `make APP=test_i2c PINMAP=nucleo`
 
     Ex. Compile the I2C test application for the safety board:  
-    `make APP=test_i2c PINMAP=safety`
+    `make APP=test_can PINMAP=safety`
 
 5. Deploy onto board
 
