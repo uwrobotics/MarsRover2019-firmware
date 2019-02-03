@@ -67,11 +67,10 @@
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/device/cmsis_nvic.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/PortNames.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/PeripheralNames.h \
- ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/PinNames.h \
+ ../config/./PinNames.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/PinNamesTypes.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/common_objects.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/TARGET_STM32F0/TARGET_NUCLEO_F091RC/PeripheralNames.h \
- ../config/./PinNames.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/gpio_object.h \
  ../lib/mbed/platform/mbed_assert.h \
  ../lib/mbed/TARGET_NUCLEO_F091RC/TARGET_STM/PortNames.h \

@@ -71,7 +71,6 @@ typedef enum {
     PA_13 = 0x0D,
     PA_14 = 0x0E,
     PA_15 = 0x0F,
-
     PB_0  = 0x10,
     PB_0_ALT0 = PB_0 | ALT0,
     PB_1  = 0x11,
@@ -127,6 +126,33 @@ typedef enum {
     ADC_VREF = 0xF1,
     ADC_VBAT = 0xF2,
 
+    // ARM BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_ARM_PINMAP
+#define ROVERBOARD_COMMON_PINMAP
+
+    // I2C
+    I2C_SCL     = PB_6,
+    I2C_SDA     = PB_7,
+#endif
+
+    // SCIENCE BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_SCIENCE_PINMAP
+#define ROVERBOARD_COMMON_PINMAP
+
+
+    
+#endif
+
+    // SAFETY BOARD PIN MAPPINGS
+#ifdef ROVERBOARD_SAFETY_PINMAP
+#define ROVERBOARD_COMMON_PINMAP
+
+    // I2C
+    I2C_SCL     = PB_6,
+    I2C_SDA     = PB_7,
+
+#endif
+
     // COMMON PIN MAPPINGS FOR ROVER BOARDS
 #ifdef ROVERBOARD_COMMON_PINMAP
 
@@ -145,18 +171,6 @@ typedef enum {
     SERIAL_RX = PC_11,
     SERIAL_RTS = PD_2,
 
-#endif
-
-    // ARM BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_ARM_PINMAP
-#endif
-
-    // SCIENCE BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_SCIENCE_PINMAP
-#endif
-
-    // SAFETY BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_SAFETY_PINMAP
 #endif
 
     // NUCLEO BOARD PIN MAPPINGS

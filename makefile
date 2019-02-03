@@ -7,14 +7,13 @@ APP_PATH     := ../app/$(APP)
 LIB_PATH     := ../lib
 CONFIG_PATH  := ../config
 
-
 ###############################################################################
 
-# cross-platform directory manipulation
+# Cross-platform directory manipulation
 ifeq ($(shell echo $$OS),$$OS)
     MAKE_DIR = if not exist "$(1)" mkdir "$(1)"
     RM_DIR = rmdir /S /Q "$(1)"
-    RM_FILE_TYPE = del /S /Q "$(1)"
+    RM_FILE_TYPE = del /S /Q "$(1)" "$(2)"
 
 else
     MAKE_DIR = '$(SHELL)' -c "mkdir -p \"$(1)\""
@@ -44,6 +43,11 @@ clean :
 	$(call RM_DIR,$(BUILD_PATH))
 	$(call RM_FILE_TYPE,app,*.o)
 	$(call RM_FILE_TYPE,app,*.d)
+clean-lib: 
+	$(call RM_FILE_TYPE,lib/can,*.d)
+	$(call RM_FILE_TYPE,lib/can,*.o)
+	$(call RM_FILE_TYPE,lib/encoder,*.d)
+	$(call RM_FILE_TYPE,lib/encoder,*.o)
 
 else
 
@@ -89,7 +93,7 @@ MBED_INC += -I$(LIB_PATH)/mbed/platform
 
 INCLUDE_PATHS += -I$(CONFIG_PATH)/.
 INCLUDE_PATHS += -I$(LIB_PATH)/.
-INCLUDE_PATHS += $(MBED_INC) $(LIB_INC) $(MBED_INC)
+INCLUDE_PATHS += $(LIB_INC) $(MBED_INC)
 
 LIBRARY_PATHS := -L$(LIB_PATH)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM 
 LIBRARIES := -lmbed 
