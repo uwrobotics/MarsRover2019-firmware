@@ -19,6 +19,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
   - Adding `Fixes #1: ...` will automatically closes the associated issue, in this example issue #1
 - Clean binaries between making changes to the makefile
 - There seems to be an annoying mix of CamelCase and snake_case in MBED but just try to be consistent with whatever code is nearby
+- Squash when merging pull requests
 
 ## UWRT Firmware Development Instructions
 
