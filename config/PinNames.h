@@ -131,8 +131,19 @@ typedef enum {
 #define ROVERBOARD_COMMON_PINMAP
 
     // I2C
-    I2C_SCL     = PB_6,
-    I2C_SDA     = PB_7,
+    I2C_SCL = PB_6,
+    I2C_SDA = PB_7,
+
+    // PWM Encoders
+    ENC_TT = PC_9,
+    ENC_SH = PA_9,
+    ENC_EL = PA_10,
+
+    // Quadrature Encoders
+    ENCR1_CH1 = PA_7,
+    ENCR1_CH2 = PC_4,
+    ENCR1_INDEX = PC_5,
+    
 #endif
 
     // SCIENCE BOARD PIN MAPPINGS
@@ -148,8 +159,8 @@ typedef enum {
 #define ROVERBOARD_COMMON_PINMAP
 
     // I2C
-    I2C_SCL     = PB_6,
-    I2C_SDA     = PB_7,
+    I2C_SCL = PB_6,
+    I2C_SDA = PB_7,
 
 #endif
 
