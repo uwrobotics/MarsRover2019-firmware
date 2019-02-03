@@ -43,7 +43,6 @@ clean :
 	$(call RM_DIR,$(BUILD_PATH))
 	$(call RM_FILE_TYPE,app,*.o)
 	$(call RM_FILE_TYPE,app,*.d)
-clean-lib: 
 	$(call RM_FILE_TYPE,lib/can,*.d)
 	$(call RM_FILE_TYPE,lib/can,*.o)
 	$(call RM_FILE_TYPE,lib/encoder,*.d)

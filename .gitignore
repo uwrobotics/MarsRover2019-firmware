@@ -6,4 +6,4 @@ build
 *.o
 *.d
 
-!lib
+!lib/mbed
