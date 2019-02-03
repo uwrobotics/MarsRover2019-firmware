@@ -14,6 +14,9 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 - Create a branch in the format `yourName/featureName` for every feature you are working on
 - Rebase onto master and test on hardware before merging into master
 - Create a pull request to merge any branch into master and select everyone else working on the feature as reviewers
+  - Name the pull request `issueNumber: FeatureTitle`
+- When merging a pull request that fixes an issue title the commit `Fixes #issueNumber: FeatureTitle`
+  - Adding `Fixes #1: ...` will automatically closes the associated issue, in this example issue #1
 - Clean binaries between making changes to the makefile
 
 ## UWRT Firmware Development Instructions
