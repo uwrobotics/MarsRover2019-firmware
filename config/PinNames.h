@@ -140,7 +140,7 @@ typedef enum {
 #define ROVERBOARD_COMMON_PINMAP
 
 
-    
+
 #endif
 
     // SAFETY BOARD PIN MAPPINGS

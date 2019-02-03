@@ -21,7 +21,7 @@ extern "C" {
 #include "PinNames.h"
 
 DigitalOut led1(PC_0);
-Serial pc(USBTX, USBRX);
+Serial pc(SERIAL_TX, SERIAL_RX);
 
 int main()
 {

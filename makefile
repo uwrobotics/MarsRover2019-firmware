@@ -64,14 +64,14 @@ PROJECT := $(APP)
 ###############################################################################
 # Objects and Paths
 
-APP_SRC_C = $(wildcard $(APP_PATH)/src/*.c)
-LIB_SRC_C = $(wildcard $(LIB_PATH)/*/src/*.c)
+APP_SRC_C += $(wildcard $(APP_PATH)/src/*.c)
+LIB_SRC_C += $(wildcard $(LIB_PATH)/*/src/*.c)
 
-APP_SRC_CPP = $(wildcard $(APP_PATH)/src/*.cpp)
-LIB_SRC_CPP = $(wildcard $(LIB_PATH)/*/src/*.cpp)
+APP_SRC_CPP += $(wildcard $(APP_PATH)/src/*.cpp)
+LIB_SRC_CPP += $(wildcard $(LIB_PATH)/*/src/*.cpp)
 
-APP_INC = -I$(APP_PATH)/inc
-LIB_INC = $(addprefix -I,$(wildcard $(LIB_PATH)/*/inc))
+APP_INC += -I$(APP_PATH)/inc
+LIB_INC += $(addprefix -I,$(wildcard $(LIB_PATH)/*/inc))
 
 SRC_FILES_C   = $(APP_SRC_C)   $(LIB_SRC_C)
 SRC_FILES_CPP = $(APP_SRC_CPP) $(LIB_SRC_CPP)
@@ -95,20 +95,33 @@ INCLUDE_PATHS += -I$(CONFIG_PATH)/.
 INCLUDE_PATHS += -I$(LIB_PATH)/.
 INCLUDE_PATHS += $(LIB_INC) $(MBED_INC)
 
-LIBRARY_PATHS := -L$(LIB_PATH)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM 
-LIBRARIES := -lmbed 
+LIBRARY_PATHS += -L$(LIB_PATH)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM 
+LIBRARIES += -lmbed 
 LINKER_SCRIPT ?= $(LIB_PATH)/mbed/TARGET_NUCLEO_F091RC/TOOLCHAIN_GCC_ARM/STM32F091XC.ld
 
 # Objects and Paths
 ###############################################################################
 # Tools and Flags
 
-AS      = arm-none-eabi-gcc
-CC      = arm-none-eabi-gcc
-CPP     = arm-none-eabi-g++
-LD      = arm-none-eabi-gcc
-ELF2BIN = arm-none-eabi-objcopy
-PREPROC = arm-none-eabi-cpp -E -P -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,_malloc_r -Wl,--wrap,_free_r -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb
+AS      := arm-none-eabi-gcc
+CC      := arm-none-eabi-gcc
+CPP     := arm-none-eabi-g++
+LD      := arm-none-eabi-gcc
+ELF2BIN := arm-none-eabi-objcopy
+
+PREPROC := arm-none-eabi-cpp -E -P -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,_malloc_r \
+		   -Wl,--wrap,_free_r -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r \
+		   -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb
+
+ifeq ($(PINMAP),nucleo)
+	COMMON_FLAGS += -DNUCLEO_PINMAP
+else ifeq ($(PINMAP),arm)
+	COMMON_FLAGS += -DROVERBOARD_ARM_PINMAP
+else ifeq ($(PINMAP),science)
+	COMMON_FLAGS += -DROVERBOARD_SCIENCE_PINMAP
+else ifeq ($(PINMAP),safety)
+	COMMON_FLAGS += -DROVERBOARD_SAFETY_PINMAP
+endif
 
 COMMON_FLAGS += -include
 COMMON_FLAGS += ../$(CONFIG_PATH)/mbed_config.h
@@ -132,7 +145,6 @@ COMMON_FLAGS += -mcpu=cortex-m0
 COMMON_FLAGS += -mthumb
 
 C_FLAGS += -std=gnu99
-C_FLAGS += -DROVERBOARD_COMMON_PINMAP
 C_FLAGS += -D__CORTEX_M0
 C_FLAGS += -DMBED_BUILD_TIMESTAMP=1548889013.95
 C_FLAGS += -DCMSIS_VECTAB_VIRTUAL
@@ -186,7 +198,6 @@ C_FLAGS += $(COMMON_FLAGS)
 CXX_FLAGS += -std=gnu++98
 CXX_FLAGS += -fno-rtti
 CXX_FLAGS += -Wvla
-CXX_FLAGS += -DROVERBOARD_COMMON_PINMAP
 CXX_FLAGS += -D__CORTEX_M0
 CXX_FLAGS += -DMBED_BUILD_TIMESTAMP=1548889013.95
 CXX_FLAGS += -DCMSIS_VECTAB_VIRTUAL
@@ -253,7 +264,10 @@ ASM_FLAGS += INCLUDE_PATHS
 ASM_FLAGS += $(COMMON_FLAGS)
 
 
-LD_FLAGS := -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,_malloc_r -Wl,--wrap,_free_r -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb 
+LD_FLAGS := -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,_malloc_r -Wl,--wrap,_free_r \
+            -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r -Wl,--wrap,exit \
+            -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb 
+
 LD_SYS_LIBS := -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys -lmbed -Wl,--end-group
 
 # Tools and Flags
