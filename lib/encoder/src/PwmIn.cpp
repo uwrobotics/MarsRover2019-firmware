@@ -23,8 +23,8 @@
 #include "PwmIn.h"
 
 PwmIn::PwmIn(PinName p) : _p(p) {
-    _p.rise(callback(this, &PwmIn::rise));
-    _p.fall(callback(this, &PwmIn::fall));
+    _p.rise(this, &PwmIn::rise);
+    _p.fall(this, &PwmIn::fall);
     _period = 0.0;
     _pulsewidth = 0.0;
     _t.start();
@@ -42,15 +42,11 @@ float PwmIn::dutycycle() {
     return _pulsewidth / _period;
 }
 
-int PwmIn::get12BitState() {
-    return int((_pulsewidth / _period) * 4098) - 1;
-}
-
 void PwmIn::rise() {
-    _period = _t.read_us();
+    _period = _t.read();
     _t.reset();
 }
 
 void PwmIn::fall() {
-    _pulsewidth = _t.read_us();
+    _pulsewidth = _t.read();
 }

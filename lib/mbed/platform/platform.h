@@ -29,7 +29,6 @@
 #include "device.h"
 #include "PinNames.h"
 #include "PeripheralNames.h"
-#include "mbed_config.h"//Jerry
 
 #endif
 

@@ -1,11 +1,20 @@
 # MarsRover2019-firmware
 
+## Platform: STM32F091 / NUCLEO-F091RC
+
 Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 - mbed library
+- additional external libaries
 - additional libraries written by the team
-- application code running on each board
+- test applications for testing code components
+- applications for running on each board
 
-## Board: STM32F091 / NUCLEO-F091RC
+## Best Contribution Practices and Tips
+
+- Create a branch in the format `yourName/featureName` for every feature you are working on
+- Rebase onto master and test on hardware before merging into master
+- Create a pull request to merge any branch into master and select everyone else working on the feature as reviewers
+- Clean binaries between making changes to the makefile
 
 ## UWRT Firmware Development Instructions
 
@@ -19,10 +28,10 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
     - `sudo apt-get install gcc-arm-none-eabi`
 		
 	For Windows
-    - download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
-    - download [gcc-arm-none-eabi for windows](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) (windows 32 bit)
-    - add gcc .exe files to path (usually `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
-    - add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`)
+    - Download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
+    - Download [gcc-arm-none-eabi for windows](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) (windows 32 bit)
+    - Add gcc .exe files to path (usually `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
+    - Add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`)
 	
 	For Mac
     - Open Command Line
@@ -33,13 +42,24 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
 	
-3. change directory into app/blinky
+3. Change directory into root directory
 
-    `cd MarsRover2019-firmware/app/blinky`
-4. run make
+    `cd MarsRover2019-firmware`
 
-    `make`
+4. Run make with the target pin mapping and application
+
+    Ex. Compile the science application for the science board:  
+    `make APP=science PINMAP=science`
+
+    Ex. Compile the CAN test application for the nucleo development board:  
+    `make APP=test_can PINMAP=nucleo`
+
+    Ex. Compile the I2C test application for the safety board:  
+    `make APP=test_i2c PINMAP=safety`
+
 5. Deploy onto board
+
+    Find the application .bin file, located in the build/app directory.
 
 	For Ubuntu 16.04
 		

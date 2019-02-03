@@ -26,6 +26,11 @@ typedef int FILEHANDLE;
 
 namespace mbed {
 /** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_FileHandle FileHandle functions
+ * @{
+ */
 
 
 /** Class FileHandle
@@ -36,7 +41,6 @@ namespace mbed {
  *
  *  @note to create a file, @see File
  *  @note Synchronization level: Set by subclass
- *  @ingroup platform
  */
 class FileHandle : private NonCopyable<FileHandle> {
 public:
@@ -47,7 +51,7 @@ public:
      *  Devices acting as FileHandles should follow POSIX semantics:
      *
      *  * if no data is available, and non-blocking set return -EAGAIN
-     *  * if no data is available, and blocking set, wait until data is available
+     *  * if no data is available, and blocking set, wait until some data is available
      *  * If any data is available, call returns immediately
      *
      *  @param buffer   The buffer to read in to
@@ -58,8 +62,14 @@ public:
 
     /** Write the contents of a buffer to a file
      *
+     *  Devices acting as FileHandles should follow POSIX semantics:
+     *
+     * * if blocking, block until all data is written
+     * * if no data can be written, and non-blocking set, return -EAGAIN
+     * * if some data can be written, and non-blocking set, write partial
+     *
      *  @param buffer   The buffer to write from
-     *  @param size     The number of bytes to write 
+     *  @param size     The number of bytes to write
      *  @return         The number of bytes written, negative error on failure
      */
     virtual ssize_t write(const void *buffer, size_t size) = 0;
@@ -136,6 +146,8 @@ public:
      *  @returns
      *    new file position on success,
      *    -1 on failure or unsupported
+     *  @deprecated Replaced by `off_t FileHandle::seek(off_t offset, int whence = SEEK_SET)'
+     *
      */
     MBED_DEPRECATED_SINCE("mbed-os-5.4", "Replaced by FileHandle::seek")
     virtual off_t lseek(off_t offset, int whence)
@@ -149,6 +161,7 @@ public:
      *  @returns
      *    0 on success or un-needed,
      *   -1 on error
+     *  @deprecated Replaced by `int FileHandle::sync()'
      */
     MBED_DEPRECATED_SINCE("mbed-os-5.4", "Replaced by FileHandle::sync")
     virtual int fsync()
@@ -160,6 +173,7 @@ public:
      *
      *  @returns
      *   Length of the file
+     *  @deprecated Replaced by `off_t FileHandle::size()'
      */
     MBED_DEPRECATED_SINCE("mbed-os-5.4", "Replaced by FileHandle::size")
     virtual off_t flen()
@@ -178,7 +192,16 @@ public:
      */
     virtual int set_blocking(bool blocking)
     {
-        return -1;
+        return blocking ? 0 : -ENOTTY;
+    }
+
+    /** Check current blocking or non-blocking mode for file operations.
+     *
+     *  @return             true for blocking mode, false for non-blocking mode.
+     */
+    virtual bool is_blocking() const
+    {
+        return true;
     }
 
     /** Check for poll event flags
@@ -242,17 +265,10 @@ public:
     }
 };
 
-/** Not a member function
- *  This call is equivalent to posix fdopen().
- *  It associates a Stream to an already opened file descriptor (FileHandle)
- *
- *  @param fh       a pointer to an opened file descriptor
- *  @param mode     operation upon the file descriptor, e.g., 'wb+'
- *
- *  @returns        a pointer to std::FILE
-*/
+/**@}*/
 
-std::FILE *fdopen(FileHandle *fh, const char *mode);
+/**@}*/
+
 
 } // namespace mbed
 

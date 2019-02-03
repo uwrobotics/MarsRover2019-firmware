@@ -25,6 +25,11 @@
 
 namespace mbed {
 /** \addtogroup platform */
+/** @{*/
+/**
+ * \defgroup platform_FileSystemLike FileSystemLike functions
+ * @{
+ */
 
 
 /** A filesystem-like object is one that can be used to open file-like
@@ -34,7 +39,6 @@ namespace mbed {
  *  of the rest of the functions just return error values).
  *
  * @note Synchronization level: Set by subclass
- * @ingroup platform
  */
 class FileSystemLike : public FileSystemHandle, public FileBase, private NonCopyable<FileSystemLike> {
 public:
@@ -55,7 +59,7 @@ public:
      *  @deprecated Replaced by `int open(FileHandle **, ...)` for propagating error codes
      */
     MBED_DEPRECATED_SINCE("mbed-os-5.5",
-        "Replaced by `int open(FileHandle **, ...)` for propagating error codes")
+                          "Replaced by `int open(FileHandle **, ...)` for propagating error codes")
     FileHandle *open(const char *path, int flags)
     {
         FileHandle *file;
@@ -70,7 +74,7 @@ public:
      *  @deprecated Replaced by `int open(DirHandle **, ...)` for propagating error codes
      */
     MBED_DEPRECATED_SINCE("mbed-os-5.5",
-        "Replaced by `int open(DirHandle **, ...)` for propagating error codes")
+                          "Replaced by `int open(DirHandle **, ...)` for propagating error codes")
     DirHandle *opendir(const char *path)
     {
         DirHandle *dir;
@@ -79,6 +83,9 @@ public:
     }
 };
 
+/**@}*/
+
+/**@}*/
 
 } // namespace mbed
 
