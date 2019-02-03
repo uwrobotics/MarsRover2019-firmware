@@ -1,13 +1,13 @@
 # MarsRover2019-firmware
 
+## Platform: STM32F091 / NUCLEO-F091RC
+
 Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 - mbed library
 - additional external libaries
 - additional libraries written by the team
 - test applications for testing code components
 - applications for running on each board
-
-## Board: STM32F091 / NUCLEO-F091RC
 
 ## Best Contribution Practices and Tips
 
