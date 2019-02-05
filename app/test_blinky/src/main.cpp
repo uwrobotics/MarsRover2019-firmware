@@ -12,22 +12,22 @@ int main() {
 
     	// Trigger the four LEDs one after the other
     	switch (count) {
-    		case 0: 
-    			ledA = 1;
+    		case 1: 
+    			ledA = ;
     			ledD = 0;
     			break;
-    		case 1:
+    		case 2:
     			ledB = 1;
     			ledA = 0;
     			break;
-    		case 2:
+    		case 3:
     			ledC = 1;
     			ledB = 0;
                 break;
-    		case 3:
+    		case 4:
     			ledD = 1;
     			ledC = 0;
-    			count = -1;
+    			count = 0;
     			break;
     	}
 
