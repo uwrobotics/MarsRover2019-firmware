@@ -80,7 +80,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
 	For Mac
     - Drag and Drop .bin file into NODE_F091RC disk (Will show up like other usb devices after connecting) or run `cp build/blinky_out.bin /Volumes/NODE_F091RC/`
     
-# Debugger Connections (using the Nucleo development board to program the rover boards)
+## Using the Nucleo Dev Board to Program the Rover Boards
 
 In order to use the Nucleo development board as a programmer, the two jumpers labelled NUCLEO - ST-LINK will need to be removed. This will sever the ST-LINK debugger portion of the Nucleo from the MCU side, allowing it to be used as a general debugger.
 
