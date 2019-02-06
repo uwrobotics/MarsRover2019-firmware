@@ -23,7 +23,7 @@ int main() {
     		case 3:
     			ledC = 1;
     			ledB = 0;
-                break;
+                	break;
     		case 4:
     			ledD = 1;
     			ledC = 0;
