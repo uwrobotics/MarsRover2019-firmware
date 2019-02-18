@@ -1,7 +1,15 @@
 *~
 .vscode
 
-build
+# Ignore CLion files
+app/*/.idea/*
+app/*/.idea/*/*
+app/*/.settings
+app/*/.cproject
+app/*/.project
+.idea/*
+.idea/*/*
 
+build
 *.o
 *.d
