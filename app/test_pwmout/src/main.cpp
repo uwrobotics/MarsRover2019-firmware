@@ -1,12 +1,31 @@
 #include "mbed.h"
  
 PwmOut led(LED1);
+PwmOut pwm1(PWM1);
  
 int main() {
-    // specify period first
-    led.period(4.0f);      // 4 second period
-    led.write(0.50f);      // 50% duty cycle, relative to period
-    //led = 0.5f;          // shorthand for led.write()
-    //led.pulsewidth(2);   // alternative to led.write, set duty cycle time in seconds
-    while(1);
+
+	float period = 4.0f;
+    float duty = 0.5f;
+
+    // Specify PWM period
+    led.period(period);  // 4 second period
+    pwm1.period(period);
+
+    // Slowly increase the duty cycle. Once it is 100%, set back to 0%.
+    while(1) {
+    	if (duty > 1.0f)
+    	{
+    		duty = 0.0f;
+    	}
+
+    	// Set the duty cycle on the pins
+    	led.write(duty);
+    	pwm1.write(duty);
+
+    	// Increment the duty cycle
+    	// duty += 0.1f;
+
+    	wait(0.5);
+    }
 }
