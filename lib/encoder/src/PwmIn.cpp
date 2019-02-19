@@ -23,8 +23,8 @@
 #include "PwmIn.h"
 
 PwmIn::PwmIn(PinName p) : _p(p) {
-    _p.rise(this, &PwmIn::rise);
-    _p.fall(this, &PwmIn::fall);
+    _p.rise(callback(this, &PwmIn::rise));
+    _p.fall(callback(this, &PwmIn::fall));
     _period = 0.0;
     _pulsewidth = 0.0;
     _t.start();
