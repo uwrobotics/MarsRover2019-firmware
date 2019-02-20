@@ -36,9 +36,9 @@ class PwmIn {
 public:
     /** Create a PwmIn
      *
-     * @param p The pwm input pin (must support InterruptIn)
+     * @param pwmSense The pwm input pin (must support InterruptIn)
      */ 
-    PwmIn(PinName p);
+    PwmIn(PinName pwmSense);
     
     /** Read the current period
      *
@@ -50,21 +50,21 @@ public:
      *
      * @returns the pulsewidth in seconds
      */
-    float pulsewidth();
+    float pulseWidth();
     
     /** Read the current dutycycle
      *
      * @returns the dutycycle as a percentage, represented between 0.0-1.0
      */
-    float dutycycle();
+    float dutyCycle();
 
 protected:        
     void rise();
     void fall();
     
-    InterruptIn _p;
-    Timer _t;
-    float _pulsewidth, _period;
+    InterruptIn _pwmSense;
+    Timer _timer;
+    float _pulseWidth, _period;
 };
 
 #endif

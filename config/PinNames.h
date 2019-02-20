@@ -135,14 +135,26 @@ typedef enum {
     I2C_SDA = PB_7,
 
     // PWM Encoders
-    ENC_TT = PC_9,
-    ENC_SH = PA_9,
-    ENC_EL = PA_10,
+    ENC_A3 = PC_9,
+    ENC_A2 = PA_9,
+    ENC_A1 = PA_10,
 
     // Quadrature Encoders
     ENCR1_CH1 = PA_7,
     ENCR1_CH2 = PC_4,
     ENCR1_INDEX = PC_5,
+
+    // PWM Output
+    PWM1 = PB_13,
+    PWM1_DIR = PB_14,
+    PWM2 = PB_15,
+    PWM2_DIR = PC_6,
+    PWM3 = PC_7,
+    PWM3_DIR = PC_8,
+
+    // Buttons
+    SW2 = PA_0,
+    SW3 = PA_1,
     
     // TODO: Add remaining pins
     
