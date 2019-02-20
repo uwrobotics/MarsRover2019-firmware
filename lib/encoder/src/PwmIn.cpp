@@ -22,31 +22,31 @@
 
 #include "PwmIn.h"
 
-PwmIn::PwmIn(PinName p) : _p(p) {
-    _p.rise(callback(this, &PwmIn::rise));
-    _p.fall(callback(this, &PwmIn::fall));
+PwmIn::PwmIn(PinName pwmSense) : _pwmSense(pwmSense) {
+    _pwmSense.rise(callback(this, &PwmIn::rise));
+    _pwmSense.fall(callback(this, &PwmIn::fall));
     _period = 0.0;
-    _pulsewidth = 0.0;
-    _t.start();
+    _pulseWidth = 0.0;
+    _timer.start();
 }
 
 float PwmIn::period() {
     return _period;
 }
 
-float PwmIn::pulsewidth() {
-    return _pulsewidth;
+float PwmIn::pulseWidth() {
+    return _pulseWidth;
 }
 
-float PwmIn::dutycycle() {
-    return _pulsewidth / _period;
+float PwmIn::dutyCycle() {
+    return fmin(1.0f, _pulseWidth / _period);
 }
 
 void PwmIn::rise() {
-    _period = _t.read();
-    _t.reset();
+    _period = _timer.read();
+    _timer.reset();
 }
 
 void PwmIn::fall() {
-    _pulsewidth = _t.read();
+    _pulseWidth = _timer.read();
 }
