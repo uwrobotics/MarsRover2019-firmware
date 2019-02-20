@@ -4,25 +4,25 @@
 DigitalOut led(LED1);
 Serial pc(SERIAL_TX, SERIAL_RX);
 
-PwmIn a(ENC_TT);
-PwmIn b(ENC_SH);
-PwmIn c(ENC_EL);
+PwmIn a(ENC_A1);
+PwmIn b(ENC_A2);
+// PwmIn c(ENC_A3;
 
 int main() {
 
     int i = 0;
-    pc.baud(9600); 
+    pc.baud(115200); 
 
     while (true) {
 
         led = i % 2;
         i++;
      
-        pc.printf("a: pw = %f, period = %f\r\n",     a.pulsewidth(), a.period());
-        pc.printf("b: pw = %f, period = %f\r\n",     b.pulsewidth(), b.period());
-        pc.printf("c: pw = %f, period = %f\r\n\r\n", c.pulsewidth(), c.period());
+        pc.printf("a: dc = %f, pw = %f, period = %f\r\n",     a.dutyCycle(), a.pulseWidth(), a.period());
+        pc.printf("b: dc = %f, pw = %f, period = %f\r\n",     b.dutyCycle(), b.pulseWidth(), b.period());
+        // pc.printf("c: dc = %f, pw = %f, period = %f\r\n\r\n", c.dutycycle(), c.pulsewidth(), c.period());
         
-        wait(1);
+        wait(0.25);
 
     }
 }
