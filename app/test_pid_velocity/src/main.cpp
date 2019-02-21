@@ -1,31 +1,63 @@
+#include "mbed.h"
 #include "PID.h"
+#include "PwmIn.h"
  
-#define RATE 0.1
+// Constants
+const float kRATE = 0.01;
+const float kP    = 1.0;
+const float KI    = 0.0;
+const float KD    = 0.0;
+
+PwmOut motor(MOTOR1);
+DigitalOut motorDirection(MOTOR1_DIR);
+PwmInPwmIn pwmEncoder(ENC_A1);
+
+PID velocityPIDController(kP, kI, kD, kRATE);
+Timer endTimer;
+
+// Variables
+volatile float motorPWMDuty = 1.0;
+volatile float angularVelocity = 0.0;
+
+// Velocity to reach.
+int goal = 3000;
+
+// Initialize motor
+void initializeMotor(void){
+    motor.period_ms(1);
+    motor.wirte(0.0f);
+    motorDirection = 0;
+}
  
-//Kc, Ti, Td, interval
-PID controller(1.0, 0.0, 0.0, RATE);
-AnalogIn pv(p15);
-PwmOut   co(p26);
+// Setup velocity PID controller
+void initializePidController(void){
+    velocityPIDController.setInputLimits(0.0, 1.0);
+    velocityPIDController.setOutputLimits(0.0, 1.0);
+    velocityPIDController.setBias(1.0);
+    velocityPIDController.setMode(AUTO_MODE);
+}
  
-int main(){
+int main() {
+
+    endTimer.start();
  
-  //Analog input from 0.0 to 3.3V
-  controller.setInputLimits(0.0, 3.3);
-  //Pwm output from 0.0 to 1.0
-  controller.setOutputLimits(0.0, 1.0);
-  //If there's a bias.
-  controller.setBias(0.3);
-  controller.setMode(AUTO);
-  //We want the process variable to be 1.7V
-  controller.setSetPoint(1.7);
+    // Initialization
+    initializeMotor();
+    initializePidController();
  
-  while(1){
-    //Update the process variable.
-    controller.setProcessValue(pv.read());
-    //Set the new output.
-    co = controller.getRealOutput();
-    //Wait for another loop calculation.
-    wait(RATE);
-  }
+    // Set velocity set point.
+    velocityPIDController.setSetPoint(goal);
  
+    // Run for 3 seconds.
+    while (endTimer.read() < 3.0) {
+        velocityPIDController.setProcessValue(angularVelocity);
+        motorPWMDuty = velocityPIDController.compute();
+        motor.write(motorPWMDuty);
+        pc.printf(fp, "%f,%f\n", angularVelocity, goal);
+        wait(RATE);
+    }
+ 
+    // Stop motors
+    motor.write(0.0);
+    
 }

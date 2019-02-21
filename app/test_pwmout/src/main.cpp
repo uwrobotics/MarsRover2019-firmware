@@ -1,7 +1,7 @@
 #include "mbed.h"
  
 DigitalOut led(LED1);
-PwmOut 	   pwm1(PWM1);
+PwmOut 	   pwm1(MOTOR1);
  
 int main() {
 
