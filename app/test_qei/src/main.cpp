@@ -5,7 +5,9 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 //Use X4 encoding.
 //QEI wheel(p29, p30, NC, 624, QEI::X4_ENCODING);
 //Use X2 encoding by default.
-QEI wheel (PA_7, PC_4, PC_5, 48, QEI::X4_ENCODING);
+
+// configured for use with science board centrifuge encoder
+QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
 
 // pin mappings when using science board EC1:
 // ENC_CENT_1 -> PA7 -> LQFP64 -> 23
