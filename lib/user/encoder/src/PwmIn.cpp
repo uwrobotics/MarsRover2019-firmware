@@ -25,8 +25,21 @@
 PwmIn::PwmIn(PinName pwmSense) : _pwmSense(pwmSense) {
     _pwmSense.rise(callback(this, &PwmIn::rise));
     _pwmSense.fall(callback(this, &PwmIn::fall));
+
     _period = 0.0;
     _pulseWidth = 0.0;
+    _pulsesToAverage = PWM_IN_AVERAGE_COUNT_DEFAULT;
+
+    _timer.start();
+}
+
+PwmIn::PwmIn(PinName pwmSense, int pulsesToAverage) : _pwmSense(pwmSense), _pulsesToAverage(pulsesToAverage) {
+    _pwmSense.rise(callback(this, &PwmIn::rise));
+    _pwmSense.fall(callback(this, &PwmIn::fall));
+
+    _period = 0.0;
+    _pulseWidth = 0.0;
+    
     _timer.start();
 }
 
@@ -34,19 +47,45 @@ float PwmIn::period() {
     return _period;
 }
 
+float PwmIn::avgPeriod() {
+    return _avgPeriod;
+}
+
 float PwmIn::pulseWidth() {
     return _pulseWidth;
 }
 
+float PwmIn::avgPulseWidth() {
+    return _avgPulseWidth;
+}
+
 float PwmIn::dutyCycle() {
-    return fmin(1.0f, _pulseWidth / _period);
+    return _pulseWidth / _period;
+}
+
+float PwmIn::avgDutyCycle() {
+    return _avgPulseWidth / _avgPeriod;
 }
 
 void PwmIn::rise() {
     _period = _timer.read();
+    _sumPeriod += _period; 
     _timer.reset();
 }
 
 void PwmIn::fall() {
     _pulseWidth = _timer.read();
+    _sumPulseWidth += _pulseWidth;
+
+    // If the number of pulses to average has been reached, calculate the averages
+    if (_pulseCount >= _pulsesToAverage) {
+        _avgPeriod = _sumPeriod / (float) _pulsesToAverage;
+        _avgPulseWidth = _sumPulseWidth / (float) _pulsesToAverage;
+
+        _sumPeriod = 0.0;
+        _sumPulseWidth = 0.0;
+        _pulseCount = 0;
+    }
+
+    _pulseCount++;
 }

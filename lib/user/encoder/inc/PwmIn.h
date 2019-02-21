@@ -23,6 +23,10 @@
 #ifndef MBED_PWMIN_H
 #define MBED_PWMIN_H
 
+#ifndef PWM_IN_AVERAGE_COUNT_DEFAULT
+#define PWM_IN_AVERAGE_COUNT_DEFAULT 4
+#endif
+
 #include "mbed.h"
 
 /** PwmIn class to read PWM inputs
@@ -34,29 +38,54 @@
  */
 class PwmIn {
 public:
-    /** Create a PwmIn
+    /** Create a PwmIn with the default number of pulses for averaging
      *
      * @param pwmSense The pwm input pin (must support InterruptIn)
      */ 
     PwmIn(PinName pwmSense);
+
+    /** Create a PwmIn with a specified number of pulses to average
+     *
+     * @param pwmSense           The pwm input pin (must support InterruptIn)
+     * @param pulsesToAverage The number of PWM measurements to sum before averaging
+     */ 
+    PwmIn(PinName pwmSense, int pulsesToAverage);
     
     /** Read the current period
      *
      * @returns the period in seconds
      */
     float period();
+
+    /** Read the average period
+     *
+     * @returns the average period in seconds
+     */
+    float avgPeriod();
     
-    /** Read the current pulsewidth
+    /** Read the current pulse width
      *
      * @returns the pulsewidth in seconds
      */
     float pulseWidth();
-    
-    /** Read the current dutycycle
+
+    /** Read the average pulse width
      *
-     * @returns the dutycycle as a percentage, represented between 0.0-1.0
+     * @returns the average pulsewidth in seconds
+     */
+    float avgPulseWidth();
+    
+    /** Read the current duty cycle
+     *
+     * @returns the duty cycle as a percentage, represented between 0.0-1.0
      */
     float dutyCycle();
+
+    /** Read the average duty cycle
+     *
+     * @returns the average duty cycle as a percentage, represented between 0.0-1.0
+     */
+    float avgDutyCycle();
 
 protected:        
     void rise();
@@ -64,7 +93,13 @@ protected:
     
     InterruptIn _pwmSense;
     Timer _timer;
+
     float _pulseWidth, _period;
+    float _avgPulseWidth, _avgPeriod;
+    double _sumPulseWidth, _sumPeriod;
+    
+    int _pulseCount;
+    int _pulsesToAverage; 
 };
 
 #endif
