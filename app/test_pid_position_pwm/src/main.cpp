@@ -15,7 +15,7 @@ int main(){
   controller.setOutputLimits(0.0, 1.0);
   //If there's a bias.
   controller.setBias(0.3);
-  controller.setMode(AUTO);
+  controller.setMode(PID_AUTO_MODE);
   //We want the process variable to be 1.7V
   controller.setSetPoint(1.7);
  
@@ -23,7 +23,7 @@ int main(){
     //Update the process variable.
     controller.setProcessValue(pv.read());
     //Set the new output.
-    co = controller.getRealOutput();
+    co = controller.compute();
     //Wait for another loop calculation.
     wait(RATE);
   }
