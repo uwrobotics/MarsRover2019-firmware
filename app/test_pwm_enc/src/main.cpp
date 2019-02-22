@@ -1,32 +1,29 @@
 #include "mbed.h"
 #include "PwmIn.h"
 
+Serial pc(SERIAL_TX, SERIAL_RX);
+
 DigitalOut led(LED1);
 DigitalOut motorDirection(MOTOR1_DIR);
 
-Serial pc(SERIAL_TX, SERIAL_RX);
+PwmOut pwm1(MOTOR3);
+PwmIn a(ENC_A2, 10);
 
-PwmIn a(ENC_A1, 20);
-// PwmIn b(ENC_A2);
-// PwmIn c(ENC_A3;
-
-
-PwmOut     pwm1(MOTOR1);
-
-double encoderPWMDuty = 0.0;
-double prevEncoderPWMDuty = 0.0;
+double avgEncPWMDuty = 0.0;
+double prevAvgEncPWMDuty = 0.0;
 double dutyVelocity = 0.0;
 double angularVelocity = 0.0;
 
-const float kUpdatePeriod = 0.05;
+const float kUpdatePeriod = 0.04;
+
+Timer timer;
 
 
 int main() {
 
     motorDirection = 1;
 
-    int i = 0;
-    pc.baud(115200); 
+    float elapsedTime = 0.0;
 
     int period_ms = 1; // Equivalent to 1kHz frequency
     float duty = 0.0f;
@@ -34,29 +31,33 @@ int main() {
     // Specify PWM period
     pwm1.period_ms(period_ms);
 
+    timer.start();
+
     while (true) {
+        elapsedTime += kUpdatePeriod;
+        led = !led;
+
+        if (elapsedTime > 5.0) {
+            // Set the duty cycle on the pins
+            duty += 0.1f;
+            pwm1.write(duty);
+            pc.printf("pwm set to %.2f %%\r\n", pwm1.read() * 100);
+            elapsedTime = 0.0;
+        }
+
         if (duty > 0.3f)
         {
             duty = 0.0f;
         }
 
-        if (i % 40 == 0) {
-            // Set the duty cycle on the pins
-            pwm1.write(duty);
-            pc.printf("pwm set to %.2f %%\r\n", pwm1.read() * 100);
-            duty += 0.1f;
-        }
+        avgEncPWMDuty = a.avgDutyCycle();
+        dutyVelocity = (avgEncPWMDuty - prevAvgEncPWMDuty) / timer.read();
+        timer.reset();
+        prevAvgEncPWMDuty = avgEncPWMDuty;
 
-        led = i % 2;
-        i++;
+        angularVelocity = 360.0 * dutyVelocity;
 
-        encoderPWMDuty = a.avgDutyCycle();
-        dutyVelocity = (encoderPWMDuty - prevEncoderPWMDuty) / kUpdatePeriod;
-        angularVelocity = 360.0f * dutyVelocity;
-        prevEncoderPWMDuty = encoderPWMDuty;
-
-        // pc.printf("Duty: %f, \tDuty Velocity: %f, \tAngular Velocity: %f\r\n", encoderPWMDuty, dutyVelocity, angularVelocity);
-        pc.printf("a: dc = %f, pw = %f, period = %f\r\n",     a.avgDutyCycle(), a.avgPulseWidth(), a.avgPeriod()); 
+        pc.printf("Avg PW: %f, \tAvg Prd: %f, \tDuty: %f, \tDuty Velo: %f, \tAng Veloc: %f\r\n", a.avgPulseWidth(), a.avgPeriod(), avgEncPWMDuty, dutyVelocity, angularVelocity);
 
         wait(kUpdatePeriod);
 
