@@ -145,12 +145,12 @@ typedef enum {
     ENCR1_INDEX = PC_5,
 
     // PWM Output
-    PWM1 = PB_13,
-    PWM1_DIR = PB_14,
-    PWM2 = PB_15,
-    PWM2_DIR = PC_6,
-    PWM3 = PC_7,
-    PWM3_DIR = PC_8,
+    MOTOR1 = PB_13,
+    MOTOR1_DIR = PB_14,
+    MOTOR2 = PB_15,
+    MOTOR2_DIR = PC_6,
+    MOTOR3 = PC_7,
+    MOTOR3_DIR = PC_8,
 
     // Buttons
     SW2 = PA_0,
