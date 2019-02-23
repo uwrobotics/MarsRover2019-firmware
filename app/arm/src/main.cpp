@@ -10,8 +10,8 @@ Serial              pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
 CAN                 can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 CANMsg              rxMsg;
 CANMsg              txMsg;
-DigitalOut          led1(LED1);
-Timer               timer;
+DigitalOut          ledErr(LED1);
+DigitalOut          ledCAN(LED4);
 uint8_t             counter = 0;
  
 void printCANMsg(CANMessage& msg) {
@@ -24,24 +24,60 @@ void printCANMsg(CANMessage& msg) {
         pc.printf(" 0x%.2X", msg.data[i]);
     pc.printf("\r\n");
 }
+
+enum armCommand {
+ 
+    configureVelocityPIDControl = RX_ID,
+    setVelocityJoint1,
+    setVelocityJoint2,
+    setVelocityJoint3,
+    configurePositionPIDControl,
+    setPositionJoint1,
+    setPositionJoint2,
+    setPOsitionJoint3,
+    configureDirectMotorControl,
+    setDutyMotor1,
+    setDutyMotor2,
+    setDutyMotor3,
+
+    firstCommand = configureVelocityPIDControl,
+    lastCommand  = setDutyMotor3
+
+};
+
+void initCAN() {
+    can.filter(ROVER_ARMO_CANID, ROVER_CANID_FILTER_MASK, CANStandard);
+
+    // for (int canHandle = firstCommand; canHandle <= lastCommand; canHandle++) {
+    //     can.filter(RX_ID + canHandle, 0xFFF, CANStandard, canHandle);
+    // }
+}
+
+void proccessCANMsg(CANMsg msg) {
+    switch (rxMsg.id) {
+        case configureDirectMotorControl: 
+            pc.printf("Recieved command configureDirectMotorControl\r\n");
+            break;
+        case setDutyMotor1:
+            pc.printf("Recieved command setDutyMotor1\r\n");
+            break;
+        default:
+            pc.printf("Recieved unimplemented command\r\n");
+            break;
+    }
+}
  
 int main(void)
 {
-    can.filter(RX_ID, CAN_MASK, CANStandard);
+    initCAN();
 
-    while(1) {
-        if(can.read(rxMsg)) {
-            led1 = !led1;       // turn the LED on
-            pc.printf("-------------------------------------\r\n");
-            pc.printf("CAN message received\r\n");
-            printCANMsg(rxMsg);
- 
-            // Filtering performed by software:
-            if(rxMsg.id == RX_ID) {
-                rxMsg >> counter;    // extract data from the received CAN message
-                pc.printf("  counter = %d\r\n", counter);
-            }
+    while (1) {
+
+        if (can.read(rxMsg)) {
+            proccessCANMsg(rxMsg);
+            ledCAN = !ledCAN;
         }
+
     }
 }
  
