@@ -28,19 +28,36 @@ PwmIn::PwmIn(PinName pwmSense) : _pwmSense(pwmSense) {
 
     _period = 0.0;
     _pulseWidth = 0.0;
-    _pulsesToAverage = PWM_IN_AVERAGE_COUNT_DEFAULT;
+    _periodSampleSum = 0.0;
+    _pulseWidthSampleSum = 0.0;
+    _sampleCount = 0;
+
+    _numSamplesToAverage = PWM_IN_AVERAGE_COUNT_DEFAULT;
+    _periodSamples = new float[_numSamplesToAverage]();
+    _pulseWidthSamples = new float[_numSamplesToAverage]();
 
     _timer.start();
 }
 
-PwmIn::PwmIn(PinName pwmSense, int pulsesToAverage) : _pwmSense(pwmSense), _pulsesToAverage(pulsesToAverage) {
+PwmIn::PwmIn(PinName pwmSense, int numSamplesToAverage) : _pwmSense(pwmSense), _numSamplesToAverage(numSamplesToAverage) {
     _pwmSense.rise(callback(this, &PwmIn::rise));
     _pwmSense.fall(callback(this, &PwmIn::fall));
 
     _period = 0.0;
     _pulseWidth = 0.0;
+    _periodSampleSum = 0.0;
+    _pulseWidthSampleSum = 0.0;
+    _sampleCount = 0;
+
+    _periodSamples = new float[_numSamplesToAverage]();
+    _pulseWidthSamples = new float[_numSamplesToAverage]();
     
     _timer.start();
+}
+
+PwmIn::~PwmIn() {
+    delete [] _pulseWidthSamples;
+    delete [] _periodSamples;
 }
 
 float PwmIn::period() {
@@ -69,23 +86,27 @@ float PwmIn::avgDutyCycle() {
 
 void PwmIn::rise() {
     _period = _timer.read();
-    _sumPeriod += _period; 
     _timer.reset();
+
+    _avgPeriod = PwmIn::movingAvg(_periodSamples, &_periodSampleSum, _period, _sampleCount);
 }
 
 void PwmIn::fall() {
     _pulseWidth = _timer.read();
-    _sumPulseWidth += _pulseWidth;
 
-    // If the number of pulses to average has been reached, calculate the averages
-    if (_pulseCount >= _pulsesToAverage) {
-        _avgPeriod = _sumPeriod / (float) _pulsesToAverage;
-        _avgPulseWidth = _sumPulseWidth / (float) _pulsesToAverage;
+    _avgPulseWidth = PwmIn::movingAvg(_pulseWidthSamples, &_pulseWidthSampleSum, _pulseWidth, _sampleCount);
 
-        _sumPeriod = 0.0;
-        _sumPulseWidth = 0.0;
-        _pulseCount = 0;
+    _sampleCount++;
+
+    if (_sampleCount >= _numSamplesToAverage) {
+        _sampleCount = 0;
     }
+}
 
-    _pulseCount++;
+float PwmIn::movingAvg(float * p_samples, float * p_sampleSum, float newSample, int newIndex) {
+    *p_sampleSum -= p_samples[newIndex];
+    p_samples[newIndex] = newSample;
+    *p_sampleSum += p_samples[newIndex];
+
+    return *p_sampleSum / (float) _numSamplesToAverage;
 }

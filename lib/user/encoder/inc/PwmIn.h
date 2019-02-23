@@ -47,9 +47,11 @@ public:
     /** Create a PwmIn with a specified number of pulses to average
      *
      * @param pwmSense           The pwm input pin (must support InterruptIn)
-     * @param pulsesToAverage The number of PWM measurements to sum before averaging
+     * @param numSamplesToAverage The number of PWM measurements to sum before averaging
      */ 
-    PwmIn(PinName pwmSense, int pulsesToAverage);
+    PwmIn(PinName pwmSense, int numSamplesToAverage);
+
+    ~PwmIn();
     
     /** Read the current period
      *
@@ -87,19 +89,26 @@ public:
      */
     float avgDutyCycle();
 
-protected:        
-    void rise();
-    void fall();
+protected:
     
     InterruptIn _pwmSense;
     Timer _timer;
 
     float _pulseWidth, _period;
     float _avgPulseWidth, _avgPeriod;
-    double _sumPulseWidth, _sumPeriod;
     
-    int _pulseCount;
-    int _pulsesToAverage; 
+    int _sampleCount;
+    int _numSamplesToAverage; 
+
+    float * _pulseWidthSamples;
+    float * _periodSamples;
+
+    float _pulseWidthSampleSum;
+    float _periodSampleSum;
+
+    void rise();
+    void fall();
+    float movingAvg(float * p_samples, float * p_sampleSum, float newSample, int newIndex);
 };
 
 #endif
