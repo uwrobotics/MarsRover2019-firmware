@@ -13,4 +13,7 @@
 #define ROVER_ARM1_CANID		0x400
 #define ROVER_SCIENCE_CANID		0x500
 
+// Controls
+#define ROVER_MOTOR_PWM_FREQ_HZ 1000    // 1 kHz
+
 #endif // ROVER_CONFIG_H
