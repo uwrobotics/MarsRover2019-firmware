@@ -1,0 +1,15 @@
+#ifndef ROVER_CONFIG_H
+#define ROVER_CONFIG_H
+
+// Serial config
+#define ROVER_DEFAULT_BAUD_RATE 115200
+
+// CAN bus config
+#define ROVER_CANBUS_FREQUENCY	1000000 // 1 MHz
+#define ROVER_JETSON_CANID   	0x010
+#define ROVER_SAFETY_CANID		0x100
+#define ROVER_ARMO_CANID		0x110
+#define ROVER_ARM1_CANID		0x111
+#define ROVER_SCIENCE_CANID		0x120
+
+#endif // ROVER_CONFIG_H
