@@ -7,13 +7,13 @@ const float kUpdatePeriod = 0.05;
 
 Serial pc(SERIAL_TX, SERIAL_RX);
 
-PwmOut motor(MOTOR3);
-DigitalOut motorDirection(MOTOR3_DIR);
+PwmOut motor(MOTOR1);
+DigitalOut motorDirection(MOTOR1_DIR);
 PwmIn pwmEncoder(ENC_A1, 12);
 
 DigitalOut led(LED1);
 
-PID velocityPIDController(0.30, 0.0, 0.0, kUpdatePeriod);
+PID velocityPIDController(0.45, 0.7, 0.0, kUpdatePeriod);
 Timer timer;
 
 // Variables
@@ -23,7 +23,7 @@ float prevEncoderPWMDuty = 0.0;
 float angularVelocity = 0.0;
 
 // Velocity to reach.
-float angularVelocityGoal = 100;
+float angularVelocityGoal = 150;
 
 // Initialize motor
 void initializeMotor(void){
@@ -35,7 +35,7 @@ void initializeMotor(void){
 // Setup velocity PID controller
 void initializePidController(void){
     velocityPIDController.setInputLimits(0.0, 200.0);
-    velocityPIDController.setOutputLimits(0.0, 1.0);
+    velocityPIDController.setOutputLimits(0.0, 0.5);
     velocityPIDController.setBias(0.0);
     velocityPIDController.setMode(PID_AUTO_MODE);
 }
