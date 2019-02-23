@@ -34,10 +34,13 @@ public:
  
     /** Create a motor control interface    
      *
-     * @param pwm A PwmOut pin, driving the H-bridge enable line to control the speed
-     * @param fwd A DigitalOut, set high when the motor should go forward, low when backwards
+     * @param pwm       A PwmOut pin, driving the H-bridge enable line to control the speed
+     * @param dir       A DigitalOut, set high when the motor should go forward, low when backwards
+     * @param freqInHz  Output PWM frequency
+     * @param inverted  If true, then forward speed will set dir to 0 instead of 1, otherwise inverse
+     * @param limit     Maximum speed magnitude
      */
-    Motor(PinName pwm, PinName dir, int freqInHz, bool inverted = false);
+    Motor(PinName pwm, PinName dir, int freqInHz, bool inverted = false, float limit = 1.0);
     
     /** Set the speed of the motor
      * 
@@ -49,7 +52,7 @@ protected:
     PwmOut _pwm;
     DigitalOut _dir;
     bool _inverted;
- 
+    float _limit;
 };
  
 #endif
