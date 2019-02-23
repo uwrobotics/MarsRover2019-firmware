@@ -4,7 +4,7 @@
 
 const unsigned int  RX_ID = ROVER_ARMO_CANID; 
 const unsigned int  TX_ID = ROVER_JETSON_CANID; 
-const unsigned int  CAN_MASK = 0xFFF;
+const unsigned int  CAN_MASK = ROVER_CANID_FILTER_MASK;
 
 Serial              pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
 CAN                 can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
@@ -14,13 +14,7 @@ DigitalOut          led1(LED1);
 Timer               timer;
 uint8_t             counter = 0;
  
-/**
- * @brief   Prints CAN msg to PC's serial terminal
- * @note
- * @param   CANMessage to print
- * @retval
- */
-void printMsg(CANMessage& msg) {
+void printCANMsg(CANMessage& msg) {
     pc.printf("  ID      = 0x%.3x\r\n", msg.id);
     pc.printf("  Type    = %d\r\n", msg.type);
     pc.printf("  Format  = %d\r\n", msg.format);
@@ -33,17 +27,14 @@ void printMsg(CANMessage& msg) {
  
 int main(void)
 {
-	pc.printf("\r\n");
-
-    can.frequency(1000000); // set bit rate to 1Mbps
     can.filter(RX_ID, CAN_MASK, CANStandard);
 
     while(1) {
-        if(can.read(rxMsg, 0)) {
-            led1 = 1;       // turn the LED on
+        if(can.read(rxMsg)) {
+            led1 = !led1;       // turn the LED on
             pc.printf("-------------------------------------\r\n");
             pc.printf("CAN message received\r\n");
-            printMsg(rxMsg);
+            printCANMsg(rxMsg);
  
             // Filtering performed by software:
             if(rxMsg.id == RX_ID) {
