@@ -116,7 +116,7 @@ void initCAN() {
 
 float handlerSetSpeedMotor(int motor, CANMsg motorSpeedMsg) {
     if (directMotorControlEnabled) {
-        float setSpeed = 0.0;
+        double setSpeed = 0.0;
         motorSpeedMsg >> setSpeed;
         // motor.speed(setSpeed);
 
@@ -130,10 +130,26 @@ float handlerSetSpeedMotor(int motor, CANMsg motorSpeedMsg) {
     }
 }
 
+float handlerSetVelocityJoint(int joint, CANMsg velocityMsg) {
+    if (velocityPIDControlEnabled) {
+        double setVelocity = 0.0;
+        velocityMsg >> setVelocity;
+        // TODO
+
+        return setVelocity;
+    }
+    else {
+        ledErr = 1;
+        pc.printf("ERROR: Velocity PID control disabled\r\n");
+
+        return 0.0;
+    }
+}
+
 void proccessCANMsg(CANMsg newMsg) {
     switch (newMsg.id) {
         case configureDirectMotorControl: 
-            pc.printf("Recieved command configureDirectMotorControl\r\n");
+            pc.printf("\r\nRecieved command configureDirectMotorControl\r\n");
 
             newMsg >> directMotorControlEnabled;
 
@@ -145,23 +161,60 @@ void proccessCANMsg(CANMsg newMsg) {
             }
 
             break;
+
         case setSpeedMotor1:
-            pc.printf("Recieved command setSpeedMotor1\r\n");
+            pc.printf("\r\nRecieved command setSpeedMotor1\r\n");
             pc.printf("Set the speed of motor 1 to %f\r\n", handlerSetSpeedMotor(1, newMsg));
 
             break;
+
         case setSpeedMotor2:
-            pc.printf("Recieved command setSpeedMotor2\r\n");
+            pc.printf("\r\nRecieved command setSpeedMotor2\r\n");
             pc.printf("Set the speed of motor 2 to %f\r\n", handlerSetSpeedMotor(2, newMsg));
 
             break;
+
         case setSpeedMotor3:
-            pc.printf("Recieved command setSpeedMotor3\r\n");
+            pc.printf("\r\nRecieved command setSpeedMotor3\r\n");
             pc.printf("Set the speed of motor 3 to %f\r\n", handlerSetSpeedMotor(3, newMsg));
 
             break;
+
+        case configureVelocityPIDControl:
+            pc.printf("\r\nRecieved command configureVelocityPIDControl\r\n");
+
+            newMsg >> velocityPIDControlEnabled;
+
+            if (velocityPIDControlEnabled) {
+                pc.printf("Enabled velocity PID control\r\n");
+            }
+            else {
+                pc.printf("Disabled velocity PID control\r\n");
+            }
+
+            break;
+
+        case setVelocityJoint1:
+            pc.printf("\r\nRecieved command setVelocityJoint1\r\n");
+            pc.printf("Set the velocity of joint 1 to %f\r\n", handlerSetVelocityJoint(1, newMsg));
+
+            break;
+
+        case setVelocityJoint2:
+            pc.printf("\r\nRecieved command setVelocityJoint2\r\n");
+            pc.printf("Set the velocity of joint 2 to %f\r\n", handlerSetVelocityJoint(2, newMsg));
+
+            break;
+
+        case setVelocityJoint3:
+            pc.printf("\r\nRecieved command setVelocityJoint3\r\n");
+            pc.printf("Set the velocity of joint 3 to %f\r\n", handlerSetVelocityJoint(3, newMsg));
+
+            break;
+
         default:
             pc.printf("Recieved unimplemented command\r\n");
+
             break;
     }
 }
