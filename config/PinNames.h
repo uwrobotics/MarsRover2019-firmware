@@ -198,6 +198,20 @@ typedef enum {
     SERIAL_RX = PC_11,
     SERIAL_RTS = PD_2,
 
+    // STDIO for console print
+#ifdef MBED_CONF_TARGET_STDIO_UART_TX
+    STDIO_UART_TX = MBED_CONF_TARGET_STDIO_UART_TX,
+#else
+    STDIO_UART_TX = SERIAL_TX,
+#endif
+#ifdef MBED_CONF_TARGET_STDIO_UART_RX
+    STDIO_UART_RX = MBED_CONF_TARGET_STDIO_UART_RX,
+#else
+    STDIO_UART_RX = SERIAL_TX,
+#endif
+
+    // TODO: Add more!
+
 #endif
 
     // NUCLEO BOARD PIN MAPPINGS
