@@ -20,7 +20,8 @@
 #define BOARD1 1 // comment out this line when compiling for board #2
 
 #if defined(BOARD1)
-
+const unsigned int  RX_ID = 0x100; 
+const unsigned int  TX_ID = 0x101; 
 #else
 const unsigned int  RX_ID = 0x101;
 const unsigned int  TX_ID = 0x100;
