@@ -47,6 +47,12 @@ public:
      * @param speed The speed of the motor as a normalised value between -1.0 and 1.0
      */
     void speed(float speed);
+
+    /** Read the current speed of the motor
+     * 
+     * @return Current speed of motor
+     */
+    float read();
  
 protected:
     PwmOut _pwm;

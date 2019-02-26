@@ -39,3 +39,7 @@ void Motor::speed(float speed) {
     _dir = (speed > 0.0) != _inverted;
     _pwm = min( (float) fabs(speed), _limit);
 }
+
+float Motor::read() {
+	return _pwm.read();
+}
