@@ -23,7 +23,7 @@ CANMsg              txMsg;
 DigitalOut          ledErr(LED1);
 DigitalOut          ledCAN(LED4);
 
-Motor               turnTableMotor(MOTOR1, MOTOR1_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
+Motor               turnTableMotor(MOTOR1, MOTOR1_DIR, ROVER_MOTOR_PWM_FREQ_HZ, true);
 Motor               shoulderMotor(MOTOR2, MOTOR2_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
 Motor               elbowMotor(MOTOR3, MOTOR3_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
 PwmIn               absEnc1(ENC_A1);

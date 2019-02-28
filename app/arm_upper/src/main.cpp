@@ -23,8 +23,8 @@ CANMsg              txMsg;
 DigitalOut          ledErr(LED1);
 DigitalOut          ledCAN(LED4);
 
-Motor               wristRightMotor(MOTOR1, MOTOR1_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
-Motor               wristLeftMotor(MOTOR2, MOTOR2_DIR, ROVER_MOTOR_PWM_FREQ_HZ, true);
+Motor               wristRightMotor(MOTOR1, MOTOR1_DIR, ROVER_MOTOR_PWM_FREQ_HZ, true);
+Motor               wristLeftMotor(MOTOR2, MOTOR2_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
 Motor               clawMotor(MOTOR3, MOTOR3_DIR, ROVER_MOTOR_PWM_FREQ_HZ);
 PwmIn               absEnc1(ENC_A1);
 PwmIn               absEnc2(ENC_A2);
