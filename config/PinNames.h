@@ -166,6 +166,16 @@ typedef enum {
 
     // TODO: Add remaining pins
 
+    // Elevator encoders
+    E_E_CH1 = PB_0,
+    E_E_CH2 = PB_1,
+    E_E_INDEX = PB_2,
+
+    // Centrifuge encoder,
+    E_C_CH1 = PA_7,
+    E_C_CH2 = PC_4,
+    E_C_INDEX = PC_5,
+
 #endif
 
     // SAFETY BOARD PIN MAPPINGS

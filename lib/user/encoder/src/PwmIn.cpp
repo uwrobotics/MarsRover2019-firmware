@@ -25,28 +25,88 @@
 PwmIn::PwmIn(PinName pwmSense) : _pwmSense(pwmSense) {
     _pwmSense.rise(callback(this, &PwmIn::rise));
     _pwmSense.fall(callback(this, &PwmIn::fall));
+
     _period = 0.0;
     _pulseWidth = 0.0;
+    _periodSampleSum = 0.0;
+    _pulseWidthSampleSum = 0.0;
+    _sampleCount = 0;
+
+    _numSamplesToAverage = PWM_IN_AVERAGE_COUNT_DEFAULT;
+    _periodSamples = new float[_numSamplesToAverage]();
+    _pulseWidthSamples = new float[_numSamplesToAverage]();
+
     _timer.start();
+}
+
+PwmIn::PwmIn(PinName pwmSense, int numSamplesToAverage) : _pwmSense(pwmSense), _numSamplesToAverage(numSamplesToAverage) {
+    _pwmSense.rise(callback(this, &PwmIn::rise));
+    _pwmSense.fall(callback(this, &PwmIn::fall));
+
+    _period = 0.0;
+    _pulseWidth = 0.0;
+    _periodSampleSum = 0.0;
+    _pulseWidthSampleSum = 0.0;
+    _sampleCount = 0;
+
+    _periodSamples = new float[_numSamplesToAverage]();
+    _pulseWidthSamples = new float[_numSamplesToAverage]();
+    
+    _timer.start();
+}
+
+PwmIn::~PwmIn() {
+    delete [] _pulseWidthSamples;
+    delete [] _periodSamples;
 }
 
 float PwmIn::period() {
     return _period;
 }
 
+float PwmIn::avgPeriod() {
+    return _avgPeriod;
+}
+
 float PwmIn::pulseWidth() {
     return _pulseWidth;
 }
 
+float PwmIn::avgPulseWidth() {
+    return _avgPulseWidth;
+}
+
 float PwmIn::dutyCycle() {
-    return fmin(1.0f, _pulseWidth / _period);
+    return _pulseWidth / _period;
+}
+
+float PwmIn::avgDutyCycle() {
+    return _avgPulseWidth / _avgPeriod;
 }
 
 void PwmIn::rise() {
     _period = _timer.read();
     _timer.reset();
+
+    _avgPeriod = PwmIn::movingAvg(_periodSamples, &_periodSampleSum, _period, _sampleCount);
 }
 
 void PwmIn::fall() {
     _pulseWidth = _timer.read();
+
+    _avgPulseWidth = PwmIn::movingAvg(_pulseWidthSamples, &_pulseWidthSampleSum, _pulseWidth, _sampleCount);
+
+    _sampleCount++;
+
+    if (_sampleCount >= _numSamplesToAverage) {
+        _sampleCount = 0;
+    }
+}
+
+float PwmIn::movingAvg(float * p_samples, float * p_sampleSum, float newSample, int newIndex) {
+    *p_sampleSum -= p_samples[newIndex];
+    p_samples[newIndex] = newSample;
+    *p_sampleSum += p_samples[newIndex];
+
+    return *p_sampleSum / (float) _numSamplesToAverage;
 }

@@ -46,6 +46,8 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
     	`brew tap ARMmbed/homebrew-formulae`
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
+
+After deploying, the Nucleo will begin to flash red and green. Once the LED stays green, power-cycle the board by unplugging and replugging the 5V connector on the Nucleo.
 	
 3. Change directory into root directory
 
@@ -98,3 +100,5 @@ The ST-LINK debugger can then be connected via header CN4 (pins 1-5 with 1 neare
 | 6 (SWO)               | Not Connected                     |
 +-----------------------+-----------------------------------+
 ```
+
+After deploying the binary to the board, the Nucleo's `LD1` LED will flash red and green. Programming is complete when the LED stays green, so don't powercycle the board before this.
