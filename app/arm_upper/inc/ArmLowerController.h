@@ -26,33 +26,46 @@ typedef enum t_joint {
 } t_joint;
 
 typedef struct {
+    float P;
+    float I;
+    float D;
+} t_pidConstants;
+
+typedef struct {
+    float minAngleDutyCycle;
+    float zeroAngleDutyCycle;
+    float maxAngleDutyCycle;
+} t_encoderConfig;
+
+typedef struct {
     // Motor config
-    PinName baseMotor,
-    PinName shoulderMotor,
-    PinName elbowMotor,
-    float maxMotorSpeed,
+    PinName baseMotor;
+    PinName shoulderMotor;
+    PinName elbowMotor;
 
     // Motor direction config
-    PinName baseMotorDir,
-    PinName shoulderMotorDir,
-    PinName elbowMotorDir,
+    PinName baseMotorDir;
+    PinName shoulderMotorDir;
+    PinName elbowMotorDir;
 
     // Joint encoder config
-    PinName baseEncoder,
-    PinName shoulderEncoder,
-    PinName elbowEncoder,
+    PinName baseEncoder;
+    PinName shoulderEncoder;
+    PinName elbowEncoder;
+
+    // Encoder duty cycle angle config (minimum, zero, and maximum angle)
+    t_encoderConfig baseEncoderConfig;
+    t_encoderConfig shoulderEncoderConfig;
+    t_encoderConfig elbowEncoderConfig;
 
     // PID config
-    float PIDUpdateInterval,
-    float basePID_P,
-    float basePID_I,
-    float basePID_D,
-    float shoulderPID_P,
-    float shoulderPID_I,
-    float shoulderPID_D,
-    float elbowPID_P,
-    float elbowPID_I,
-    float elbowPID_D
+    float PIDUpdateInterval;
+    t_pidConstants baseVelocityPID;
+    t_pidConstants shoulderVelocityPID;
+    t_pidConstants elbowVelocityPID;
+    t_pidConstants basePositionPID;
+    t_pidConstants shoulderPositionPID;
+    t_pidConstants elbowPositionPID;
 
 } t_armLowerControllerConfig;
 
@@ -70,13 +83,15 @@ public:
 
     void setJointVelocity(t_joint joint, float setVelocity);
 
+    void setJointAngle(t_joint joint, float setAngle)
+
     float getJointAngle(t_joint);
 
 
 private:
 
     t_controlMode m_controlMode;
-    t_armLowerControllerConfig m_armBaseControllerConfig;
+    t_armLowerControllerConfig m_armLowerControllerConfig;
 
 };
 
