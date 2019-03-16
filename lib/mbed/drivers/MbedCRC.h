@@ -31,7 +31,7 @@ but we check for ( width < 8) before performing shift, so it should not be an is
 #pragma diag_suppress 62  // Shift count is negative
 #elif defined ( __GNUC__ )
 #pragma GCC diagnostic push
-// #pragma GCC diagnostic ignored "-Wshift-count-negative"
+#pragma GCC diagnostic ignored "-Wshift-count-negative"
 #elif defined (__ICCARM__)
 #pragma diag_suppress=Pe062  // Shift count is negative
 #endif

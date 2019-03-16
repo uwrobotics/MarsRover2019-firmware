@@ -1,12 +1,11 @@
 #include "mbed.h"
 
 DigitalOut led(LED1);
-Serial pc(SERIAL_TX, SERIAL_RX);
+Serial pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
 
 int main() {
 
     int i = 0;
-    pc.baud(9600); 
 
     while (true) {
         pc.printf("Hello World! %d\r\n", i);

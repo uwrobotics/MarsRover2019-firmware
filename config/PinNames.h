@@ -126,8 +126,7 @@ typedef enum {
     ADC_VREF = 0xF1,
     ADC_VBAT = 0xF2,
 
-    // ARM BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_ARM_PINMAP
+#ifdef ROVERBOARD_ARM_PINMAP        // ARM BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
 
     // I2C
@@ -158,13 +157,11 @@ typedef enum {
     
     // TODO: Add remaining pins
     
-#endif
+#endif                              // ARM BOARD PIN MAPPINGS END
 
-    // SCIENCE BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_SCIENCE_PINMAP
+
+#ifdef ROVERBOARD_SCIENCE_PINMAP    // SCIENCE BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
-
-    // TODO: Add remaining pins
 
     // Elevator encoders
     E_E_CH1 = PB_0,
@@ -176,10 +173,10 @@ typedef enum {
     E_C_CH2 = PC_4,
     E_C_INDEX = PC_5,
 
-#endif
+#endif                              // SCIENCE BOARD PIN MAPPINGS END
 
-    // SAFETY BOARD PIN MAPPINGS
-#ifdef ROVERBOARD_SAFETY_PINMAP
+    
+#ifdef ROVERBOARD_SAFETY_PINMAP     // SAFETY BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
 
     // I2C
@@ -188,10 +185,10 @@ typedef enum {
     
     // TODO: Add remaining pins
 
-#endif
+#endif                              // SAFETY BOARD PIN MAPPINGS END
 
-    // COMMON PIN MAPPINGS FOR ROVER BOARDS
-#ifdef ROVERBOARD_COMMON_PINMAP
+    
+#ifdef ROVERBOARD_COMMON_PINMAP     // COMMON PIN MAPPINGS FOR ROVER BOARDS BEGIN
 
     // LEDs
     LED1 = PC_0,
@@ -208,10 +205,24 @@ typedef enum {
     SERIAL_RX = PC_11,
     SERIAL_RTS = PD_2,
 
+    // STDIO for console print
+#ifdef MBED_CONF_TARGET_STDIO_UART_TX
+    STDIO_UART_TX = MBED_CONF_TARGET_STDIO_UART_TX,
+#else
+    STDIO_UART_TX = SERIAL_TX,
+#endif
+#ifdef MBED_CONF_TARGET_STDIO_UART_RX
+    STDIO_UART_RX = MBED_CONF_TARGET_STDIO_UART_RX,
+#else
+    STDIO_UART_RX = SERIAL_TX,
 #endif
 
-    // NUCLEO BOARD PIN MAPPINGS
-#ifdef NUCLEO_PINMAP
+    // TODO: Add more!
+
+#endif                              // COMMON PIN MAPPINGS FOR ROVER BOARDS END
+
+    
+#ifdef NUCLEO_PINMAP                // NUCLEO BOARD PIN MAPPINGS BEGIN
     
     // Arduino connector namings
     A0          = PA_0,
@@ -285,7 +296,7 @@ typedef enum {
     SYS_WKUP6 = PB_5,
     SYS_WKUP7 = PB_15,
 
-#endif
+#endif                              // NUCLEO BOARD PIN MAPPINGS END
 
     // Not connected
     NC = (int)0xFFFFFFFF
