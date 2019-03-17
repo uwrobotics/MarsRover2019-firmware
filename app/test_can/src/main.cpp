@@ -17,11 +17,11 @@
  *
  */
   
-#define BOARD1                  1       // comment out this line when compiling for board #2
+#define BOARD1 1 // comment out this line when compiling for board #2
 
 #if defined(BOARD1)
-const unsigned int  RX_ID = 0x100;
-const unsigned int  TX_ID = 0x101;
+const unsigned int  RX_ID = 0x100; 
+const unsigned int  TX_ID = 0x101; 
 #else
 const unsigned int  RX_ID = 0x101;
 const unsigned int  TX_ID = 0x100;
@@ -31,7 +31,7 @@ const unsigned int  TX_ID = 0x100;
 #include "CANMsg.h"
 
 Serial              pc(SERIAL_TX, SERIAL_RX);
-CAN                 can(PB_8, PB_9);
+CAN                 can(CAN_RX, CAN_TX);
 CANMsg              rxMsg;
 CANMsg              txMsg;
 DigitalOut          led(LED1);
@@ -55,22 +55,15 @@ void printMsg(CANMessage& msg) {
     pc.printf("\r\n");
 }
  
-/**
- * @brief   Main
- * @note
- * @param
- * @retval
- */
 int main(void)
 {
-    pc.baud(9600);          // set Serial speed
     can.frequency(1000000); // set bit rate to 1Mbps
 #if defined(BOARD1)
-    led = 1;               // turn the LED on
+    led = 1;                // turn the LED on
     timer.start();          // start timer
     pc.printf("CAN_Hello board #1\r\n");
 #else
-    led = 0;      // turn LED off
+    led = 0;                // turn LED off
     pc.printf("CAN_Hello board #2\r\n");
 #endif
     while(1) {
@@ -80,9 +73,9 @@ int main(void)
             counter++;                   // increment counter
             txMsg.clear();               // clear Tx message storage
             txMsg.id = TX_ID;            // set ID
-            txMsg << counter; // append data (total data length must not exceed 8 bytes!)
+            txMsg << counter;            // append data (total data length must not exceed 8 bytes!)
             if(can.write(txMsg)) {       // transmit message
-                led = 0;               // turn the LED off
+                led = 0;                 // turn the LED off
                 pc.printf("-------------------------------------\r\n");
                 pc.printf("CAN message sent\r\n");
                 printMsg(txMsg);

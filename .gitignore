@@ -13,5 +13,3 @@ app/*/.project
 build
 *.o
 *.d
-
-!lib/mbed
