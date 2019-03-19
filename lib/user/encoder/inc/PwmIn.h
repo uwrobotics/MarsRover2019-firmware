@@ -37,19 +37,17 @@
  * @note uses InterruptIn, so not available on p19/p20
  */
 class PwmIn {
+
 public:
-    /** Create a PwmIn with the default number of pulses for averaging
-     *
-     * @param pwmSense The pwm input pin (must support InterruptIn)
-     */ 
-    PwmIn(PinName pwmSense);
+
+    const int k_defaultNumSamplesToAverage = 12;
 
     /** Create a PwmIn with a specified number of pulses to average
      *
      * @param pwmSense           The pwm input pin (must support InterruptIn)
      * @param numSamplesToAverage The number of PWM measurements to sum before averaging
      */ 
-    PwmIn(PinName pwmSense, int numSamplesToAverage);
+    PwmIn(PinName pwmSense, int numSamplesToAverage = k_defaultNumSamplesToAverage);
 
     ~PwmIn();
     
@@ -109,6 +107,7 @@ protected:
     void rise();
     void fall();
     float movingAvg(float * p_samples, float * p_sampleSum, float newSample, int newIndex);
+
 };
 
 #endif

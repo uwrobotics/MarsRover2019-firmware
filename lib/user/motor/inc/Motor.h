@@ -30,17 +30,22 @@
  * with an H-bridge using a PwmOut and 2 DigitalOuts
  */
 class Motor {
+
 public:
+
+    /** Default motor frequency (1kHz) **/
+    static const k_DefaultMotorFrequency = 1000;
  
     /** Create a motor control interface    
      *
      * @param pwm       A PwmOut pin, driving the H-bridge enable line to control the speed
      * @param dir       A DigitalOut, set high when the motor should go forward, low when backwards
-     * @param freqInHz  Output PWM frequency
+     * @param freqInHz  Output PWM frequency, default 1kHz
      * @param inverted  If true, then forward speed will set dir to 0 instead of 1, otherwise inverse
      * @param limit     Maximum speed magnitude
      */
-    Motor(PinName pwm, PinName dir, int freqInHz, bool inverted = false, float limit = 1.0);
+    Motor(PinName pwm, PinName dir, int freqInHz = k_DefaultMotorFrequency, bool inverted = false, float limit = 1.0);
+    Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = k_DefaultMotorFrequency, float limit = 1.0);
     
     /** Set the speed of the motor
      * 
