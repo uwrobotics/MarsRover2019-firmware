@@ -83,10 +83,11 @@ public:
 
     void setJointVelocity(t_joint joint, float setVelocity);
 
-    void setJointAngle(t_joint joint, float setAngle)
+    void setJointAngle(t_joint joint, float setAngle);
 
     float getJointAngle(t_joint);
 
+    void update();
 
 private:
 
