@@ -8,6 +8,8 @@
 #include "Motor.h"
 #include "PwmIn.h"
 #include "PID.h"
+#include "PinNames.h"
+#include "ArmJointController.h"
 
 // TYPES
 
@@ -20,46 +22,31 @@ typedef enum t_joint {
 
 typedef struct {
     PinName pwmPin;
-    PinName dirPin;
-    bool inverted;
-
-} t_motorConfig;
-
-typedef struct {
-    PinName pwmPin;
     float minAngleDutyCycle;
     float zeroAngleDutyCycle;
     float maxAngleDutyCycle;
-} t_encoderConfig;
+} t_absoluteEncoderConfig;
 
 typedef struct {
-    float P;
-    float I;
-    float D;
-    float
+    float P, I, D;
 } t_pidConstants;
 
 typedef struct {
     // Joint motor config
-    t_motorConfig baseMotor;
-    t_motorConfig shoulderMotor;
-    t_motorConfig elbowMotor;
+    t_motorConfig baseMotor, shoulderMotor, elbowMotor;
 
     // Joint encoder config
-    t_encoderConfig baseEncoder;
-    t_encoderConfig shoulderEncoder;
-    t_encoderConfig elbowEncoder;
+    t_absoluteEncoderConfig baseEncoder, shoulderEncoder, elbowEncoder;
 
     // PID config
-    float PIDUpdateInterval;
-    t_pidConstants baseVelocityPID;
-    t_pidConstants shoulderVelocityPID;
-    t_pidConstants elbowVelocityPID;
-    t_pidConstants basePositionPID;
-    t_pidConstants shoulderPositionPID;
-    t_pidConstants elbowPositionPID;
+    t_pidConstants baseVelocityPID, shoulderVelocityPID, elbowVelocityPID;
+    t_pidConstants basePositionPID, shoulderPositionPID, elbowPositionPID;
 
-} t_armLowerControllerConfig;
+    float PIDUpdateInterval;
+    float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
+    float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
+
+} t_armJointConfig;
 
 typedef enum t_controlMode {
     motorSpeed,
@@ -74,71 +61,69 @@ class ArmLowerController {
 
 public:
 
-    static const t_armLowerControllerConfig k_defaultArmLowerControllerConfig = {
+    static constexpr t_armJointConfig k_defaultArmLowerControllerConfig = {
 
         .baseMotor = {
-            .pwmPin = MOTOR1,
-            .dirPin = MOTOR1_DIR,
+            .pwmPin   = MOTOR1,
+            .dirPin   = MOTOR1_DIR,
             .inverted = false
         },
 
         .shoulderMotor = {
-            .pwmPin = MOTOR2,
-            .directionPin = MOTOR2_DIR,
+            .pwmPin   = MOTOR2,
+            .dirPin   = MOTOR2_DIR,
             .inverted = false
         },
 
         .elbowMotor = {
-            .pwmPin = MOTOR3,
-            .dirPin = MOTOR3_DIR,
+            .pwmPin   = MOTOR3,
+            .dirPin   = MOTOR3_DIR,
             .inverted = false
         },
 
         .baseEncoder = {
-            .pwmPin = ENC_A1,
-            .minAngleDutyCycle = 0,
+            .pwmPin             = ENC_A1,
+            .minAngleDutyCycle  = 0,
             .zeroAngleDutyCycle = 0,
-            .maxAngleDutyCycle = 0
+            .maxAngleDutyCycle  = 0
         },
 
         .shoulderEncoder = {
-            .pwmPin = ENC_A2,
-            .minAngleDutyCycle = 0,
+            .pwmPin             = ENC_A2,
+            .minAngleDutyCycle  = 0,
             .zeroAngleDutyCycle = 0,
-            .maxAngleDutyCycle = 0
+            .maxAngleDutyCycle  = 0
         },
 
         .elbowEncoder = {
-            .pwmPin = ENC_A3,
-            .minAngleDutyCycle = 0,
+            .pwmPin             = ENC_A3,
+            .minAngleDutyCycle  = 0,
             .zeroAngleDutyCycle = 0,
-            .maxAngleDutyCycle = 0
+            .maxAngleDutyCycle  = 0
         },
-
-        .PIDUpdateInterval = 0.01f,
 
         .baseVelocityPID = {
             .P = 0.0f,
             .I = 0.0f,
-            .D = 0.0f
+            .D = 0.0f,
         },
 
         .shoulderVelocityPID = {
             .P = 0.0f,
             .I = 0.0f,
-            .D = 0.0f
+            .D = 0.0f,
         },
 
         .elbowVelocityPID = {
             .P = 0.0f,
             .I = 0.0f,
-            .D = 0.0f
+            .D = 0.0f,
         },
 
         .basePositionPID = {
             .P = 0.0f,
             .I = 0.0f,
-            .D = 0.0f
+            .D = 0.0f,
         },
 
         .shoulderPositionPID = {
@@ -153,11 +138,17 @@ public:
             .D = 0.0f
         },
 
+        .PIDUpdateInterval = 0.01f,
+
+        .PIDInputVelocityMinDegPerSec = -5.0f,
+        .PIDInputVelocityMaxDegPerSec = 5.0f,
+
+        .PIDOutputMotorMinDutyCycle = -1.0f,
+        .PIDOutputMotorMaxDutyCycle = 1.0f
+
     };
 
-    ArmBaseController(t_armLowerControllerConfig armLowerControllerConfig = k_defaultArmLowerControllerConfig, t_controlMode controlMode = t_controlMode.velocityPID);
-
-    ArmBaseController(t_controlMode controlMode = t_controlMode.velocityPID);
+    ArmLowerController(t_controlMode controlMode = velocityPID, t_armJointConfig armLowerControllerConfig = k_defaultArmLowerControllerConfig);
 
     mbed_error_status_t setControlMode(t_controlMode controlMode);
 
@@ -171,16 +162,16 @@ public:
 
     void update();
 
-
-private:
+protected:
 
     t_controlMode m_controlMode;
-    t_armLowerControllerConfig m_armLowerControllerConfig;
+    t_armJointConfig m_armLowerControllerConfig;
 
-    Motor m_motor[3];
-    PwmIn m_encoder[3];
-    PID m_velocityPIDController[3];
-    PID m_positionPIDController[3];
+    std::vector<*Motor> m_motor;
+    std::vector<PwmIn> m_encoder;
+
+    std::vector<PID> m_velocityPIDController;
+    std::vector<PID> m_positionPIDController;
 
 };
 

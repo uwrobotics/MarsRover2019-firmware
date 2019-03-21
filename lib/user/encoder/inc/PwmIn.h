@@ -23,8 +23,8 @@
 #ifndef MBED_PWMIN_H
 #define MBED_PWMIN_H
 
-#ifndef PWM_IN_AVERAGE_COUNT_DEFAULT
-#define PWM_IN_AVERAGE_COUNT_DEFAULT 4
+#ifndef PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE
+#define PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE 12
 #endif
 
 #include "mbed.h"
@@ -40,14 +40,12 @@ class PwmIn {
 
 public:
 
-    const int k_defaultNumSamplesToAverage = 12;
-
     /** Create a PwmIn with a specified number of pulses to average
      *
      * @param pwmSense           The pwm input pin (must support InterruptIn)
      * @param numSamplesToAverage The number of PWM measurements to sum before averaging
      */ 
-    PwmIn(PinName pwmSense, int numSamplesToAverage = k_defaultNumSamplesToAverage);
+    PwmIn(PinName pwmSense, int numSamplesToAverage = PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE);
 
     ~PwmIn();
     

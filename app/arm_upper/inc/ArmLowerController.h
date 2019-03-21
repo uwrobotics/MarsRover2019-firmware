@@ -35,7 +35,7 @@ typedef struct {
     float minAngleDutyCycle;
     float zeroAngleDutyCycle;
     float maxAngleDutyCycle;
-} t_encoderConfig;
+} t_absoluteEncoderConfig;
 
 typedef struct {
     // Motor config
@@ -54,9 +54,9 @@ typedef struct {
     PinName elbowEncoder;
 
     // Encoder duty cycle angle config (minimum, zero, and maximum angle)
-    t_encoderConfig baseEncoderConfig;
-    t_encoderConfig shoulderEncoderConfig;
-    t_encoderConfig elbowEncoderConfig;
+    t_absoluteEncoderConfig baseEncoderConfig;
+    t_absoluteEncoderConfig shoulderEncoderConfig;
+    t_absoluteEncoderConfig elbowEncoderConfig;
 
     // PID config
     float PIDUpdateInterval;
@@ -67,7 +67,7 @@ typedef struct {
     t_pidConstants shoulderPositionPID;
     t_pidConstants elbowPositionPID;
 
-} t_armLowerControllerConfig;
+} t_armJointConfig;
 
 // CLASS
 
@@ -92,7 +92,7 @@ public:
 private:
 
     t_controlMode m_controlMode;
-    t_armLowerControllerConfig m_armLowerControllerConfig;
+    t_armJointConfig m_armLowerControllerConfig;
 
 };
 

@@ -22,6 +22,10 @@
  
 #ifndef MBED_MOTOR_H
 #define MBED_MOTOR_H
+
+#ifndef MOTOR_DEFAULT_FREQUENCY_HZ
+#define MOTOR_DEFAULT_FREQUENCY_HZ 1000 // 1 kHz
+#endif
  
 #include "mbed.h"
  
@@ -32,9 +36,6 @@
 class Motor {
 
 public:
-
-    /** Default motor frequency (1kHz) **/
-    static const k_DefaultMotorFrequency = 1000;
  
     /** Create a motor control interface    
      *
@@ -44,14 +45,15 @@ public:
      * @param inverted  If true, then forward speed will set dir to 0 instead of 1, otherwise inverse
      * @param limit     Maximum speed magnitude
      */
-    Motor(PinName pwm, PinName dir, int freqInHz = k_DefaultMotorFrequency, bool inverted = false, float limit = 1.0);
-    Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = k_DefaultMotorFrequency, float limit = 1.0);
+    Motor(PinName pwm, PinName dir, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, bool inverted = false, float limit = 1.0);
+    Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, float limit = 1.0);
     
     /** Set the speed of the motor
      * 
      * @param speed The speed of the motor as a normalised value between -1.0 and 1.0
      */
     void speed(float speed);
+    Motor& operator=(int speed);
 
     /** Read the current speed of the motor
      * 

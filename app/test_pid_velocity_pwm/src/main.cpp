@@ -28,14 +28,14 @@ float angularVelocity = 0.0;
 float angularVelocityGoal = 150;
 
 // Initialize motor
-void initializeMotor(void){
+void initializeMotor(void) {
     motor.period_ms(1); // 1 ms period = 1 kHz frequency
     motor.write(0.0);
     motorDirection = 1;
 }
  
 // Setup velocity PID controller
-void initializePidController(void){
+void initializePidController(void) {
     velocityPIDController.setInputLimits(0.0, 200.0);
     velocityPIDController.setOutputLimits(0.0, 0.5);
     velocityPIDController.setBias(0.0);
