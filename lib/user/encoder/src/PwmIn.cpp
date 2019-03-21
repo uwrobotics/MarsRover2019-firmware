@@ -22,23 +22,6 @@
 
 #include "PwmIn.h"
 
-PwmIn::PwmIn(PinName pwmSense) : _pwmSense(pwmSense) {
-    _pwmSense.rise(callback(this, &PwmIn::rise));
-    _pwmSense.fall(callback(this, &PwmIn::fall));
-
-    _period = 0.0;
-    _pulseWidth = 0.0;
-    _periodSampleSum = 0.0;
-    _pulseWidthSampleSum = 0.0;
-    _sampleCount = 0;
-
-    _numSamplesToAverage = PWM_IN_AVERAGE_COUNT_DEFAULT;
-    _periodSamples = new float[_numSamplesToAverage]();
-    _pulseWidthSamples = new float[_numSamplesToAverage]();
-
-    _timer.start();
-}
-
 PwmIn::PwmIn(PinName pwmSense, int numSamplesToAverage) : _pwmSense(pwmSense), _numSamplesToAverage(numSamplesToAverage) {
     _pwmSense.rise(callback(this, &PwmIn::rise));
     _pwmSense.fall(callback(this, &PwmIn::fall));
