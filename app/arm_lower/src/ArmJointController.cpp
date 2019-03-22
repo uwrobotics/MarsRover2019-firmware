@@ -72,6 +72,10 @@ mbed_error_status_t ArmJointController::setAngleDegrees(float angleDegrees) {
     return MBED_SUCCESS;
 }
 
+t_controlMode ArmJointController::getControlMode() {
+    return m_controlMode;
+}
+
 float ArmJointController::getAngle() {
     return (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle) * 360.0f;
 }

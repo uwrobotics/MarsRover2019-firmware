@@ -136,7 +136,7 @@ float handlerSetSpeedWristRoll(Motor *motorLeft, Motor *motorRight, CANMsg *spee
     }
 }
 
-void proccessCANMsg(CANMsg *p_newMsg) {
+void processCANMsg(CANMsg *p_newMsg) {
     switch (p_newMsg->id) {
         // case configureDirectMotorControl: 
         //     pc.printf("\r\nRecieved command configureDirectMotorControl\r\n");
@@ -212,7 +212,7 @@ int main(void)
     while (1) {
 
         if (can.read(rxMsg)) {
-            proccessCANMsg(&rxMsg);
+            processCANMsg(&rxMsg);
             rxMsg.clear();
             ledCAN = !ledCAN;
         }

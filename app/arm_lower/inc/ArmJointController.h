@@ -21,8 +21,8 @@ typedef struct {
 
 typedef struct {
     PinName pwmPin;
-    float minAngleDutyCycle;
     float zeroAngleDutyCycle;
+    float minAngleDutyCycle;
     float maxAngleDutyCycle;
 } t_absoluteEncoderConfig;
 
@@ -68,6 +68,8 @@ public:
     mbed_error_status_t setVelocityDegreesPerSec(float velocityDegreesPerSec);
 
     mbed_error_status_t setAngleDegrees(float angleDegrees);
+
+    t_controlMode getControlMode();
 
     float getAngle();
 
