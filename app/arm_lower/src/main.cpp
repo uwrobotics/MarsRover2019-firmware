@@ -166,15 +166,16 @@ void initCAN() {
     // }
 }
 
-void handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
+t_controlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
     t_controlMode controlMode;
     *p_newMsg >> controlMode;
 
     p_armJointControllers[joint]->setControlMode(controlMode);
 
+    return controlMode;
 }
 
-void handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
+float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
     float motionData = 0;
     *p_newMsg >> motionData;
 
@@ -191,6 +192,8 @@ void handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             p_armJointControllers[joint]->setAngleDegrees(motionData);
             break;
     }
+
+    return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
