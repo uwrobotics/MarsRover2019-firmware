@@ -41,7 +41,7 @@ typedef struct {
     t_pidConstants velocityPID, positionPID;
 
     float PIDUpdateInterval;
-    float PIDInputVelocityInDegPerSec, PIDInputVelocityMaxDegPerSec;
+    float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
     float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
 
 } t_armJointConfig;

@@ -111,7 +111,7 @@ void ArmJointController::update() {
 void ArmJointController::initializePIDControllers(void) {
 
     // Configure velocity PID
-    m_velocityPIDController.setInputLimits(m_armJointConfig.PIDInputVelocityInDegPerSec, m_armJointConfig.PIDInputVelocityMaxDegPerSec);
+    m_velocityPIDController.setInputLimits(m_armJointConfig.PIDInputVelocityMinDegPerSec, m_armJointConfig.PIDInputVelocityMaxDegPerSec);
     m_velocityPIDController.setOutputLimits(m_armJointConfig.PIDOutputMotorMinDutyCycle, m_armJointConfig.PIDOutputMotorMaxDutyCycle);
     m_velocityPIDController.setBias(m_armJointConfig.velocityPID.bias);
     m_velocityPIDController.setMode(PID_AUTO_MODE);
