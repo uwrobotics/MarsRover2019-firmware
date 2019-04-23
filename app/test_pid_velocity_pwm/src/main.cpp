@@ -25,7 +25,7 @@ float angularVelocity = 0.0;
 
 // Velocity to reach.
 
-float angularVelocityGoal = 150;
+float angularVelocityGoal = 120;
 
 // Initialize motor
 void initializeMotor(void) {

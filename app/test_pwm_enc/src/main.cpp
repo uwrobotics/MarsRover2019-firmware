@@ -7,7 +7,7 @@ DigitalOut led(LED1);
 DigitalOut motorDirection(MOTOR1_DIR);
 
 PwmOut pwm1(MOTOR3);
-PwmIn a(ENC_A2, 10);
+PwmIn a(ENC_A1, 120);
 
 double avgEncPWMDuty = 0.0;
 double prevAvgEncPWMDuty = 0.0;
@@ -57,7 +57,7 @@ int main() {
 
         angularVelocity = 360.0 * dutyVelocity;
 
-        pc.printf("Avg PW: %f, \tAvg Prd: %f, \tDuty: %f, \tDuty Velo: %f, \tAng Veloc: %f\r\n", a.avgPulseWidth(), a.avgPeriod(), avgEncPWMDuty, dutyVelocity, angularVelocity);
+        pc.printf("Avg PW: %+f, \tAvg Prd: %+f, \tRaw Duty: %+f, \tAvg Duty: %+f, \tAvg Duty Velo: %+f, \tAng Veloc: %+f\r\n", a.avgPulseWidth(), a.avgPeriod(), a.dutyCycle(), avgEncPWMDuty, dutyVelocity, angularVelocity);
 
         wait(kUpdatePeriod);
 
