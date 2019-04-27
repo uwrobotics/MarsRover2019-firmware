@@ -7,7 +7,10 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 //Use X2 encoding by default.
 
 // configured for use with science board centrifuge encoder
-QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
+//QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
+
+// configured for use with arm claw encoder
+QEI wheel(ENCR1_CH1, ENCR1_CH2, ENCR1_INDEX, 48, QEI::X4_ENCODING);
 
 // pin mappings when using science board EC1:
 // ENC_CENT_1 -> PA7 -> LQFP64 -> 23
@@ -15,8 +18,7 @@ QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
 // END_CENT_INDEX -> PC5 -> LQFP64 -> 25
  
 int main() {
-    pc.baud(9600);
- 
+
     while(1){
         wait(0.1);
         pc.printf("Pulses is: %i\n\r", wheel.getPulses());
