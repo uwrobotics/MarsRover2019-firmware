@@ -45,7 +45,6 @@ public:
      * @param inverted  If true, then forward speed will set dir to 0 instead of 1, otherwise inverse
      * @param limit     Maximum speed magnitude
      */
-    Motor(PinName pwm, PinName dir, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, bool inverted = false, float limit = 1.0);
     Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, float limit = 1.0);
     
     /** Set the speed of the motor
