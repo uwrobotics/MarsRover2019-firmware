@@ -182,7 +182,7 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
     t_controlMode controlMode = p_armJointControllers[joint]->getControlMode();
 
     switch (controlMode) {
-        case motorSpeed:
+        case motorDutyCycle:
             p_armJointControllers[joint]->setMotorSpeedPercent(motionData);
             break;
         case velocityPID:

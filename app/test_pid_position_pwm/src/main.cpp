@@ -1,82 +1,68 @@
 #include "mbed.h"
 #include "PID.h"
 #include "PwmIn.h"
- 
+#include "Motor.h"
+
 // Constants
 const float kUpdatePeriod = 0.05;
 
 Serial pc(SERIAL_TX, SERIAL_RX);
 
-PwmOut motor(MOTOR1);
-DigitalOut motorDirection(MOTOR1_DIR);
-PwmIn pwmEncoder(ENC_A1, 12);
+Motor motor(MOTOR1, MOTOR1_DIR, true);
+PwmIn pwmEncoder(ENC_A1, 50);
 
 DigitalOut led(LED1);
 
-PID velocityPIDController(3.4, 0.6, 0.0, kUpdatePeriod);
+PID velocityPIDController(5.5, 0.0, 0.0, kUpdatePeriod);
+Timer timer;
 
 // Variables
 float motorPWMDuty = 0.0;
-float encoderPWMDuty = 0.0;
+float jointAngle = 0.0;
 
 // Velocity to reach.
-float angleGoal = 0.9;
 
-// Initialize motor
-void initializeMotor(void){
-    motor.period_ms(1); // 1 ms period = 1 kHz frequency
-    motor.write(0.0);
-    motorDirection = 1;
-}
- 
+float angleGoalDegrees = 0.0;
+
 // Setup velocity PID controller
-void initializePidController(void){
-    velocityPIDController.setInputLimits(0.0, 1.0);
-    velocityPIDController.setOutputLimits(-0.3, 0.3);
+void initializePidController(void) {
+    velocityPIDController.setInputLimits(-180, 180.0);
+    velocityPIDController.setOutputLimits(-1.0, 1.0);
     velocityPIDController.setBias(0.0);
     velocityPIDController.setMode(PID_AUTO_MODE);
 }
 
-void setMotor(float speed) {
-    if (speed >= 0) {
-        motorDirection = 1;
-    }
-    else {
-        motorDirection = 0;
-        speed = -speed;
-    }
-
-    motor.write(speed);
-}
- 
 int main() {
- 
+
     // Initialization
-    initializeMotor();
     initializePidController();
 
-    wait(2);
+    wait(1);
 
     // Set velocity set point.
-    velocityPIDController.setSetPoint(angleGoal);
- 
-    // Run for 3 seconds.
+    velocityPIDController.setSetPoint(angleGoalDegrees);
+
+    timer.start();
+
+    float interval = 0.00;
+
+    // Run
     while (true) {
         // Get the encoder PWM duty and calculate the angular velocity
-        encoderPWMDuty = pwmEncoder.avgDutyCycle();
+        jointAngle = -(pwmEncoder.avgDutyCycle() - 0.5) * 360.0;
+        interval = timer.read();
+        timer.reset();
 
         // Update the PID controller
-        velocityPIDController.setProcessValue(encoderPWMDuty);
+        velocityPIDController.setInterval(interval);
+        velocityPIDController.setProcessValue(jointAngle);
         motorPWMDuty = velocityPIDController.compute();
-        setMotor(motorPWMDuty);
+        motor.speed(motorPWMDuty);
 
-        pc.printf("%f, %f, %f\r\n", encoderPWMDuty, angleGoal, motorPWMDuty);
+        pc.printf("Angle: %f, \tGoal: %f, \tMotor DC: %f\r\n", jointAngle, angleGoalDegrees, motorPWMDuty);
 
         wait(kUpdatePeriod);
         led = !led;
     }
- 
-    // Stop motors
-    motor.write(0.0);
-    
+
 }

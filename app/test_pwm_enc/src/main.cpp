@@ -7,7 +7,7 @@ DigitalOut led(LED1);
 DigitalOut motorDirection(MOTOR1_DIR);
 
 PwmOut pwm1(MOTOR3);
-PwmIn a(ENC_A1, 120);
+PwmIn a(ENC_A1, 50);
 
 double avgEncPWMDuty = 0.0;
 double prevAvgEncPWMDuty = 0.0;

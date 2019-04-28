@@ -25,7 +25,7 @@ mbed_error_status_t ArmJointController::setControlMode(t_controlMode controlMode
     m_motor.speed(0.0f);
 
     switch (m_controlMode) {
-        case motorSpeed:
+        case motorDutyCycle:
             break;
         case velocityPID:
             m_velocityPIDController.reset();
@@ -43,7 +43,7 @@ mbed_error_status_t ArmJointController::setControlMode(t_controlMode controlMode
 }
 
 mbed_error_status_t ArmJointController::setMotorSpeedPercent(float speedPercent) {
-    if (m_controlMode != motorSpeed) {
+    if (m_controlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
@@ -89,7 +89,7 @@ void ArmJointController::update() {
     m_prevEncoderPWMDuty = encoderPWMDuty;
 
     switch (m_controlMode) {
-        case motorSpeed:
+        case motorDutyCycle:
             break;
         case velocityPID:
 

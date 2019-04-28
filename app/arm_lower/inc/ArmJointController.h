@@ -47,7 +47,7 @@ typedef struct {
 } t_armJointConfig;
 
 typedef enum t_controlMode {
-    motorSpeed,
+    motorDutyCycle,
     velocityPID,
     positionPID
 
