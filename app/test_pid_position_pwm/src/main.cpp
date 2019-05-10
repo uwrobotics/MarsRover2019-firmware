@@ -57,7 +57,7 @@ int main() {
         velocityPIDController.setInterval(interval);
         velocityPIDController.setProcessValue(jointAngle);
         motorPWMDuty = velocityPIDController.compute();
-        motor.speed(motorPWMDuty);
+        motor.setSpeed(motorPWMDuty);
 
         pc.printf("Angle: %f, \tGoal: %f, \tMotor DC: %f\r\n", jointAngle, angleGoalDegrees, motorPWMDuty);
 

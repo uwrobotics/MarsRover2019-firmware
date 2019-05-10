@@ -60,7 +60,7 @@ int main() {
         velocityPIDController.setInterval(interval);
         velocityPIDController.setProcessValue(angularVelocity);
         motorPWMDuty = velocityPIDController.compute();
-        motor.speed(motorPWMDuty);
+        motor.setSpeed(motorPWMDuty);
 
         pc.printf("Angular Velocity: %f, \tGoal: %f, \tMotor DC: %f\r\n", angularVelocity, angleGoalDegrees, motorPWMDuty);
 

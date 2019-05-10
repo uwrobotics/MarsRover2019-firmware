@@ -68,7 +68,7 @@ float handlerSetSpeedClaw(Motor *motor, CANMsg *motorSpeedMsg) {
         double setSpeed = 0.0;
         *motorSpeedMsg >> setSpeed;
         setSpeed /= VELOCITY_TO_PWM_DUTY_SCALER;
-        motor->speed(setSpeed);
+        motor->setSpeed(setSpeed);
 
         return setSpeed;
     }
@@ -97,8 +97,8 @@ float handerSetSpeedWristPitch(Motor *motorLeft, Motor *motorRight, CANMsg *spee
         wristLeftMotorPitchSpeed = setSpeed * 0.5;
         wristRightMotorPitchSpeed = setSpeed;
 
-        motorLeft->speed(wristLeftMotorPitchSpeed + wristLeftMotorRollSpeed);
-        motorRight->speed(wristRightMotorPitchSpeed + wristRightMotorRollSpeed);
+        motorLeft->setSpeed(wristLeftMotorPitchSpeed + wristLeftMotorRollSpeed);
+        motorRight->setSpeed(wristRightMotorPitchSpeed + wristRightMotorRollSpeed);
 
         return setSpeed;
     }
@@ -122,8 +122,8 @@ float handlerSetSpeedWristRoll(Motor *motorLeft, Motor *motorRight, CANMsg *spee
         wristLeftMotorRollSpeed = setSpeed * 0.5;
         wristRightMotorRollSpeed = -setSpeed;
 
-        motorLeft->speed(wristLeftMotorPitchSpeed + wristLeftMotorRollSpeed);
-        motorRight->speed(wristRightMotorPitchSpeed + wristRightMotorRollSpeed);
+        motorLeft->setSpeed(wristLeftMotorPitchSpeed + wristLeftMotorRollSpeed);
+        motorRight->setSpeed(wristRightMotorPitchSpeed + wristRightMotorRollSpeed);
 
         return setSpeed;
     }

@@ -35,16 +35,16 @@ Motor::Motor(PinName pwm, PinName dir, bool inverted, int freqInHz, float limit)
     _dir = 0.0;
 }
 
-void Motor::speed(float speed) {
+void Motor::setSpeed(float speed) {
     _dir = (speed > 0.0) != _inverted;
     _pwm = min( (float) fabs(speed), _limit);
 }
 
 Motor& Motor::operator=(int speed) {
-    this->speed(speed);
+    this->setSpeed(speed);
     return *this;
 }
 
-float Motor::read() {
+float Motor::getSpeed() {
 	return _pwm.read();
 }

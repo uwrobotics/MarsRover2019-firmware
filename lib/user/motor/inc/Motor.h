@@ -51,14 +51,14 @@ public:
      * 
      * @param speed The speed of the motor as a normalised value between -1.0 and 1.0
      */
-    void speed(float speed);
+    void setSpeed(float speed);
     Motor& operator=(int speed);
 
     /** Read the current speed of the motor
      * 
      * @return Current speed of motor
      */
-    float read();
+    float getSpeed();
  
 protected:
     PwmOut _pwm;
