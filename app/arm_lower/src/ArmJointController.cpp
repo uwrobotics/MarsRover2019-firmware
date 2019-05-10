@@ -62,7 +62,12 @@ mbed_error_status_t ArmJointController::setMotorSpeedPercent(float speedPercent)
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    m_motor.speed(speedPercent);
+    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && speedPercent < 0.0f) ||
+        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && speedPercent > 0.0f)) {
+        speedPercent = 0.0f;
+    }
+
+    m_motor.setSpeed(speedPercent);
 
     return MBED_SUCCESS;
 }
@@ -70,6 +75,11 @@ mbed_error_status_t ArmJointController::setMotorSpeedPercent(float speedPercent)
 mbed_error_status_t ArmJointController::setVelocityDegreesPerSec(float velocityDegreesPerSec) {
     if (m_controlMode != velocityPID) {
         return MBED_ERROR_INVALID_OPERATION;
+    }
+
+    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && velocityDegreesPerSec < 0.0f) ||
+        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && velocityDegreesPerSec > 0.0f)) {
+        velocityDegreesPerSec = 0.0f;
     }
 
     m_positionPIDController.setSetPoint(velocityDegreesPerSec);
@@ -80,6 +90,13 @@ mbed_error_status_t ArmJointController::setVelocityDegreesPerSec(float velocityD
 mbed_error_status_t ArmJointController::setAngleDegrees(float angleDegrees) {
     if (m_controlMode != positionPID) {
         return MBED_ERROR_INVALID_OPERATION;
+    }
+
+    if (angleDegrees < m_armJointConfig.encoder.minAngleDegrees) {
+        angleDegrees = m_armJointConfig.encoder.minAngleDegrees;
+    }
+    else if (angleDegrees > m_armJointConfig.encoder.maxAngleDegrees) {
+        angleDegrees = m_armJointConfig.encoder.maxAngleDegrees;
     }
 
     m_positionPIDController.setSetPoint(angleDegrees);
@@ -97,7 +114,13 @@ void ArmJointController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
+            if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && m_motor.getSpeed() < 0.0f) ||
+                (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && m_motor.getSpeed() > 0.0f)) {
+                m_motor.setSpeed(0.0f);
+            }
+
             break;
+
         case velocityPID:
 
             angularVelocity = m_inversionMultiplier * 360.0f * (encoderPWMDuty - m_prevEncoderPWMDuty) / interval;
@@ -108,6 +131,7 @@ void ArmJointController::update() {
             m_motor.setSpeed(m_velocityPIDController.compute());
 
             break;
+
         case positionPID:
 
             m_positionPIDController.setInterval(interval);
