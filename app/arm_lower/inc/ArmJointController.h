@@ -74,6 +74,8 @@ public:
 
     float getAngleDegrees();
 
+    float getAngleVelocityDegreesPerSec();
+
     void update();
 
 protected:
@@ -85,8 +87,6 @@ protected:
 
     Motor m_motor;
     PwmIn m_encoder;
-
-    float m_prevEncoderPWMDuty;
 
     PID m_velocityPIDController;
     PID m_positionPIDController;

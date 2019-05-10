@@ -35,6 +35,10 @@ float ArmJointController::getAngleDegrees() {
     return m_inversionMultiplier * 360.0f * (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle);
 }
 
+float ArmJointController::getAngleVelocityDegreesPerSec() {
+    return m_inversionMultiplier * 360.0f * m_encoder.avgDutyCycleVelocity();
+}
+
 mbed_error_status_t ArmJointController::setControlMode(t_controlMode controlMode) {
     m_controlMode = controlMode;
     m_motor.setSpeed(0.0f);
@@ -105,12 +109,8 @@ mbed_error_status_t ArmJointController::setAngleDegrees(float angleDegrees) {
 }
 
 void ArmJointController::update() {
-    float encoderPWMDuty = m_encoder.avgDutyCycle();
-    float angularVelocity = 0;
     float interval = timer.read();
-
     timer.reset();
-    m_prevEncoderPWMDuty = encoderPWMDuty;
 
     switch (m_controlMode) {
         case motorDutyCycle:
@@ -122,21 +122,15 @@ void ArmJointController::update() {
             break;
 
         case velocityPID:
-
-            angularVelocity = m_inversionMultiplier * 360.0f * (encoderPWMDuty - m_prevEncoderPWMDuty) / interval;
-
             m_velocityPIDController.setInterval(interval);
-            m_velocityPIDController.setProcessValue(angularVelocity);
-
+            m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
             m_motor.setSpeed(m_velocityPIDController.compute());
 
             break;
 
         case positionPID:
-
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getAngleDegrees());
-
             m_motor.setSpeed(m_velocityPIDController.compute());
 
             break;
