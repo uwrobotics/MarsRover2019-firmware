@@ -85,19 +85,25 @@ public:
      */
     float avgDutyCycle();
 
+    /** Read the average duty cycle velocity
+     *
+     * @returns the average duty cycle velocity as a 0.0-1.0 percentage/second
+     */
+    float avgDutyCycleVelocity();
+
 protected:
     
     InterruptIn _pwmSense;
     Timer _timer;
 
     float _pulseWidth, _period;
-    float _avgPulseWidth, _avgPeriod;
+    float _avgPulseWidth, _avgPeriod, _avgDutyCycle, _prevAvgDutyCycle, _avgDutyCycleVelocity;
     
     int _sampleCount;
     int _numSamplesToAverage; 
 
-    float * _pulseWidthSamples;
-    float * _periodSamples;
+    float * _p_pulseWidthSamples;
+    float * _p_periodSamples;
 
     float _pulseWidthSampleSum;
     float _periodSampleSum;
