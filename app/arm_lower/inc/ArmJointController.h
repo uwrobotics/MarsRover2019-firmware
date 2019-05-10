@@ -22,8 +22,9 @@ typedef struct {
 typedef struct {
     PinName pwmPin;
     float zeroAngleDutyCycle;
-    float minAngleDutyCycle;
-    float maxAngleDutyCycle;
+    float minAngleDegrees;
+    float maxAngleDegrees;
+    bool inverted;
 } t_absoluteEncoderConfig;
 
 typedef struct {
@@ -40,7 +41,7 @@ typedef struct {
     // PID config
     t_pidConstants velocityPID, positionPID;
 
-    float PIDUpdateInterval;
+    float initPIDUpdateInterval;
     float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
     float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
 
@@ -71,7 +72,7 @@ public:
 
     t_controlMode getControlMode();
 
-    float getAngle();
+    float getAngleDegrees();
 
     void update();
 
@@ -89,6 +90,8 @@ protected:
 
     PID m_velocityPIDController;
     PID m_positionPIDController;
+
+    float m_inversionMultiplier;
 
     Timer timer;
 

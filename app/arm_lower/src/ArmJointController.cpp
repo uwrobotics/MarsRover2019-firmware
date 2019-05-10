@@ -12,17 +12,32 @@
 ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_controlMode controlMode) :
     m_controlMode(controlMode), m_armJointConfig(armJointConfig),
     m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin, armJointConfig.motor.inverted), m_encoder(armJointConfig.encoder.pwmPin),
-    m_velocityPIDController(armJointConfig.velocityPID.P, armJointConfig.velocityPID.I, armJointConfig.velocityPID.D, armJointConfig.PIDUpdateInterval),
-    m_positionPIDController(armJointConfig.positionPID.P, armJointConfig.positionPID.I, armJointConfig.positionPID.D, armJointConfig.PIDUpdateInterval) {
+    m_velocityPIDController(armJointConfig.velocityPID.P, armJointConfig.velocityPID.I, armJointConfig.velocityPID.D, armJointConfig.initPIDUpdateInterval),
+    m_positionPIDController(armJointConfig.positionPID.P, armJointConfig.positionPID.I, armJointConfig.positionPID.D, armJointConfig.initPIDUpdateInterval) {
+
+    if (armJointConfig.encoder.inverted) {
+        m_inversionMultiplier = -1;
+    }
+    else {
+        m_inversionMultiplier = 1;
+    }
 
     initializePIDControllers();
     timer.start();
 
 }
 
+t_controlMode ArmJointController::getControlMode() {
+    return m_controlMode;
+}
+
+float ArmJointController::getAngleDegrees() {
+    return m_inversionMultiplier * 360.0f * (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle);
+}
+
 mbed_error_status_t ArmJointController::setControlMode(t_controlMode controlMode) {
     m_controlMode = controlMode;
-    m_motor.speed(0.0f);
+    m_motor.setSpeed(0.0f);
 
     switch (m_controlMode) {
         case motorDutyCycle:
@@ -72,16 +87,8 @@ mbed_error_status_t ArmJointController::setAngleDegrees(float angleDegrees) {
     return MBED_SUCCESS;
 }
 
-t_controlMode ArmJointController::getControlMode() {
-    return m_controlMode;
-}
-
-float ArmJointController::getAngle() {
-    return (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle) * 360.0f;
-}
-
 void ArmJointController::update() {
-    float encoderPWMDuty = m_encoder.avgDutyCycle();;
+    float encoderPWMDuty = m_encoder.avgDutyCycle();
     float angularVelocity = 0;
     float interval = timer.read();
 
@@ -93,20 +100,20 @@ void ArmJointController::update() {
             break;
         case velocityPID:
 
-            angularVelocity = 360.0f * (encoderPWMDuty - m_prevEncoderPWMDuty) / interval;
+            angularVelocity = m_inversionMultiplier * 360.0f * (encoderPWMDuty - m_prevEncoderPWMDuty) / interval;
 
             m_velocityPIDController.setInterval(interval);
             m_velocityPIDController.setProcessValue(angularVelocity);
 
-            m_motor.speed(m_velocityPIDController.compute());
+            m_motor.setSpeed(m_velocityPIDController.compute());
 
             break;
         case positionPID:
 
             m_positionPIDController.setInterval(interval);
-            m_positionPIDController.setProcessValue(encoderPWMDuty);
+            m_positionPIDController.setProcessValue(getAngleDegrees());
 
-            m_motor.speed(m_velocityPIDController.compute());
+            m_motor.setSpeed(m_velocityPIDController.compute());
 
             break;
     }
@@ -121,7 +128,7 @@ void ArmJointController::initializePIDControllers(void) {
     m_velocityPIDController.setMode(PID_AUTO_MODE);
 
     // Configure position PID
-    m_positionPIDController.setInputLimits(m_armJointConfig.encoder.minAngleDutyCycle * 360.0f, m_armJointConfig.encoder.maxAngleDutyCycle * 360.0f);
+    m_positionPIDController.setInputLimits(m_armJointConfig.encoder.minAngleDegrees * 360.0f, m_armJointConfig.encoder.maxAngleDegrees * 360.0f);
     m_velocityPIDController.setOutputLimits(m_armJointConfig.PIDOutputMotorMinDutyCycle, m_armJointConfig.PIDOutputMotorMaxDutyCycle);
     m_velocityPIDController.setBias(m_armJointConfig.positionPID.bias);
     m_velocityPIDController.setMode(PID_AUTO_MODE);

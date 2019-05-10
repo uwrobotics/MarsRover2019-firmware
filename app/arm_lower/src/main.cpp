@@ -16,27 +16,28 @@ const t_armJointConfig turnTableConfig = {
         .encoder = {
                 .pwmPin = ENC_A1,
                 .zeroAngleDutyCycle = 0.5f,
-                .minAngleDutyCycle = 0.0f,
-                .maxAngleDutyCycle = 1.0f
+                .minAngleDegrees = -90.0f,
+                .maxAngleDegrees = 90.0f,
+                .inverted = true
         },
 
         .velocityPID = {
-                .P    = 0.0f,
-                .I    = 0.0f,
+                .P    = 0.4f,
+                .I    = 0.2f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
         .positionPID = {
-                .P    = 0.0f,
-                .I    = 0.0f,
+                .P    = 4.50f,
+                .I    = 0.98f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
-        .PIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = 0.0f,
-        .PIDInputVelocityMaxDegPerSec = 5.0f,
+        .initPIDUpdateInterval = 0.05f,
+        .PIDInputVelocityMinDegPerSec = -20.0f,
+        .PIDInputVelocityMaxDegPerSec = 20.0f,
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -50,28 +51,29 @@ const t_armJointConfig shoulderConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A2,
-                .zeroAngleDutyCycle = 0.5f,
-                .minAngleDutyCycle = 0.0f,
-                .maxAngleDutyCycle = 1.0f
+                .zeroAngleDutyCycle = 0.7281f,
+                .minAngleDegrees = -18.7f,
+                .maxAngleDegrees = 139.0f,
+                .inverted = true;
         },
 
         .velocityPID = {
-                .P    = 0.0f,
-                .I    = 0.0f,
+                .P    = 0.65f,
+                .I    = 0.20f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
         .positionPID = {
-                .P    = 0.0f,
+                .P    = 6.1f,
                 .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
-        .PIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = 0.0f,
-        .PIDInputVelocityMaxDegPerSec = 5.0f,
+        .initPIDUpdateInterval = 0.05f,
+        .PIDInputVelocityMinDegPerSec = -20.0f,
+        .PIDInputVelocityMaxDegPerSec = 20.0f,
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -80,33 +82,34 @@ const t_armJointConfig elbowConfig = {
         .motor = {
                 .pwmPin = MOTOR3,
                 .dirPin = MOTOR3_DIR,
-                .inverted = false
+                .inverted = true
         },
 
         .encoder = {
                 .pwmPin = ENC_A3,
-                .zeroAngleDutyCycle = 0.5f,
-                .minAngleDutyCycle = 0.0f,
-                .maxAngleDutyCycle = 1.0f
+                .zeroAngleDutyCycle = 0.547f,
+                .minAngleDegrees = -160.9f,
+                .maxAngleDegrees = 1.1f,
+                .inverted = false
         },
 
         .velocityPID = {
-                .P    = 0.0f,
-                .I    = 0.0f,
+                .P    = 0.7f,
+                .I    = 0.2f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
         .positionPID = {
-                .P    = 0.0f,
-                .I    = 0.0f,
+                .P    = 16.0f,
+                .I    = 0.97f,
                 .D    = 0.0f,
                 .bias = 0.0f
         },
 
-        .PIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = 0.0f,
-        .PIDInputVelocityMaxDegPerSec = 5.0f,
+        .initPIDUpdateInterval = 0.05f,
+        .PIDInputVelocityMinDegPerSec = -20.0f,
+        .PIDInputVelocityMaxDegPerSec = 20.0f,
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -233,7 +236,7 @@ void sendJointAngles() {
 
     for (int i = 0; i < 3; i++) {
 
-        float angle = p_armJointControllers[i]->getAngle();
+        float angle = p_armJointControllers[i]->getAngleDegrees();
 
 //        char arr[sizeof(angle)];
 //        memcpy(arr, &angle, sizeof(angle));
