@@ -23,8 +23,8 @@
 #include "Motor.h"
 #include "mbed.h"
 #include <algorithm>
- 
-Motor::Motor(PinName pwm, PinName dir, int freqInHz, bool inverted, float limit) : 
+
+Motor::Motor(PinName pwm, PinName dir, bool inverted, int freqInHz, float limit) :
 	_pwm(pwm), _dir(dir), _inverted(inverted), _limit(limit) {
  
     // Set initial condition of PWM
@@ -34,12 +34,17 @@ Motor::Motor(PinName pwm, PinName dir, int freqInHz, bool inverted, float limit)
     // Initial condition of output enables
     _dir = 0.0;
 }
- 
-void Motor::speed(float speed) {
+
+void Motor::setSpeed(float speed) {
     _dir = (speed > 0.0) != _inverted;
     _pwm = min( (float) fabs(speed), _limit);
 }
 
-float Motor::read() {
+Motor& Motor::operator=(int speed) {
+    this->setSpeed(speed);
+    return *this;
+}
+
+float Motor::getSpeed() {
 	return _pwm.read();
 }
