@@ -1,13 +1,13 @@
-# MarsRover2019-firmware
+# Mars Rover 2019 Firmware
 
-## Platform: STM32F091 / NUCLEO-F091RC
+## Platform: [STM32F091](https://www.st.com/resource/en/datasheet/stm32f091rc.pdf) / [NUCLEO-F091RC](https://os.mbed.com/platforms/ST-Nucleo-F091RC/)
 
-Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
-- mbed library
-- additional external libaries
-- additional libraries written by the team
-- test applications for testing code components
-- applications for running on each board
+Firmware for the 2019 University of Waterloo Mars Rover. Contains:
+- Arm MBED SDK source ([lib/mbed](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/mbed))
+- additional external libaries ([lib/user](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/user))
+- additional libraries written by the team ([lib/user](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/user))
+- test applications for testing code components ([app/test_xxxx](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/app))
+- applications for running on each board ([app](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/app))
 
 ## Best Contribution Practices and Tips
 
