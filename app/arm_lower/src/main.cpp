@@ -273,10 +273,14 @@ int main(void)
             ledCAN = !ledCAN;
         }
 
-         if (canSendTimer.read() > 0.1) {
-             sendJointAngles();
-             canSendTimer.reset();
-         }
+        if (canSendTimer.read() > 0.1) {
+            sendJointAngles();
+            canSendTimer.reset();
+        }
+
+        turnTableController.update();
+        shoulderController.update();
+        elbowController.update();
 
     }
 }
