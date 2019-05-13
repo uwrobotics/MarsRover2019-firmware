@@ -1,7 +1,7 @@
 /* Controller for the arm base, shoulder and elbow
  */
 
-#include "ArmJointController.h"
+#include "../inc/ArmJointController.h"
 
 #include "mbed.h"
 #include "Motor.h"
