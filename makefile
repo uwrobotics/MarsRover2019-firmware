@@ -2,8 +2,9 @@
 # see http://mbed.org/handbook/Exporting-to-GCC-ARM-Embedded
 
 BUILD_PATH    := build
+APPS_PATH	  := app
 APP_OUT_PATH  := ../$(BUILD_PATH)/$(APP)
-APP_PATH      := ../app/$(APP)
+APP_PATH      := ../$(APPS_PATH)/$(APP)
 LIB_PATH      := ../lib
 USER_LIB_PATH := $(LIB_PATH)/user
 CONFIG_PATH   := ../config
@@ -22,6 +23,15 @@ else
     RM_FILE_TYPE = '$(SHELL)' -c "find $(1) -name \"$(2)\" -delete -print"
 endif
 
+null :=
+space := ${null} ${null}
+${space} := ${space}
+
+define \n
+
+
+endef
+
 # Move to the build directory
 ifeq (,$(filter $(BUILD_PATH),$(notdir $(CURDIR))))
 .SUFFIXES:
@@ -30,9 +40,15 @@ MAKETARGET = '$(MAKE)' --no-print-directory -C $(BUILD_PATH) -f '$(mkfile_path)'
 		'SRCDIR=$(CURDIR)' $(MAKECMDGOALS)
 .PHONY: $(BUILD_PATH) clean
 all:
-ifeq ($(APP),)
-	$(error APP is not set. Select an app to build with APP=app_name $(APP))
+
+ifeq ($(filter $(APP), $(patsubst app/%/,%,$(sort $(dir $(wildcard app/*/))))),)
+	$(error APP is not set or is not supported. ${\n}Select an app to build with APP=app_name:${\n}${\n}$(subst ${ },${\n},$(patsubst $(APPS_PATH)/%/,%,$(sort $(dir $(wildcard app/*/)))))${\n}${\n})
 endif
+
+ifeq ($(filter $(BOARD),"nucleo arm science safety"),)
+	$(error BOARD is not set or is not supported. Set BOARD=board_name:${\n}${\n}safety${\n}arm${\n}science${\n}nucleo${\n}${\n}))
+endif
+
 	+@$(call MAKE_DIR,$(BUILD_PATH)/$(APP))
 	+@$(MAKETARGET)
 $(BUILD_PATH): all
@@ -58,7 +74,7 @@ VPATH = ..
 ###############################################################################
 # Project settings
 
-PROJECT := $(APP)_$(PINMAP)
+PROJECT := $(APP)_$(BOARD)
 
 # Project settings
 ###############################################################################
@@ -261,13 +277,13 @@ PREPROC := arm-none-eabi-cpp -E -P -Wl,--gc-sections -Wl,--wrap,main -Wl,--wrap,
 		   -Wl,--wrap,_free_r -Wl,--wrap,_realloc_r -Wl,--wrap,_memalign_r -Wl,--wrap,_calloc_r \
 		   -Wl,--wrap,exit -Wl,--wrap,atexit -Wl,-n -mcpu=cortex-m0 -mthumb
 
-ifeq ($(PINMAP),nucleo)
+ifeq ($(BOARD),nucleo)
 	COMMON_FLAGS += -DNUCLEO_PINMAP
-else ifeq ($(PINMAP),arm)
+else ifeq ($(BOARD),arm)
 	COMMON_FLAGS += -DROVERBOARD_ARM_PINMAP
-else ifeq ($(PINMAP),science)
+else ifeq ($(BOARD),science)
 	COMMON_FLAGS += -DROVERBOARD_SCIENCE_PINMAP
-else ifeq ($(PINMAP),safety)
+else ifeq ($(BOARD),safety)
 	COMMON_FLAGS += -DROVERBOARD_SAFETY_PINMAP
 endif
 
