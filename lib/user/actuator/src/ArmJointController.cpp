@@ -9,7 +9,7 @@
 #include "PID.h"
 #include "PinNames.h"
 
-ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_controlMode controlMode) :
+ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_jointControlMode controlMode) :
     m_controlMode(controlMode), m_armJointConfig(armJointConfig),
     m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin, armJointConfig.motor.inverted), m_encoder(armJointConfig.encoder.pwmPin),
     m_velocityPIDController(armJointConfig.velocityPID.P, armJointConfig.velocityPID.I, armJointConfig.velocityPID.D, armJointConfig.initPIDUpdateInterval),
@@ -27,7 +27,7 @@ ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_contro
 
 }
 
-t_controlMode ArmJointController::getControlMode() {
+t_jointControlMode ArmJointController::getControlMode() {
     return m_controlMode;
 }
 
@@ -39,7 +39,7 @@ float ArmJointController::getAngleVelocityDegreesPerSec() {
     return m_inversionMultiplier * 360.0f * m_encoder.avgDutyCycleVelocity();
 }
 
-mbed_error_status_t ArmJointController::setControlMode(t_controlMode controlMode) {
+mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode controlMode) {
     m_controlMode = controlMode;
     m_motor.setSpeed(0.0f);
 
