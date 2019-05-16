@@ -43,7 +43,7 @@ public:
     mbed_error_status_t setRollAngleDegrees(float angleDegrees);
 
     mbed_error_status_t setPitchAngleDegrees(float angleDegrees);
-return 0;
+
     t_jointControlMode getControlMode();
 
     float getRollAngleDegrees();
