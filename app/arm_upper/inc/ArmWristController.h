@@ -1,5 +1,5 @@
-#ifndef ARM_JOINT_CONTROLLER_H
-#define ARM_JOINT_CONTROLLER_H
+#ifndef ARM_WRIST_CONTROLLER_H
+#define ARM_WRIST_CONTROLLER_H
 
 /* Controller for the arm base, shoulder and elbow
  */
@@ -17,18 +17,10 @@ typedef struct {
     // Joint config
     t_armJointConfig leftJointConfig, rightJointConfig;
 
-    float initPIDUpdateInterval;
-    float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
-    float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
+    float leftToRightMotorBias;
+
 
 } t_armWristConfig;
-
-typedef enum t_controlMode {
-    motorDutyCycle,
-    velocityPID,
-    positionPID
-
-} t_controlMode;
 
 // CLASS
 
@@ -36,9 +28,9 @@ class ArmWristController {
 
 public:
 
-    ArmWristController(t_armWristConfig armWristConfig, t_controlMode controlMode = velocityPID);
+    explicit ArmWristController(t_armWristConfig armWristConfig, t_jointControlMode controlMode = velocityPID);
 
-    mbed_error_status_t setControlMode(t_controlMode controlMode);
+    mbed_error_status_t setControlMode(t_jointControlMode controlMode);
 
     mbed_error_status_t setRollSpeedPercent(float speedPercent);
 
@@ -51,8 +43,8 @@ public:
     mbed_error_status_t setRollAngleDegrees(float angleDegrees);
 
     mbed_error_status_t setPitchAngleDegrees(float angleDegrees);
-
-    t_controlMode getControlMode();
+return 0;
+    t_jointControlMode getControlMode();
 
     float getRollAngleDegrees();
 
@@ -66,21 +58,20 @@ public:
 
 protected:
 
-    void initializePIDControllers(void);
+    mbed_error_status_t setMotorSpeeds(void);
+    mbed_error_status_t setVelocities(void);
+    mbed_error_status_t setAngles(void);
 
-    t_controlMode m_controlMode;
-    t_armJointConfig m_armJointConfig;
+    t_jointControlMode m_controlMode;
 
-    Motor m_motor;
-    PwmIn m_encoder;
+    ArmJointController m_leftJointController, m_rightJointController;
 
-    PID m_velocityPIDController;
-    PID m_positionPIDController;
-
-    float m_inversionMultiplier;
+    float m_rollMotorSpeed, m_pitchMotorSpeed;
+    float m_rollVelocitiyDegreesPerSec, m_pitchVelocityDegreesPerSec;
+    float m_rollAngleDegrees, m_pitchAngleDegrees;
 
     Timer timer;
 
 };
 
-#endif // ARM_JOINT_CONTROLLER_H
+#endif // ARM_WRIST_CONTROLLER_H
