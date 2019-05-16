@@ -169,8 +169,8 @@ void initCAN() {
     // }
 }
 
-t_controlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
-    t_controlMode controlMode;
+t_jointControlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
+    t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
     p_armJointControllers[joint]->setControlMode(controlMode);
@@ -182,7 +182,7 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
     float motionData = 0;
     *p_newMsg >> motionData;
 
-    t_controlMode controlMode = p_armJointControllers[joint]->getControlMode();
+    t_jointControlMode controlMode = p_armJointControllers[joint]->getControlMode();
 
     switch (controlMode) {
         case motorDutyCycle:

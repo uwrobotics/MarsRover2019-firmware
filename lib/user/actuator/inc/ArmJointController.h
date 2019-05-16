@@ -52,7 +52,7 @@ typedef enum t_controlMode {
     velocityPID,
     positionPID
 
-} t_controlMode;
+} t_jointControlMode;
 
 // CLASS
 
@@ -60,9 +60,9 @@ class ArmJointController {
 
 public:
 
-    ArmJointController(t_armJointConfig armJointConfig, t_controlMode controlMode = velocityPID);
+    explicit ArmJointController(t_armJointConfig armJointConfig, t_jointControlMode controlMode = velocityPID);
 
-    mbed_error_status_t setControlMode(t_controlMode controlMode);
+    mbed_error_status_t setControlMode(t_jointControlMode controlMode);
 
     mbed_error_status_t setMotorSpeedPercent(float speedPercent);
 
@@ -70,7 +70,7 @@ public:
 
     mbed_error_status_t setAngleDegrees(float angleDegrees);
 
-    t_controlMode getControlMode();
+    t_jointControlMode getControlMode();
 
     float getAngleDegrees();
 
@@ -82,7 +82,7 @@ protected:
 
     void initializePIDControllers(void);
 
-    t_controlMode m_controlMode;
+    t_jointControlMode m_controlMode;
     t_armJointConfig m_armJointConfig;
 
     Motor m_motor;
