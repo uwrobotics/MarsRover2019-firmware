@@ -7,8 +7,12 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 //Use X2 encoding by default.
 
 // configured for use with science board centrifuge encoder
-QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
-
+#ifdef ROVERBOARD_SCIENCE_PINMAP 
+    QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 360, QEI::X4_ENCODING);
+#endif
+#ifdef ROVERBOARD_ARM_PINMAP  
+    QEI wheel (ENCR1_CH1, ENCR1_CH2, ENCR1_INDEX, 48, QEI::X4_ENCODING);
+#endif
 // pin mappings when using science board EC1:
 // ENC_CENT_1 -> PA7 -> LQFP64 -> 23
 // ENC_CENT_2 -> PC4 -> LQFP64 -> 24
@@ -16,7 +20,6 @@ QEI wheel (E_C_CH1, E_C_CH2, E_C_INDEX, 48, QEI::X4_ENCODING);
  
 int main() {
     pc.baud(9600);
- 
     while(1){
         wait(0.1);
         pc.printf("Pulses is: %i\n\r", wheel.getPulses());
