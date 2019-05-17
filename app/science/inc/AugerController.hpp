@@ -9,8 +9,7 @@
 
 // Methods of control
 typedef enum t_augerControlMode {
-    motorSpeed,
-    velocityPID
+    motorSpeed
 } t_augerControlMode;
 
 typedef struct{
@@ -21,12 +20,6 @@ typedef struct{
     // Motor Direction Configuration
     PinName augerMotorDir;
 
-    // PID Configuration
-    float PIDUpdateInterval;
-    float augerPID_P;
-    float augerPID_I;
-    float augerPID_D;
-
 } t_augerControllerConfig;
 
 class AugerController{
@@ -36,10 +29,8 @@ class AugerController{
     public:
         AugerController( t_augerControllerConfig m_augerControllerConfig,
                          t_augerControlMode      m_augerControlMode );
-
-        void setControlMode( t_augerControlMode );
+                         
         void setAugerMotorSpeed( float setSpeed );
-        void setAugerMotorVelocity( float setVelocity );
 };
 
 

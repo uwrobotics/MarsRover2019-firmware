@@ -10,8 +10,7 @@
 // Methods of control
 typedef enum t_elevatorControlMode {
     motorSpeed,
-    positionPID,
-    velocityPID
+    positionPID
 } t_elevatorControlMode;
 
 typedef struct{
@@ -22,11 +21,16 @@ typedef struct{
     // Motor Direction Configuration
     PinName elevatorMotorDir;
 
+    // Encoder config
+    PinName elevatorEncoder;
+
     // PID Configuration
     float PIDUpdateInterval;
-    float elevatorPID_P;
-    float elevatorPID_I;
-    float elevatorPID_D;
+    float positionPID_P;
+    float positionPID_I;
+    float positionPID_D;
+
+    float EXTENTION_ENCODER_LIMIT; //Lower limit for encoder
 
 } t_elevatorControllerConfig;
 
@@ -40,7 +44,9 @@ class ElevatorController{
 
         void  setControlMode( t_elevatorControlMode );
         void  setElevatorMotorSpeed( float setSpeed );
-        void  setElevatorVelocity( float setVelocity );
+        void  setPosition( float position );
+        void  maxLower(); // Wrapper for setPosition with lower encoder limit
+        void  retract(); // Wrapper for setPosition with encoder = 0
         float getPosition(); // Return encoder value (reference = top = 0 ?)
 };
 
