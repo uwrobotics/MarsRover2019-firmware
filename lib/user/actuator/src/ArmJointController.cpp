@@ -131,7 +131,7 @@ void ArmJointController::update() {
         case positionPID:
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getAngleDegrees());
-            m_motor.setSpeed(m_velocityPIDController.compute());
+            m_motor.setSpeed(m_positionPIDController.compute());
 
             break;
     }
