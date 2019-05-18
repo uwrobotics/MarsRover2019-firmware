@@ -18,6 +18,14 @@ mbed_error_status_t ArmWristController::setControlMode(t_jointControlMode contro
     m_rollMotorSpeed = 0.0f;
     m_pitchMotorSpeed = 0.0f;
 
+    m_rollVelocitiyDegreesPerSec = 0.0f;
+    m_pitchVelocityDegreesPerSec = 0.0f;
+
+    m_rollAngleDegrees = 0.0f;
+    m_pitchAngleDegrees = 0.0f;
+
+    update();
+
     MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setControlMode(controlMode));
     MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setControlMode(controlMode));
 
@@ -25,38 +33,32 @@ mbed_error_status_t ArmWristController::setControlMode(t_jointControlMode contro
 }
 
 mbed_error_status_t ArmWristController::setRollSpeedPercent(float speedPercent) {
-
     m_rollMotorSpeed = speedPercent;
-    return setMotorSpeeds();;
+    return setMotorSpeeds();
 }
 
 mbed_error_status_t ArmWristController::setPitchSpeedPercent(float speedPercent) {
-
     m_pitchMotorSpeed = speedPercent;
     return setMotorSpeeds();
 }
 
 mbed_error_status_t ArmWristController::setRollVelocityDegreesPerSec(float velocityDegreesPerSec) {
-
     m_rollVelocitiyDegreesPerSec = velocityDegreesPerSec;
     return setVelocities();
 }
 
 mbed_error_status_t ArmWristController::setPitchVelocityDegreesPerSec(float velocityDegreesPerSec) {
-
     m_pitchVelocityDegreesPerSec = velocityDegreesPerSec;
     return setVelocities();
 
 }
 
 mbed_error_status_t ArmWristController::setRollAngleDegrees(float angleDegrees) {
-
     m_rollAngleDegrees = angleDegrees;
     return setAngles();
 }
 
 mbed_error_status_t ArmWristController::setPitchAngleDegrees(float angleDegrees) {
-
     m_pitchAngleDegrees = angleDegrees;
     return setAngles();
 }
@@ -73,16 +75,9 @@ float ArmWristController::getPitchAngleDegrees() {
     return (m_leftJointController.getAngleDegrees() + m_rightJointController.getAngleDegrees()) / 2.0f;
 }
 
-float ArmWristController::getRollAngleVelocityDegreesPerSec() {
-    return 0;
-}
-
-float ArmWristController::getPitchAngleVelocityDegreesPerSec() {
-    return 0;
-}
-
 void ArmWristController::update() {
-
+    m_leftJointController.update();
+    m_rightJointController.update();
 }
 
 mbed_error_status_t ArmWristController::setMotorSpeeds(void) {
