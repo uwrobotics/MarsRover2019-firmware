@@ -45,9 +45,9 @@ ifeq ($(filter $(APP), $(patsubst app/%/,%,$(sort $(dir $(wildcard app/*/))))),)
 	$(error APP is not set or is not supported. ${\n}Select an app to build with APP=app_name:${\n}${\n}$(subst ${ },${\n},$(patsubst $(APPS_PATH)/%/,%,$(sort $(dir $(wildcard app/*/)))))${\n}${\n})
 endif
 
-ifeq ($(filter $(BOARD),"nucleo arm science safety"),)
-	$(error BOARD is not set or is not supported. Set BOARD=board_name:${\n}${\n}safety${\n}arm${\n}science${\n}nucleo${\n}${\n}))
-endif
+#ifeq ($(filter $(BOARD),"nucleo arm science safety"),)
+#	$(error BOARD is not set or is not supported. Set BOARD=board_name:${\n}${\n}safety${\n}arm${\n}science${\n}nucleo${\n}${\n}))
+#endif
 
 	+@$(call MAKE_DIR,$(BUILD_PATH)/$(APP))
 	+@$(MAKETARGET)
