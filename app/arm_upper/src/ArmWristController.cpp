@@ -1,12 +1,5 @@
 #include "ArmWristController.h"
 
-#define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {     \
-    mbed_error_status_t result = functionCall;  \
-    if (result != MBED_SUCCESS) {               \
-        return result;                          \
-    }                                           \
-}
-
 ArmWristController::ArmWristController(t_armWristConfig armWristConfig, t_jointControlMode controlMode) :
     m_controlMode(controlMode),
     m_leftJointController(armWristConfig.leftJointConfig, controlMode),
