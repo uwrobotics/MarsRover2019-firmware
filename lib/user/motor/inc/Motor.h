@@ -36,6 +36,13 @@
 class Motor {
 
 public:
+
+    typedef struct {
+        PinName pwmPin;
+        PinName dirPin;
+        bool inverted;
+
+    } t_motorConfig;
  
     /** Create a motor control interface    
      *
@@ -46,7 +53,9 @@ public:
      * @param limit     Maximum speed magnitude
      */
     Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, float limit = 1.0);
-    
+
+    Motor(t_motorConfig motorConfig);
+
     /** Set the speed of the motor
      * 
      * @param speed The speed of the motor as a normalised value between -1.0 and 1.0

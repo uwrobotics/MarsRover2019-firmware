@@ -10,57 +10,38 @@
 #include "PID.h"
 #include "PinNames.h"
 
-// TYPES
-
-typedef struct {
-    PinName pwmPin;
-    PinName dirPin;
-    bool inverted;
-
-} t_motorConfig;
-
-typedef struct {
-    PinName pwmPin;
-    float zeroAngleDutyCycle;
-    float minAngleDegrees;
-    float maxAngleDegrees;
-    bool inverted;
-} t_absoluteEncoderConfig;
-
-typedef struct {
-    float P, I, D, bias;
-} t_pidConstants;
-
-typedef struct {
-    // Joint motor config
-    t_motorConfig motor;
-
-    // Joint encoder config
-    t_absoluteEncoderConfig encoder;
-
-    // PID config
-    t_pidConstants velocityPID, positionPID;
-
-    float initPIDUpdateInterval;
-    float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
-    float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
-
-} t_armJointConfig;
-
-typedef enum t_controlMode {
-    motorDutyCycle,
-    velocityPID,
-    positionPID
-
-} t_jointControlMode;
-
 // CLASS
 
 class ArmJointController {
 
 public:
 
-    explicit ArmJointController(t_armJointConfig armJointConfig, t_jointControlMode controlMode = velocityPID);
+    // TYPES
+
+    typedef struct {
+        // Joint motor config
+        Motor::t_motorConfig motor;
+
+        // Joint encoder config
+        PwmIn::t_absoluteEncoderConfig encoder;
+
+        // PID config
+        PID::t_pidConfig velocityPID, positionPID;
+
+        float initPIDUpdateInterval;
+        float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
+        float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
+
+    } t_jointConfig;
+
+    typedef enum t_controlMode {
+        motorDutyCycle,
+        velocityPID,
+        positionPID
+
+    } t_jointControlMode;
+
+    explicit ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode = velocityPID);
 
     mbed_error_status_t setControlMode(t_jointControlMode controlMode);
 
@@ -83,7 +64,7 @@ protected:
     void initializePIDControllers(void);
 
     t_jointControlMode m_controlMode;
-    t_armJointConfig m_armJointConfig;
+    t_jointConfig m_armJointConfig;
 
     Motor m_motor;
     PwmIn m_encoder;

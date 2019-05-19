@@ -6,7 +6,7 @@
 #include "Motor.h"
 #include "ArmJointController.h"
 
-const t_armJointConfig turnTableConfig = {
+const ArmJointController::t_jointConfig turnTableConfig = {
         .motor = {
                 .pwmPin = MOTOR1,
                 .dirPin = MOTOR1_DIR,
@@ -42,7 +42,7 @@ const t_armJointConfig turnTableConfig = {
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
 
-const t_armJointConfig shoulderConfig = {
+const ArmJointController::t_jointConfig shoulderConfig = {
         .motor = {
                 .pwmPin = MOTOR2,
                 .dirPin = MOTOR2_DIR,
@@ -78,7 +78,7 @@ const t_armJointConfig shoulderConfig = {
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
 
-const t_armJointConfig elbowConfig = {
+const ArmJointController::t_jointConfig elbowConfig = {
         .motor = {
                 .pwmPin = MOTOR3,
                 .dirPin = MOTOR3_DIR,
@@ -122,9 +122,9 @@ CANMsg             txMsg;
 DigitalOut         ledErr(LED1);
 DigitalOut         ledCAN(LED4);
 
-ArmJointController turnTableController(turnTableConfig, velocityPID);
-ArmJointController shoulderController(shoulderConfig, velocityPID);
-ArmJointController elbowController(elbowConfig, velocityPID);
+ArmJointController turnTableController(turnTableConfig, ArmJointController::velocityPID);
+ArmJointController shoulderController(shoulderConfig, ArmJointController::velocityPID);
+ArmJointController elbowController(elbowConfig, ArmJointController::velocityPID);
 
 ArmJointController* p_armJointControllers[3];
 
@@ -169,8 +169,8 @@ void initCAN() {
     // }
 }
 
-t_jointControlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
-    t_jointControlMode controlMode;
+ArmJointController::t_jointControlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
+    ArmJointController::t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
     p_armJointControllers[joint]->setControlMode(controlMode);
@@ -182,16 +182,16 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
     float motionData = 0;
     *p_newMsg >> motionData;
 
-    t_jointControlMode controlMode = p_armJointControllers[joint]->getControlMode();
+    ArmJointController::t_jointControlMode controlMode = p_armJointControllers[joint]->getControlMode();
 
     switch (controlMode) {
-        case motorDutyCycle:
+        case ArmJointController::motorDutyCycle:
             p_armJointControllers[joint]->setMotorSpeedPercent(motionData);
             break;
-        case velocityPID:
+        case ArmJointController::velocityPID:
             p_armJointControllers[joint]->setVelocityDegreesPerSec(motionData);
             break;
-        case positionPID:
+        case ArmJointController::positionPID:
             p_armJointControllers[joint]->setAngleDegrees(motionData);
             break;
     }
@@ -236,7 +236,7 @@ void sendJointAngles() {
 
     for (int i = 0; i < 3; i++) {
 
-        float angle = p_armJointControllers[i]->getAngleDegrees();
+        angle = p_armJointControllers[i]->getAngleDegrees();
 
 //        char arr[sizeof(angle)];
 //        memcpy(arr, &angle, sizeof(angle));
