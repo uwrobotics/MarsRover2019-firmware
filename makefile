@@ -9,6 +9,9 @@ LIB_PATH      := ../lib
 USER_LIB_PATH := $(LIB_PATH)/user
 CONFIG_PATH   := ../config
 
+COMPILE_FLAGS_TO_TRIGGER_TOUCH := $(BOARD)
+TOUCH_ON_COMPILE_FLAGS_CHANGE  := $(CONFIG_PATH)/PinNames.h
+
 ###############################################################################
 
 # Cross-platform directory manipulation
@@ -438,11 +441,14 @@ LD_SYS_LIBS := -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys  -Wl,--
 ###############################################################################
 # Rules
 
-.PHONY: all lst size
+.PHONY: all # lst size
 
+all: compile_flags $(APP_OUT_PATH)/$(PROJECT).bin # $(APP_OUT_PATH)/$(PROJECT).hex size
 
-all: $(APP_OUT_PATH)/$(PROJECT).bin $(APP_OUT_PATH)/$(PROJECT).hex size
-
+.PHONY: force
+compile_flags: force
+	+@echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) | cmp -s - $@ && echo "Compile flags unmodified: No flag dependent files to recompile." \
+		|| (echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) > $@ && touch $(TOUCH_ON_COMPILE_FLAGS_CHANGE))
 
 .s.o:
 	+@$(call MAKE_DIR,$(dir $@))
@@ -468,19 +474,16 @@ all: $(APP_OUT_PATH)/$(PROJECT).bin $(APP_OUT_PATH)/$(PROJECT).hex size
 $(APP_OUT_PATH)/$(PROJECT).link_script.ld: $(LINKER_SCRIPT)
 	@$(PREPROC) $< -o $@
 
-
-
 $(APP_OUT_PATH)/$(PROJECT).elf: $(OBJECTS) $(MBED_OBJECTS) $(APP_OUT_PATH)/$(PROJECT).link_script.ld 
-	+@echo "link: $(notdir $@)"
+	+@echo "link: $(notdir $@) \n"
 	@$(LD) $(LD_FLAGS) -T $(filter-out %.o, $^) $(LIBRARY_PATHS) --output $@ $(filter %.o, $^) $(LIBRARIES) $(LD_SYS_LIBS)
-
 
 $(APP_OUT_PATH)/$(PROJECT).bin: $(APP_OUT_PATH)/$(PROJECT).elf
 	$(ELF2BIN) -O binary $< $@
-	+@echo "===== bin file ready to flash: $(BUILD_PATH)/$@ =====" 
+	+@echo "===== bin file ready to flash: $@ ====="
 
-$(APP_OUT_PATH)/$(PROJECT).hex: $(APP_OUT_PATH)/$(PROJECT).elf
-	$(ELF2BIN) -O ihex $< $@
+# $(APP_OUT_PATH)/$(PROJECT).hex: $(APP_OUT_PATH)/$(PROJECT).elf
+# 	$(ELF2BIN) -O ihex $< $@
 
 
 # Rules
@@ -489,4 +492,5 @@ $(APP_OUT_PATH)/$(PROJECT).hex: $(APP_OUT_PATH)/$(PROJECT).elf
 
 DEPS = $(OBJECTS:.o=.d) $(MBED_OBJECTS:.o=.d)
 -include $(DEPS)
+
 endif
