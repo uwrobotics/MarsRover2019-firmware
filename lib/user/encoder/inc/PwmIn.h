@@ -40,6 +40,14 @@ class PwmIn {
 
 public:
 
+    typedef struct {
+        PinName pwmPin;
+        float zeroAngleDutyCycle;
+        float minAngleDegrees;
+        float maxAngleDegrees;
+        bool inverted;
+    } t_absoluteEncoderConfig;
+
     /** Create a PwmIn with a specified number of pulses to average
      *
      * @param pwmSense           The pwm input pin (must support InterruptIn)

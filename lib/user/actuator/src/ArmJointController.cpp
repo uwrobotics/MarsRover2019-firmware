@@ -9,7 +9,7 @@
 #include "PID.h"
 #include "PinNames.h"
 
-ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_jointControlMode controlMode) :
+ArmJointController::ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode) :
     m_controlMode(controlMode), m_armJointConfig(armJointConfig),
     m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin, armJointConfig.motor.inverted), m_encoder(armJointConfig.encoder.pwmPin),
     m_velocityPIDController(armJointConfig.velocityPID.P, armJointConfig.velocityPID.I, armJointConfig.velocityPID.D, armJointConfig.initPIDUpdateInterval),
@@ -27,7 +27,7 @@ ArmJointController::ArmJointController(t_armJointConfig armJointConfig, t_jointC
 
 }
 
-t_jointControlMode ArmJointController::getControlMode() {
+ArmJointController::t_jointControlMode ArmJointController::getControlMode() {
     return m_controlMode;
 }
 

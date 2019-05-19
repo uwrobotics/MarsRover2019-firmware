@@ -65,6 +65,14 @@ class PID {
 
 public:
 
+    typedef struct {
+        float P, I, D, bias;
+//        float interval;
+//        float inputMin, inputMax;
+//        float outputMin, outputMax;
+
+    } t_pidConfig;
+
     /**
      * Constructor.
      *
