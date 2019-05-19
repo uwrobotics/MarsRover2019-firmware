@@ -15,7 +15,7 @@
 
 typedef struct {
     // Joint config
-    t_armJointConfig leftJointConfig, rightJointConfig;
+    ArmJointController::t_jointConfig leftJointConfig, rightJointConfig;
 
     float leftToRightMotorBias;
 
@@ -28,9 +28,9 @@ class ArmWristController {
 
 public:
 
-    explicit ArmWristController(t_armWristConfig armWristConfig, t_jointControlMode controlMode = velocityPID);
+    explicit ArmWristController(t_armWristConfig armWristConfig, ArmJointController::t_jointControlMode controlMode = ArmJointController::velocityPID);
 
-    mbed_error_status_t setControlMode(t_jointControlMode controlMode);
+    mbed_error_status_t setControlMode(ArmJointController::t_jointControlMode controlMode);
 
     mbed_error_status_t setRollSpeedPercent(float speedPercent);
 
@@ -44,7 +44,7 @@ public:
 
     mbed_error_status_t setPitchAngleDegrees(float angleDegrees);
 
-    t_jointControlMode getControlMode();
+    ArmJointController::t_jointControlMode getControlMode();
 
     float getRollAngleDegrees();
 
@@ -62,7 +62,7 @@ protected:
     mbed_error_status_t setVelocities(void);
     mbed_error_status_t setAngles(void);
 
-    t_jointControlMode m_controlMode;
+    ArmJointController::t_jointControlMode m_controlMode;
 
     ArmJointController m_leftJointController, m_rightJointController;
 
