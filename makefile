@@ -41,6 +41,7 @@ ifeq (,$(filter $(BUILD_PATH),$(notdir $(CURDIR))))
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKETARGET = '$(MAKE)' --no-print-directory -C $(BUILD_PATH) -f '$(mkfile_path)' \
 		'SRCDIR=$(CURDIR)' $(MAKECMDGOALS)
+
 .PHONY: $(BUILD_PATH) clean
 all:
 
@@ -54,20 +55,26 @@ endif
 
 	+@$(call MAKE_DIR,$(BUILD_PATH)/$(APP))
 	+@$(MAKETARGET)
+
 $(BUILD_PATH): all
+
 Makefile : ;
 % :: $(BUILD_PATH) ; :
+
 makefile : ;
 % :: $(BUILD_PATH) ; :
+
 clean :
 	$(call RM_DIR,$(BUILD_PATH))
 	$(call RM_FILE_TYPE,app,*.o)
 	$(call RM_FILE_TYPE,app,*.d)
 	$(call RM_FILE_TYPE,lib/user,*.d)
 	$(call RM_FILE_TYPE,lib/user,*.o)
+
 clean-mbed: 
 	$(call RM_FILE_TYPE,lib/mbed,*.d)
 	$(call RM_FILE_TYPE,lib/mbed,*.o)
+
 else
 
 # Trick rules into thinking we are in the root, when we are in the bulid dir
@@ -441,11 +448,12 @@ LD_SYS_LIBS := -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys  -Wl,--
 ###############################################################################
 # Rules
 
-.PHONY: all # lst size
+.PHONY: all
 
-all: compile_flags $(APP_OUT_PATH)/$(PROJECT).bin # $(APP_OUT_PATH)/$(PROJECT).hex size
+all: compile_flags $(APP_OUT_PATH)/$(PROJECT).bin # $(APP_OUT_PATH)/$(PROJECT).hex
 
 .PHONY: force
+
 compile_flags: force
 	+@echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) | cmp -s - $@ && echo "Compile flags unmodified: No flag dependent files to recompile." \
 		|| (echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) > $@ && touch $(TOUCH_ON_COMPILE_FLAGS_CHANGE))
@@ -469,7 +477,6 @@ compile_flags: force
 	+@$(call MAKE_DIR,$(dir $@))
 	+@echo "Compile: $(notdir $<)"
 	@$(CPP) $(CXX_FLAGS) $(INCLUDE_PATHS) -o $@ $<
-
 
 $(APP_OUT_PATH)/$(PROJECT).link_script.ld: $(LINKER_SCRIPT)
 	@$(PREPROC) $< -o $@
