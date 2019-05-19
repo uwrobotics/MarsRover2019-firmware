@@ -6,53 +6,9 @@
 
 #include "mbed.h"
 #include "Motor.h"
-#include "PwmIn.h"
+#include "QEI.h"
 #include "PID.h"
 #include "PinNames.h"
-
-// TYPES
-
-typedef struct {
-    PinName pwmPin;
-    PinName dirPin;
-    bool inverted;
-
-} t_motorConfig;
-
-typedef struct {
-    PinName pwmPin;
-    float zeroAngleDutyCycle;
-    float minAngleDegrees;
-    float maxAngleDegrees;
-    bool inverted;
-} t_absoluteEncoderConfig;
-
-typedef struct {
-    float P, I, D, bias;
-} t_pidConstants;
-
-typedef struct {
-    // Joint motor config
-    t_motorConfig motor;
-
-    // Joint encoder config
-    t_absoluteEncoderConfig encoder;
-
-    // PID config
-    t_pidConstants velocityPID, positionPID;
-
-    float initPIDUpdateInterval;
-    float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
-    float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
-
-} t_armJointConfig;
-
-typedef enum t_controlMode {
-    motorDutyCycle,
-    velocityPID,
-    positionPID
-
-} t_jointControlMode;
 
 // CLASS
 
@@ -60,35 +16,55 @@ class ArmClawController {
 
 public:
 
-    explicit ArmClawController(t_armJointConfig armJointConfig, t_jointControlMode controlMode = velocityPID);
+    // TYPES
 
-    mbed_error_status_t setControlMode(t_jointControlMode controlMode);
+    typedef struct {
+        // Claw motor config
+        Motor::t_motorConfig motor;
+
+        // Claw encoder config
+        QEI::t_relativeEncoderConfig encoder;
+
+        // PID config
+        PID::t_pidConfig positionPID;
+
+        float max;
+
+
+    } t_clawConfig;
+
+    typedef enum t_controlMode {
+        motorDutyCycle,
+        positionPID
+
+    } t_clawControlMode;
+
+    explicit ArmClawController(t_clawConfig armJointConfig, t_clawControlMode controlMode = positionPID);
+
+    mbed_error_status_t setControlMode(t_clawControlMode controlMode);
 
     mbed_error_status_t setMotorSpeedPercent(float speedPercent);
 
-    mbed_error_status_t setVelocityDegreesPerSec(float velocityDegreesPerSec);
+    mbed_error_status_t setSeparationDistanceMm(float separationDistanceMm);
 
-    mbed_error_status_t setAngleDegrees(float angleDegrees);
+    mbed_error_status_t setSeparationDistanceCm(float separationDistanceCm);
 
-    t_jointControlMode getControlMode();
+    t_clawControlMode getControlMode();
 
-    float getAngleDegrees();
-
-    float getAngleVelocityDegreesPerSec();
+    float getSeparationDistanceCm();
 
     void update();
 
 protected:
 
-    void initializePIDControllers(void);
+    void initializePIDController(void);
 
-    t_jointControlMode m_controlMode;
-    t_armJointConfig m_armJointConfig;
+    t_clawControlMode m_controlMode;
+    t_clawConfig m_armClawConfig;
 
     Motor m_motor;
-    PwmIn m_encoder;
+    QEI m_encoder;
 
-    PID m_velocityPIDController;
     PID m_positionPIDController;
 
     float m_inversionMultiplier;
