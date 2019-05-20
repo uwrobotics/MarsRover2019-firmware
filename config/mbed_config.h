@@ -21,12 +21,15 @@
 #ifndef __MBED_CONFIG_DATA__
 #define __MBED_CONFIG_DATA__
 
+#include "mbed_assert.h"
+
 // Macros
-#define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {     \
-    mbed_error_status_t result = functionCall;  \
-    if (result != MBED_SUCCESS) {               \
-        return result;                          \
-    }                                           \
+#define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {    \
+    mbed_error_status_t result = functionCall;              \
+    MBED_ASSERT(result == MBED_SUCCESS);                    \
+    if (result != MBED_SUCCESS) {                           \
+        return result;                                      \
+    }                                                       \
 }
 
 // Configuration parameters
