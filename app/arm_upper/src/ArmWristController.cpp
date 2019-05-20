@@ -1,11 +1,24 @@
 #include "ArmWristController.h"
 
-ArmWristController::ArmWristController(t_armWristConfig armWristConfig, t_jointControlMode controlMode) :
-    m_controlMode(controlMode),
-    m_leftJointController(armWristConfig.leftJointConfig, controlMode),
-    m_rightJointController(armWristConfig.rightJointConfig, controlMode) {}
+ArmWristController::ArmWristController(t_armWristConfig armWristConfig, ArmJointController::t_jointControlMode controlMode) :
+        m_controlMode(controlMode), m_leftJointController(armWristConfig.leftJointConfig, controlMode),
+        m_rightJointController(armWristConfig.rightJointConfig, controlMode) {
 
-mbed_error_status_t ArmWristController::setControlMode(t_jointControlMode controlMode) {
+    m_rollMotorSpeed = 0.0f;
+    m_pitchMotorSpeed = 0.0f;
+
+    m_rollVelocitiyDegreesPerSec = 0.0f;
+    m_pitchVelocityDegreesPerSec = 0.0f;
+
+    m_rollAngleDegrees = 0.0f;
+    m_pitchAngleDegrees = 0.0f;
+}
+
+mbed_error_status_t ArmWristController::setControlMode(ArmJointController::t_jointControlMode controlMode) {
+
+    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setControlMode(controlMode));
+    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setControlMode(controlMode));
+
     m_controlMode = controlMode;
 
     m_rollMotorSpeed = 0.0f;
@@ -18,9 +31,6 @@ mbed_error_status_t ArmWristController::setControlMode(t_jointControlMode contro
     m_pitchAngleDegrees = 0.0f;
 
     update();
-
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setControlMode(controlMode));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setControlMode(controlMode));
 
     return MBED_SUCCESS;
 }
@@ -56,7 +66,7 @@ mbed_error_status_t ArmWristController::setPitchAngleDegrees(float angleDegrees)
     return setAngles();
 }
 
-t_jointControlMode ArmWristController::getControlMode() {
+ArmJointController::t_jointControlMode ArmWristController::getControlMode() {
     return m_controlMode;
 }
 

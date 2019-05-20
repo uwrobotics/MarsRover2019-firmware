@@ -56,7 +56,7 @@ public:
 
     void update();
 
-protected:
+private:
 
     mbed_error_status_t setMotorSpeeds(void);
     mbed_error_status_t setVelocities(void);
