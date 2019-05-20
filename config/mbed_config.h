@@ -32,6 +32,8 @@
     }                                                       \
 }
 
+#define MBED_ASSERT_SUCCESS(functionCall) MBED_ASSERT(functionCall == MBED_SUCCESS)
+
 // Configuration parameters
 #define CLOCK_SOURCE                                        USE_PLL_HSE_EXTC|USE_PLL_HSI            // set by target:NUCLEO_F091RC
 #define LPTICKER_DELAY_TICKS                                1                                       // set by target:NUCLEO_F091RC
