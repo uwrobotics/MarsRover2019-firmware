@@ -11,22 +11,21 @@
 #include "PinNames.h"
 #include "ArmJointController.h"
 
-// TYPES
-
-typedef struct {
-    // Joint config
-    ArmJointController::t_jointConfig leftJointConfig, rightJointConfig;
-
-    float leftToRightMotorBias;
-
-
-} t_armWristConfig;
-
 // CLASS
 
 class ArmWristController {
 
 public:
+
+    // TYPES
+
+    typedef struct {
+        // Joint config
+        ArmJointController::t_jointConfig leftJointConfig, rightJointConfig;
+
+        float leftToRightMotorBias;
+
+    } t_armWristConfig;
 
     explicit ArmWristController(t_armWristConfig armWristConfig, ArmJointController::t_jointControlMode controlMode = ArmJointController::velocityPID);
 

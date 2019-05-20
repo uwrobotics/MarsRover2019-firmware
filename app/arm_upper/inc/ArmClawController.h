@@ -27,7 +27,7 @@ public:
 
         // Limit switch pin
         PinName limitSwitchPin;
-        int calibrationDutyCycle, calibrationTimeoutSeconds;
+        float calibrationDutyCycle, calibrationTimeoutSeconds;
 
         // PID config
         PID::t_pidConfig positionPID;
