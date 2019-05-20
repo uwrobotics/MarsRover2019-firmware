@@ -7,7 +7,7 @@
 #define REPEAT_FIVE(a)     a;a;a;a;a
 #define REPEAT_TEN(a)      REPEAT_FIVE(a); REPEAT_FIVE(a)
 
-neopixel::neopixel(PinName signalPin, int pixel_num) :led_signal(signalPin) {
+neopixel::neopixel(PinName signalPin, int pixel_num):led_signal(signalPin) {
 	m_pixel_num = pixel_num;
 
 	pin_mask = gpio_set(signalPin);
@@ -30,31 +30,40 @@ neopixel::neopixel(PinName signalPin, int pixel_num) :led_signal(signalPin) {
 }
 
 inline void neopixel::sendBit(int val) {
+
 	if (val) {
-		*pin_reg_set |= pin_mask;
+		//*pin_reg_set |= pin_mask;
+		led_signal = 1;
+		wait(0.5);
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
-		*pin_reg_clr |= pin_mask;
+		led_signal = 0;
+		wait(0.5);
+		//*pin_reg_clr |= pin_mask;
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 		REPEAT_FIVE(__NOP());
 	}
 	else {
-		*pin_reg_set = pin_mask;
+		//*pin_reg_set = pin_mask;
+		led_signal = 1;
+		wait(0.5);
 		REPEAT_TEN(__NOP());
 		REPEAT_FIVE(__NOP());
 		__NOP();
 		__NOP();
 
-		*pin_reg_clr = pin_mask;
+		//*pin_reg_clr = pin_mask;
+		led_signal = 0;
+		wait(0.5);
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 		REPEAT_TEN(__NOP());
 	}
-
+	
 }
 
 inline void neopixel::sendByte(unsigned char byte) {
@@ -89,8 +98,22 @@ void neopixel::showColor(unsigned char r, unsigned char g, unsigned char b) {
 
 int main(void) {
 	neopixel neo(PA_5, 10);
+	//DigitalOut led_signal(PA_5);
+	//unsigned int pin_mask = gpio_set(PA_5);
+	//GPIO_TypeDef* pin_gpio = (GPIO_TypeDef *)(GPIOA_BASE);
+	//__IO uint32_t* pin_reg_set = &pin_gpio->BSRR;
+	//__IO uint32_t* pin_reg_clr = &pin_gpio->BRR;
 
 	while (1) {
+	//	led_signal = 1;
+	//	wait(0.5);
+	//	led_signal = 0;
+	//	wait(0.5);
 		neo.sendBit(1);
+	//	neo.showColor(0, 0, 255);
+	//	*pin_reg_set = pin_mask;
+	//	wait(1);
+	//	*pin_reg_clr = pin_mask;
+	//	wait(1);
 	}
 }
