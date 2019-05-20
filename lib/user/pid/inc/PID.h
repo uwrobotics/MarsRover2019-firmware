@@ -67,9 +67,7 @@ public:
 
     typedef struct {
         float P, I, D, bias;
-//        float interval;
-//        float inputMin, inputMax;
-//        float outputMin, outputMax;
+        float interval;
 
     } t_pidConfig;
 

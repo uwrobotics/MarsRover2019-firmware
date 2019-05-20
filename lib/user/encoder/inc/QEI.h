@@ -186,6 +186,10 @@ public:
      */
     QEI(PinName channelA, PinName channelB, PinName index, int pulsesPerRev, Encoding encoding = X2_ENCODING);
 
+    QEI(QEI::t_relativeEncoderConfig);
+
+    QEI();
+
     /**
      * Reset the encoder.
      *

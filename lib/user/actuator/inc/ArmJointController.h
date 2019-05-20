@@ -28,9 +28,8 @@ public:
         // PID config
         PID::t_pidConfig velocityPID, positionPID;
 
-        float initPIDUpdateInterval;
-        float PIDInputVelocityMinDegPerSec, PIDInputVelocityMaxDegPerSec;
-        float PIDOutputMotorMinDutyCycle, PIDOutputMotorMaxDutyCycle;
+        float minInputVelocityDegPerSec, maxInputVelocityDegPerSec;
+        float minOutputMotorDutyCycle, maxOutputMotorDutyCycle;
 
     } t_jointConfig;
 
@@ -59,7 +58,7 @@ public:
 
     void update();
 
-protected:
+private:
 
     void initializePIDControllers(void);
 

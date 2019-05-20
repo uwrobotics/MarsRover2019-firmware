@@ -25,21 +25,22 @@ const ArmJointController::t_jointConfig turnTableConfig = {
                 .P    = 0.4f,
                 .I    = 0.2f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
         .positionPID = {
                 .P    = 4.50f,
                 .I    = 0.98f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
-        .PIDOutputMotorMinDutyCycle = -1.0f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        .minInputVelocityDegPerSec = -20.0f,
+        .maxInputVelocityDegPerSec = 20.0f,
+        .minOutputMotorDutyCycle = -1.0f,
+        .maxOutputMotorDutyCycle = 1.0f
 };
 
 const ArmJointController::t_jointConfig shoulderConfig = {
@@ -61,21 +62,22 @@ const ArmJointController::t_jointConfig shoulderConfig = {
                 .P    = 0.65f,
                 .I    = 0.20f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
         .positionPID = {
                 .P    = 6.1f,
                 .I    = 0.0f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
-        .PIDOutputMotorMinDutyCycle = -1.0f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        .minInputVelocityDegPerSec = -20.0f,
+        .maxInputVelocityDegPerSec = 20.0f,
+        .minOutputMotorDutyCycle = -1.0f,
+        .maxOutputMotorDutyCycle = 1.0f
 };
 
 const ArmJointController::t_jointConfig elbowConfig = {
@@ -97,21 +99,22 @@ const ArmJointController::t_jointConfig elbowConfig = {
                 .P    = 0.7f,
                 .I    = 0.2f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
         .positionPID = {
                 .P    = 16.0f,
                 .I    = 0.97f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.05f
         },
 
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
-        .PIDOutputMotorMinDutyCycle = -1.0f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        .minInputVelocityDegPerSec = -20.0f,
+        .maxInputVelocityDegPerSec = 20.0f,
+        .minOutputMotorDutyCycle = -1.0f,
+        .maxOutputMotorDutyCycle = 1.0f
 };
 
 Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
