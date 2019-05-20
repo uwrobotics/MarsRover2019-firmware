@@ -25,11 +25,15 @@ public:
         // Claw encoder config
         QEI::t_relativeEncoderConfig encoder;
 
+        // Limit switch pin
+        PinName limitSwitchPin;
+        int calibrationDutyCycle, calibrationTimeoutSeconds;
+
         // PID config
         PID::t_pidConfig positionPID;
 
-        float max;
-
+        float minInputSeparationDistanceCm, maxInputSeparationDistanceCm;
+        float minOutputMotorDutyCycle, maxOutputMotorDutyCycle;
 
     } t_clawConfig;
 
@@ -39,7 +43,7 @@ public:
 
     } t_clawControlMode;
 
-    explicit ArmClawController(t_clawConfig armJointConfig, t_clawControlMode controlMode = positionPID);
+    explicit ArmClawController(t_clawConfig armClawConfig, t_clawControlMode controlMode = positionPID);
 
     mbed_error_status_t setControlMode(t_clawControlMode controlMode);
 
@@ -51,23 +55,31 @@ public:
 
     t_clawControlMode getControlMode();
 
+    float getSeparationDistanceMm();
+
     float getSeparationDistanceCm();
+
+    mbed_error_status_t runEndpointCalibration();
 
     void update();
 
-protected:
+private:
 
     void initializePIDController(void);
+
+    float encoderPulsesToMm(int encoderPulses);
 
     t_clawControlMode m_controlMode;
     t_clawConfig m_armClawConfig;
 
     Motor m_motor;
     QEI m_encoder;
+    DigitalIn m_limitSwitch;
 
     PID m_positionPIDController;
 
     float m_inversionMultiplier;
+    bool m_encoderEndpointCalibrated;
 
     Timer timer;
 
