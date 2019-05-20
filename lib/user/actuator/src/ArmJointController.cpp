@@ -40,21 +40,26 @@ float ArmJointController::getAngleVelocityDegreesPerSec() {
 }
 
 mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode controlMode) {
-    m_controlMode = controlMode;
-    m_motor.setSpeed(0.0f);
 
     switch (m_controlMode) {
+
         case motorDutyCycle:
             break;
+
         case velocityPID:
             m_velocityPIDController.reset();
-
             break;
+
         case positionPID:
             m_positionPIDController.reset();
-
             break;
+
+        default:
+            return MBED_ERROR_INVALID_ARGUMENT;
     }
+
+    m_controlMode = controlMode;
+    m_motor.setSpeed(0.0f);
 
     timer.reset();
 
