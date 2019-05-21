@@ -5,7 +5,7 @@
  */
 
 #include "mbed.h"
-#include "../../../lib/neopixel/ultrasonic.h"
+#include "../../../lib/ultrasonic/ultrasonic.h"
 #include "CANMsg.h"
 #include "rover_config.h"
 
