@@ -1,13 +1,13 @@
-# MarsRover2019-firmware
+# Mars Rover 2019 Firmware
 
-## Platform: STM32F091 / NUCLEO-F091RC
+## Platform: [STM32F091](https://www.st.com/resource/en/datasheet/stm32f091rc.pdf) / [NUCLEO-F091RC](https://os.mbed.com/platforms/ST-Nucleo-F091RC/)
 
-Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
-- mbed library
-- additional external libaries
-- additional libraries written by the team
-- test applications for testing code components
-- applications for running on each board
+Firmware for the 2019 University of Waterloo Mars Rover. Contains:
+- Arm MBED SDK source ([lib/mbed](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/mbed))
+- additional external libaries ([lib/user](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/user))
+- additional libraries written by the team ([lib/user](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/lib/user))
+- test applications for testing code components ([app/test_xxxx](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/app))
+- applications for running on each board ([app](https://github.com/uwrobotics/MarsRover2019-firmware/tree/master/app))
 
 ## Best Contribution Practices and Tips
 
@@ -46,25 +46,23 @@ Firmware for the 2019 University of Waterloo Mars Rover. Will contain:
     	`brew tap ARMmbed/homebrew-formulae`
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
-
-After deploying, the Nucleo will begin to flash red and green. Once the LED stays green, power-cycle the board by unplugging and replugging the 5V connector on the Nucleo.
 	
 3. Change directory into root directory
 
     `cd MarsRover2019-firmware`
 
-4. Run make with the target pin mapping and application
+4. Run make with the target application and board
 
     Ex. Compile the science application for the science board:  
-    `make APP=science PINMAP=science`
+    `make APP=science BOARD=science`
 
     Ex. Compile the CAN test application for the nucleo development board:  
-    `make APP=test_i2c PINMAP=nucleo`
+    `make APP=test_i2c BOARD=nucleo`
 
     Ex. Compile the I2C test application for the safety board:  
-    `make APP=test_can PINMAP=safety`
+    `make APP=test_can BOARD=safety`
 
-5. Deploy onto board
+5. Deploy onto board (see below for how to connect to a board)
 
     Find the application .bin file, located in the build/app directory.
 
@@ -81,6 +79,12 @@ After deploying, the Nucleo will begin to flash red and green. Once the LED stay
 	
 	For Mac
     - Drag and Drop .bin file into NODE_F091RC disk (Will show up like other usb devices after connecting) or run `cp build/blinky_out.bin /Volumes/NODE_F091RC/`
+
+    After deploying, the Nucleo will begin to flash red and green. Once the LED stays green, power-cycle the board by unplugging and replugging the 5V connector on the Nucleo.
+
+- To clean the project workspace of app and library build files, run `make clean`
+- To clean compiled MBED SDK files, run `make clean-mbed`
+
     
 ## Using the Nucleo Dev Board to Program the Rover Boards
 
