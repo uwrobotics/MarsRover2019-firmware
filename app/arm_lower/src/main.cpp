@@ -120,7 +120,6 @@ const ArmJointController::t_jointConfig elbowConfig = {
 Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
 CAN                can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 CANMsg             rxMsg;
-CANMsg             txMsg;
 
 DigitalOut         ledErr(LED1);
 DigitalOut         ledCAN(LED4);
@@ -235,16 +234,18 @@ void processCANMsg(CANMsg *p_newMsg) {
 
 void sendJointAngles() {
 
+    CANMsg txMsg(0);
     float angle = 0;
 
-    for (int i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 3; i++) {
 
         angle = p_armJointControllers[i]->getAngleDegrees();
 
 //        char arr[sizeof(angle)];
 //        memcpy(arr, &angle, sizeof(angle));
 
-        CANMsg txMsg(ROVER_JETSON_CANID); // , arr, sizeof(arr));
+        txMsg.clear();
+        txMsg.id = ROVER_JETSON_START_CANID_MSG_ARM_LOWER + i;
         txMsg << angle;
 
         if(can.write(txMsg)) {

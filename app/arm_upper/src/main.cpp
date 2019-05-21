@@ -4,6 +4,7 @@
 #include "PwmIn.h"
 #include "PID.h"
 #include "Motor.h"
+#include "ArmJointController.h"
 #include "ArmWristController.h"
 #include "ArmClawController.h"
 
@@ -128,7 +129,6 @@ const ArmClawController::t_clawConfig clawConfig = {
 Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
 CAN                can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 CANMsg             rxMsg;
-CANMsg             txMsg;
 
 DigitalOut         ledErr(LED1);
 DigitalOut         ledCAN(LED4);
@@ -160,6 +160,12 @@ enum armCommand {
     firstCommand = setWristControlMode,
     lastCommand  = setClawMotion
 
+};
+
+enum jetsonFeedback {
+    wristPitchDegrees = ROVER_JETSON_START_CANID_MSG_ARM_UPPER,
+    wristRollDegrees,
+    clawSeparationDistanceCm,
 };
 
 void initCAN() {
@@ -280,6 +286,23 @@ void processCANMsg(CANMsg *p_newMsg) {
 }
 
 void sendJetsonInfo() {
+
+    CANMsg txMsg(0);
+
+    txMsg.clear();
+    txMsg.id = wristPitchDegrees;
+    txMsg << wristController.getPitchAngleDegrees();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = wristRollDegrees;
+    txMsg << wristController.getRollAngleDegrees();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = clawSeparationDistanceCm;
+    txMsg << clawController.getSeparationDistanceCm();
+    MBED_ASSERT(can.write(txMsg) == true);
 
 }
 
