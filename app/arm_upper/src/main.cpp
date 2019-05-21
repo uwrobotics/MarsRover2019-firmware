@@ -94,7 +94,7 @@ const ArmClawController::t_clawConfig clawConfig = {
 
         .encoder = {
                 .channelAPin = ENCR1_CH1,
-                .channelAPin = ENCR1_CH2,
+                .channelBPin = ENCR1_CH2,
                 .indexPin    = ENCR1_INDEX,
 
                 .pulsesPerRevolution = 360,
@@ -205,6 +205,7 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    return motionData;
 }
 
 float handleSetWristRollMotion(CANMsg *p_newMsg) {
@@ -228,6 +229,7 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    return motionData;
 }
 
 float handleSetClawMotion(CANMsg *p_newMsg) {
@@ -246,6 +248,8 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
             MBED_ASSERT_SUCCESS(clawController.setSeparationDistanceCm(motionData));
             break;
     }
+
+    return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
@@ -276,7 +280,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 }
 
 void sendJetsonInfo() {
-    
+
 }
 
 int main(void)
