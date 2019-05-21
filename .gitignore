@@ -4,8 +4,10 @@
 .idea
 cmake-build-debug
 CMakeLists.txt
+.settings
+.cproject
+.project
 
 build
-
 *.o
 *.d
