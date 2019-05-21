@@ -1,14 +1,12 @@
 *~
 .vscode
 
-# Ignore CLion files
-app/*/.idea/*
-app/*/.idea/*/*
-app/*/.settings
-app/*/.cproject
-app/*/.project
-.idea/*
-.idea/*/*
+.idea
+cmake-build-debug
+CMakeLists.txt
+.settings
+.cproject
+.project
 
 build
 *.o
