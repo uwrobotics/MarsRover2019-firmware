@@ -9,16 +9,27 @@
 
 // Methods of control
 typedef enum t_augerControlMode {
-    motorSpeed
+    motorDutyCycle
 } t_augerControlMode;
+
+typedef struct {
+    PinName pwmPin;
+    PinName dirPin;
+    float   maxMotorSpeed;
+    bool    inverted;
+} t_motorConfig;
+
+typedef struct {
+    PinName pwmPin;
+    bool inverted;
+} t_absoluteEncoderConfig;
 
 typedef struct{
     // Motor Configuration
-    PinName augerMotor;
-    float   maxMotorSpeed;
+    t_motorConfig motor;
 
-    // Motor Direction Configuration
-    PinName augerMotorDir;
+    // Encoder Configuration
+    t_absoluteEncoderConfig encoder;
 
 } t_augerControllerConfig;
 
@@ -26,11 +37,18 @@ class AugerController{
     private:
         t_augerControlMode      m_augerControlMode;
         t_augerControllerConfig m_augerControllerConfig;
+
+        Motor m_motor;
+        PwmIn m_encoder;
+
+        float m_inversionMultiplier;
+        
+        Timer timer;
     public:
-        AugerController( t_augerControllerConfig m_augerControllerConfig,
-                         t_augerControlMode      m_augerControlMode );
+        AugerController( t_augerControllerConfig controllerConfig );
                          
-        void setAugerMotorSpeed( float setSpeed );
+        mbed_error_status_t setMotorSpeedPercent( float percent );
+        void                update();
 };
 
 
