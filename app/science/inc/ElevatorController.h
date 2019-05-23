@@ -29,6 +29,7 @@ class ElevatorController{
 
             // PID Configuration
             unsigned int    maxEncoderPulses; // Should be an int
+            unsigned int    maxDistanceInCM; // Should be an int
             float           PIDOutputMotorMinDutyCycle;
             float           PIDOutputMotorMaxDutyCycle;
 
@@ -47,12 +48,15 @@ class ElevatorController{
         mbed_error_status_t  setControlMode( t_elevatorControlMode controlMode );
         mbed_error_status_t  setMotorSpeedPercent( float percent );
         mbed_error_status_t  setEncoderPositionPercent( float percent );
-        mbed_error_status_t  maxLower(); // Wrapper for setPosition with lower encoder limit
-        mbed_error_status_t  retract(); // Wrapper for setPosition with encoder = 0
+        mbed_error_status_t  setPositionInCM( float centimeter );
+
+        mbed_error_status_t runInitCalibration();
+
 
         t_elevatorControlMode getControlMode() const;
 
         int     getPosition(); // Return encoder value
+        int     getCurrentDistanceCM(); // Return encoder transformed value into cm
         void    update();
 
     private:

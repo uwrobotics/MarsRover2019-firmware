@@ -1,8 +1,7 @@
 // Controller for the centrifuge
 
-#include <CentrifugeController.hpp>
-
-#include "../inc/CentrifugeController.hpp"
+#include <CentrifugeController.h>
+#include "../inc/CentrifugeController.h"
 
 CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
                                             CentrifugeController::t_centrifugeControlMode   controlMode )
@@ -103,4 +102,24 @@ void CentrifugeController::initializePID( void )
     m_positionPIDController.setOutputLimits( m_centrifugeConfig.PIDOutputMotorMinDutyCycle, m_centrifugeConfig.PIDOutputMotorMaxDutyCycle );
     m_positionPIDController.setBias( m_centrifugeConfig.positionPID.bias );
     m_positionPIDController.setMode( PID_AUTO_MODE );
+}
+
+mbed_error_status_t CentrifugeController::runInitCalibration() {
+
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorSpeedPercent( m_centrifugeConfig.calibrationDutyCycle ) );
+
+    timer.reset();
+
+    while ( m_limitSwitch.read() == 0 ) {
+        if ( timer.read() > m_centrifugeConfig.calibrationTimeoutSeconds ) {
+            return MBED_ERROR_TIME_OUT;
+        }
+    }
+
+    //TODO: ROTATE 15 DEGREES TO LINE UP TUBE 0
+
+    m_encoder.reset();
+
+    return MBED_SUCCESS;
 }

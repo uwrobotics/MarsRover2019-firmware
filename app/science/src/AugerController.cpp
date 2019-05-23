@@ -1,6 +1,7 @@
 // Controller for the auger drill
 
-#include "../inc/AugerController.hpp"
+#include <AugerController.h>
+#include "../inc/AugerController.h"
 
 #include "mbed.h"
 #include "Motor.h"
@@ -8,20 +9,12 @@
 #include "PID.h"
 #include "PinNames.h"
 
-AugerController::AugerController( t_augerControllerConfig controllerConfig )
-:   m_augerControllerConfig( controllerConfig ),
-    m_motor( controllerConfig.motor.pwmPin, controllerConfig.motor.dirPin, controllerConfig.motor.inverted ),
-    m_encoder( controllerConfig.encoder.pwmPin )
-{
-    if( controllerConfig.encoder.inverted ) {
-        m_inversionMultiplier = -1;
-    }
-    else {
-        m_inversionMultiplier = 1;
-    }
-}
+AugerController::AugerController( AugerController::t_augerConfig controllerConfig )
+:   m_augerConfig( controllerConfig ),
+    m_motor( controllerConfig.motor ),
+    m_encoder( controllerConfig.encoder )
+{}
 
-// Takes a float between -1 <= percent <= 1
 mbed_error_status_t AugerController::setMotorSpeedPercent( float percent )
 {
     m_motor.speed( percent );

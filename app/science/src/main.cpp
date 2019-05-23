@@ -4,9 +4,12 @@
 #include "PwmIn.h"
 #include "PID.h"
 #include "Motor.h"
-#include "ArmJointController.h"
+#include "AugerController.h"
+#include "CentrifugeController.h"
+#include "ElevatorController.h"
 
-const t_armJointConfig turnTableConfig = {
+//TODO: CHECK ALL CONFIGS
+const AugerController::t_augerConfig augerConfig = {
         .motor = {
                 .pwmPin = MOTOR1,
                 .dirPin = MOTOR1_DIR,
@@ -14,71 +17,46 @@ const t_armJointConfig turnTableConfig = {
         },
 
         .encoder = {
-                .pwmPin = ENC_A1,
-                .zeroAngleDutyCycle = 0.5f,
-                .minAngleDegrees = -90.0f,
-                .maxAngleDegrees = 90.0f,
+                .PwmInPin = ENCR1_CH1,
                 .inverted = true
-        },
-
-        .velocityPID = {
-                .P    = 0.4f,
-                .I    = 0.2f,
-                .D    = 0.0f,
-                .bias = 0.0f
-        },
-
-        .positionPID = {
-                .P    = 4.50f,
-                .I    = 0.98f,
-                .D    = 0.0f,
-                .bias = 0.0f
-        },
-
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
-        .PIDOutputMotorMinDutyCycle = -1.0f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        }
 };
 
-const t_armJointConfig shoulderConfig = {
+const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         .motor = {
                 .pwmPin = MOTOR2,
                 .dirPin = MOTOR2_DIR,
-                .inverted = false
-        },
-
-        .encoder = {
-                .pwmPin = ENC_A2,
-                .zeroAngleDutyCycle = 0.7281f,
-                .minAngleDegrees = -18.7f,
-                .maxAngleDegrees = 139.0f,
                 .inverted = true
         },
 
-        .velocityPID = {
-                .P    = 0.65f,
-                .I    = 0.20f,
-                .D    = 0.0f,
-                .bias = 0.0f
+        .encoder = {
+                .channelAPin = ENCR2_CH1,
+                .channelAPin = ENCR2_CH2,
+                .indexPin    = ENCR2_INDEX,
+                .pulsesPerRevolution = 360,
+                .encoding = QEI::X4_ENCODING,
+                .inverted = true
         },
+
+        .limitSwitchPin = LIM_1A,
+
+        .calibrationDutyCycle = 0.2f,
+        .calibrationTimeoutSeconds = 7.0f,
 
         .positionPID = {
-                .P    = 6.1f,
+                .P    = 3.5f,
                 .I    = 0.0f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.1f
         },
 
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
+        .maxEncoderPulsePerRev = 360,
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
 
-const t_armJointConfig elbowConfig = {
+const ElevatorController::t_elevatorConfig elevatorConfig = {
         .motor = {
                 .pwmPin = MOTOR3,
                 .dirPin = MOTOR3_DIR,
@@ -86,30 +64,29 @@ const t_armJointConfig elbowConfig = {
         },
 
         .encoder = {
-                .pwmPin = ENC_A3,
-                .zeroAngleDutyCycle = 0.547f,
-                .minAngleDegrees = -160.9f,
-                .maxAngleDegrees = 1.1f,
-                .inverted = false
+                .channelAPin = ENCR3_CH1,
+                .channelAPin = ENCR3_CH2,
+                .indexPin    = ENCR3_INDEX,
+                .pulsesPerRevolution = 360,
+                .encoding = QEI::X4_ENCODING,
+                .inverted = true
         },
 
-        .velocityPID = {
-                .P    = 0.7f,
-                .I    = 0.2f,
-                .D    = 0.0f,
-                .bias = 0.0f
-        },
+        .limitSwitchTop = LIM_2A,
+        .limitSwitchBottom = LIM_3A,
+
+        .calibrationDutyCycle = 0.2f,
+        .calibrationTimeoutSeconds = 7.0f,
 
         .positionPID = {
-                .P    = 16.0f,
-                .I    = 0.97f,
+                .P    = 3.5f,
+                .I    = 0.0f,
                 .D    = 0.0f,
-                .bias = 0.0f
+                .bias = 0.0f,
+                .interval = 0.1f
         },
 
-        .initPIDUpdateInterval = 0.05f,
-        .PIDInputVelocityMinDegPerSec = -20.0f,
-        .PIDInputVelocityMaxDegPerSec = 20.0f,
+        .maxEncoderPulses = 360,
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -122,19 +99,11 @@ CANMsg             txMsg;
 DigitalOut         ledErr(LED1);
 DigitalOut         ledCAN(LED4);
 
-ArmJointController turnTableController(turnTableConfig, velocityPID);
-ArmJointController shoulderController(shoulderConfig, velocityPID);
-ArmJointController elbowController(elbowConfig, velocityPID);
-
-ArmJointController* p_armJointControllers[3];
+AugerController         augerController( augerConfig );
+CentrifugeController    centrifugeController( centrifugeConfig, CentrifugeController::motorDutyCycle );
+ElevatorController      elevatorController( elevatorConfig, ElevatorController::positionPID );
 
 Timer              canSendTimer;
-
-enum t_joint {
-    turnTable,
-    shoulder,
-    elbow
-};
 
 void printCANMsg(CANMessage& msg) {
     pc.printf("  ID      = 0x%.3x\r\n", msg.id);
@@ -147,121 +116,91 @@ void printCANMsg(CANMessage& msg) {
     pc.printf("\r\n");
 }
 
-enum armCommand {
- 
-    setTurnTableControlMode = ROVER_ARM_LOWER_CANID,
-    setTurnTableMotion,
-    setShoulderControlMode,
-    setShoulderMotion,
-    setElbowControlMode,
-    setElbowMotion,
+enum scienceCommand {
 
-    firstCommand = setTurnTableControlMode,
-    lastCommand  = setElbowMotion
+    setElevatorHeight = ROVER_SCIENCE_CANID,
+    setAugerSpeed,
+    setCentrifugeSpinning,
+    setCentrifugePosition,
+    //setFunnelOpen,
+    //setSensorMountPosition,
+
+    firstCommand = setElevatorHeight,
+    lastCommand  = setCentrifugePosition
+    // lastCommand  = setSensorMountPosition
 
 };
 
 void initCAN() {
-    can.filter(ROVER_ARM_LOWER_CANID, ROVER_CANID_FILTER_MASK, CANStandard);
-
-    // for (int canHandle = firstCommand; canHandle <= lastCommand; canHandle++) {
-    //     can.filter(RX_ID + canHandle, 0xFFF, CANStandard, canHandle);
-    // }
+    can.filter(ROVER_SCIENCE_CANID, ROVER_CANID_FILTER_MASK, CANStandard);
 }
 
-t_jointControlMode handleSetControlMode(t_joint joint, CANMsg *p_newMsg) {
-    t_jointControlMode controlMode;
-    *p_newMsg >> controlMode;
+float handleSetElevatorHeight(CANMsg *p_newMsg) {
+    float setHeight = 0;
+    *p_newMsg >> setHeight;
 
-    p_armJointControllers[joint]->setControlMode(controlMode);
+    ElevatorController::t_elevatorControlMode controlMode = elevatorController.getControlMode();
 
-    return controlMode;
-}
-
-float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
-    float motionData = 0;
-    *p_newMsg >> motionData;
-
-    t_jointControlMode controlMode = p_armJointControllers[joint]->getControlMode();
-
-    switch (controlMode) {
-        case motorDutyCycle:
-            p_armJointControllers[joint]->setMotorSpeedPercent(motionData);
-            break;
-        case velocityPID:
-            p_armJointControllers[joint]->setVelocityDegreesPerSec(motionData);
-            break;
-        case positionPID:
-            p_armJointControllers[joint]->setAngleDegrees(motionData);
-            break;
-    }
-
-    return motionData;
-}
-
-void processCANMsg(CANMsg *p_newMsg) {
-    switch (p_newMsg->id) {
-        case setTurnTableControlMode:
-            handleSetControlMode(turnTable, p_newMsg);
-            break;
-
-        case setTurnTableMotion:
-            handleSetMotion(turnTable, p_newMsg);
-
-        case setShoulderControlMode:
-            handleSetControlMode(shoulder, p_newMsg);
-            break;
-
-        case setShoulderMotion:
-            handleSetMotion(shoulder, p_newMsg);
-            break;
-
-        case setElbowControlMode:
-            handleSetControlMode(elbow, p_newMsg);
-            break;
-
-        case setElbowMotion:
-            handleSetMotion(elbow, p_newMsg);
-            break;
-
-        default:
-            pc.printf("Recieved unimplemented command\r\n");
-            break;
-    }
-}
-
-void sendJointAngles() {
-
-    float angle = 0;
-
-    for (int i = 0; i < 3; i++) {
-
-        float angle = p_armJointControllers[i]->getAngleDegrees();
-
-//        char arr[sizeof(angle)];
-//        memcpy(arr, &angle, sizeof(angle));
-
-        CANMsg txMsg(ROVER_JETSON_CANID); // , arr, sizeof(arr));
-        txMsg << angle;
-
-        if(can.write(txMsg)) {
-            // pc.printf("Sent joint %d angle to jetson\r\n", i);
-        }
-        else {
-            pc.printf("ERROR: CAN now write!\r\n");
+    if( controlMode != ElevatorController::positionPID ) {
+        mbed_error_status_t status = elevatorController.setControlMode( ElevatorController::positionPID );
+        if( status != MBED_SUCCESS ) {
+            MBED_ASSERT_FAILURE();
         }
     }
+    MBED_ASSERT_SUCCESS(elevatorController.setPositionInCM( setHeight ));
 }
- 
+
+float handleSetAugerSpeed(CANMsg *p_newMsg) {
+    float speed = 0;
+    *p_newMsg >> speed;
+    MBED_ASSERT_SUCCESS(augerController.setMotorSpeedPercent( speed ));
+}
+
+float handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
+    bool spin = 0;
+    *p_newMsg >> spin;
+
+    CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
+
+    if( controlMode != CentrifugeController::motorDutyCycle ) {
+        mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::motorDutyCycle );
+        if( status != MBED_SUCCESS ) {
+            MBED_ASSERT_FAILURE();
+        }
+    }
+    MBED_ASSERT_SUCCESS(centrifugeController.setMotorSpeedPercent( spin ));
+
+
+}
+
+float handleSetCentrifugePosition(CANMsg *p_newMsg) {
+    int tube_num = 0;
+    *p_newMsg >> tube_num;
+
+    CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
+
+    if( controlMode != CentrifugeController::positionPID ) {
+        mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::positionPID );
+        if( status != MBED_SUCCESS ) {
+            MBED_ASSERT_FAILURE();
+        }
+    }
+    MBED_ASSERT_SUCCESS(centrifugeController.setTubePosition(tube_num));
+
+}
+
+void sendJetsonInfo() {
+    
+}
+
 int main(void)
 {
-    p_armJointControllers[turnTable] = &turnTableController;
-    p_armJointControllers[shoulder]  = &shoulderController;
-    p_armJointControllers[elbow]     = &elbowController;
-
     pc.printf("Program Started\r\n\r\n");
 
     initCAN();
+
+    elevatorController.runInitCalibration();
+    centrifugeController.runInitCalibration();
 
     canSendTimer.start();
 
@@ -274,29 +213,12 @@ int main(void)
         }
 
         if (canSendTimer.read() > 0.1) {
-            sendJointAngles();
+            sendJetsonInfo();
             canSendTimer.reset();
         }
 
-        turnTableController.update();
-        shoulderController.update();
-        elbowController.update();
+        elevatorController.update();
+        centrifugeController.update();
 
     }
 }
-
-    // Original code in science main.cppy
-    /*
-    #include "mbed.h"
-
-    DigitalOut myled(LED1);
-
-    int main() {
-        while(1) {
-            myled = 1;
-            wait(0.2);
-            myled = 0;
-            wait(0.2);
-        }
-    }
-*/ 
