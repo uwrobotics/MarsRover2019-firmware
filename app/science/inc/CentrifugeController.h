@@ -1,6 +1,7 @@
 #ifndef CENTRIFUGE_CONTROLLER_H
 #define CENTRIFUGE_CONTROLLER_H
-// Controller for the Centrifuge/Turntable
+/* Controller for the Centrifuge/Turntable
+ */
 
 #include "mbed.h"
 #include "Motor.h"
@@ -42,9 +43,9 @@ class CentrifugeController{
 
         mbed_error_status_t  setControlMode( t_centrifugeControlMode control );
         mbed_error_status_t  setMotorSpeedPercent( float percent );
+        mbed_error_status_t  setTubePosition( unsigned int tube_num ); // Range of [0-11]
 
-        // tube_num within range [0-11] - places tube of # tube_num under the Auger output mouth
-        mbed_error_status_t  setTubePosition( unsigned int tube_num );
+        mbed_error_status_t runInitCalibration();
 
         t_centrifugeControlMode getControlMode();
 
