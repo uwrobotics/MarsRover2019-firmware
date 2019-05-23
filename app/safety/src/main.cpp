@@ -59,7 +59,8 @@ int main() {
 	
 	i2c.frequency(100000);
     initCAN();
-	
+	ledI2C = 1;
+
     while(1) {
 		raw_adc_sum = 0.0;
 		
@@ -75,13 +76,13 @@ int main() {
 				//current[i] = ((bitRange_100A - raw_adc[i])/iConversion_100A);
 				current[i] = ((246 - raw_adc[i])/iConversion_100A) - 16.5;
 			}
-			else if(i == sensor_100A2){
+			else if(i == sensor_100A2) {
 				current[i] = ((246 - raw_adc[i])/iConversion_100A) - 1;
 			}
 			else {
 				current[i] = ((bitRange_30A - raw_adc[i])/iConversion_30A);
 			}
-			pc.printf("Address: %d\tCurrent Sensor %d: %f\r\n", ADC_address[i], i, current[i]);
+			pc.printf("Address: %d\tCurrent Sensor %d: %f\r\n", ADC_address[i] >> 1, i, current[i]);
 			
 			// Send current data over CAN
 			uint8_t data = round(current[i] * 100); // Convert current data to int 
@@ -97,5 +98,7 @@ int main() {
 				ledErr = 1;
 			}
 		}
+		
+		wait(2);
     }
 }
