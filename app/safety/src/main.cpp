@@ -60,6 +60,7 @@ int main() {
 	i2c.frequency(100000);
     initCAN();
 	ledI2C = 1;
+	ledCAN = 1;
 
     while(1) {
 		raw_adc_sum = 0.0;
@@ -99,6 +100,6 @@ int main() {
 			}
 		}
 		
-		wait(2);
+		wait(1);
     }
 }
