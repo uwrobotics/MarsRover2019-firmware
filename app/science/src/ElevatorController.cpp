@@ -2,8 +2,8 @@
 // NOTE: the convention established is that positive motor signals drive the elevator downwards
 //          and negative signals drive the elevator upwards
 
-#include <ElevatorController.hpp>
-#include "../inc/ElevatorController.hpp"
+#include <ElevatorController.h>
+#include "../inc/ElevatorController.h"
 
 ElevatorController::ElevatorController( ElevatorController::t_elevatorConfig        controllerConfig,
                                         ElevatorController::t_elevatorControlMode   controlMode )
@@ -28,6 +28,11 @@ ElevatorController::t_elevatorControlMode ElevatorController::getControlMode() c
 int ElevatorController::getPosition()
 {
     return m_encoder.getPulses();
+}
+
+int ElevatorController::getCurrentDistanceCM()
+{
+    return getPosition() * ; //TODO: WRITE CONVERSION FROM ENCODER PULSES TO CM
 }
 
 mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode controlMode )
@@ -91,14 +96,20 @@ mbed_error_status_t  ElevatorController::setEncoderPositionPercent( float percen
     return MBED_SUCCESS;
 }
 
-mbed_error_status_t  ElevatorController::maxLower() // Wrapper for setPosition with lower encoder limit
+mbed_error_status_t ElevatorController::setPositionInCM( float centimeter )
 {
-    return setEncoderPositionPercent( 1.0f );
-}
+    // Has to be in positionPID control
+    if( m_elevatorControlMode != positionPID ) {
+        return MBED_ERROR_INVALID_OPERATION;
+    }
 
-mbed_error_status_t  ElevatorController::retract() // Wrapper for setPosition with encoder = 0
-{
-    return setEncoderPositionPercent( 0.0f );
+    if( centimeter < 0 || centimeter > m_elevatorConfig.maxDistanceInCM ){
+        centimeter = getCurrentDistanceCM();
+    }
+    // Convert cm distance into encoder value
+    centimeter = ; //TODO: WRITE UNIT TRANSFORMATION
+    m_positionPIDController.setSetPoint( centimeter );
+    return MBED_SUCCESS;
 }
 
 
@@ -131,4 +142,22 @@ void ElevatorController::initializePID( void ) {
     m_positionPIDController.setOutputLimits( m_elevatorConfig.PIDOutputMotorMinDutyCycle, m_elevatorConfig.PIDOutputMotorMaxDutyCycle );
     m_positionPIDController.setBias( m_elevatorConfig.positionPID.bias );
     m_positionPIDController.setMode( PID_AUTO_MODE );
+}
+
+mbed_error_status_t ElevatorController::runInitCalibration() {
+
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorSpeedPercent( m_elevatorConfig.calibrationDutyCycle ) );
+
+    timer.reset();
+
+    while ( m_limitSwitchTop.read() == 0 ) {
+        if ( timer.read() > m_elevatorConfig.calibrationTimeoutSeconds ) {
+            return MBED_ERROR_TIME_OUT;
+        }
+    }
+
+    m_encoder.reset();
+
+    return MBED_SUCCESS;
 }
