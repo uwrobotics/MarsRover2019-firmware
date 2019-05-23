@@ -8,10 +8,6 @@
 #include "PID.h"
 
 // Methods of control
-typedef enum t_augerControlMode {
-    motorDutyCycle
-} t_augerControlMode;
-
 typedef struct {
     PinName pwmPin;
     PinName dirPin;
@@ -35,7 +31,6 @@ typedef struct{
 
 class AugerController{
     private:
-        t_augerControlMode      m_augerControlMode;
         t_augerControllerConfig m_augerControllerConfig;
 
         Motor m_motor;
@@ -43,12 +38,10 @@ class AugerController{
 
         float m_inversionMultiplier;
         
-        Timer timer;
     public:
         AugerController( t_augerControllerConfig controllerConfig );
                          
         mbed_error_status_t setMotorSpeedPercent( float percent );
-        void                update();
 };
 
 
