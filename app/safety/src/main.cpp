@@ -35,8 +35,8 @@ const float lowerV_100A = 0.314; //lowerV and upperV is the voltage after signal
 const float upperV_100A = 3.218;
 const float ampRange_100A = 100;
 const float bitsPerVolt_100A = 255/3.3;
-const int bitRange_100A = round((upperV_100A - lowerV_100A) * bitsPerVolt_100A);
-const float iConversion_100A = bitRange_100A/ampRange_100A;
+const int bitRange_100A = round((upperV_100A - lowerV_100A) * bitsPerVolt_100A); // 224.4
+const float iConversion_100A = bitRange_100A/ampRange_100A; // 2.244
 
 // Specfic variables for 30A sensor
 const float lowerV_30A = 0.385714; //lowerV and upperV is the voltage after signal has been amplified
@@ -71,13 +71,17 @@ int main() {
 				ledI2C = !ledI2C;
 			}
 			raw_adc[i] = raw_adc_sum / TOTAL_SAMPLE;
-			if (i == sensor_100A1 || i == sensor_100A2) {
-				current[i] = ((bitRange_100A - raw_adc[i])/iConversion_100A);
+			if (i == sensor_100A1) {
+				//current[i] = ((bitRange_100A - raw_adc[i])/iConversion_100A);
+				current[i] = ((246 - raw_adc[i])/iConversion_100A) - 16.5;
+			}
+			else if(i == sensor_100A2){
+				current[i] = ((246 - raw_adc[i])/iConversion_100A) - 1;
 			}
 			else {
 				current[i] = ((bitRange_30A - raw_adc[i])/iConversion_30A);
 			}
-			pc.printf("Current Sensor %d: %f\r\n", current[i]);
+			pc.printf("Address: %d\tCurrent Sensor %d: %f\r\n", ADC_address[i], i, current[i]);
 			
 			// Send current data over CAN
 			uint8_t data = round(current[i] * 100); // Convert current data to int 
