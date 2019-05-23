@@ -4,7 +4,7 @@
 #ifdef NUCLEO_PINMAP 
 neopixel neo(PA_5, 10);
 #else 
-neopixel neo(PC_0, 10);
+neopixel neo(PB_5, 13);
 #endif
 
 const int DELAY_TIME_S = 1;
