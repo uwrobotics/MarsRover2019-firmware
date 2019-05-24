@@ -2,7 +2,6 @@
 // NOTE: the convention established is that positive motor signals drive the elevator downwards
 //          and negative signals drive the elevator upwards
 
-#include <ElevatorController.h>
 #include "../inc/ElevatorController.h"
 
 ElevatorController::ElevatorController( ElevatorController::t_elevatorConfig        controllerConfig,
@@ -30,15 +29,15 @@ int ElevatorController::getPosition()
     return m_encoder.getPulses();
 }
 
-int ElevatorController::getCurrentDistanceCM()
+/*int ElevatorController::getCurrentDistanceCM()
 {
     return getPosition() * ; //TODO: WRITE CONVERSION FROM ENCODER PULSES TO CM
-}
+}*/
 
 mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode controlMode )
 {
     m_elevatorControlMode = controlMode;
-    m_motor.speed( 0.0f );
+    m_motor.setSpeed( 0.0f );
 
     switch (m_elevatorControlMode) {
         case motorDutyCycle:
@@ -73,7 +72,7 @@ mbed_error_status_t ElevatorController::setMotorSpeedPercent(float percent)
         percent = 0.0f;
     }
 
-    m_motor.speed(percent);
+    m_motor.setSpeed(percent);
 
     return MBED_SUCCESS;
 }
@@ -107,7 +106,7 @@ mbed_error_status_t ElevatorController::setPositionInCM( float centimeter )
         centimeter = getCurrentDistanceCM();
     }
     // Convert cm distance into encoder value
-    centimeter = ; //TODO: WRITE UNIT TRANSFORMATION
+    //centimeter = ; //TODO: WRITE UNIT TRANSFORMATION
     m_positionPIDController.setSetPoint( centimeter );
     return MBED_SUCCESS;
 }
@@ -119,19 +118,19 @@ void ElevatorController::update() {
 
     switch (m_elevatorControlMode) {
         case motorDutyCycle:
-            if (( getPosition() <= 0 && m_motor.read() < 0.0f )                                 ||
-                ( getPosition() >= m_elevatorConfig.maxEncoderPulses && m_motor.read() > 0.0f ) ||
-                ( m_limitSwitchTop.read() && m_motor.read() < 0.0f)                             ||
-                ( m_limitSwitchBottom.read() && m_motor.read() > 0.0f))
+            if (( getPosition() <= 0 && m_motor.getSpeed() < 0.0f )                                 ||
+                ( getPosition() >= m_elevatorConfig.maxEncoderPulses && m_motor.getSpeed() > 0.0f ) ||
+                ( m_limitSwitchTop.read() && m_motor.getSpeed() < 0.0f)                             ||
+                ( m_limitSwitchBottom.read() && m_motor.getSpeed() > 0.0f))
             {
-                m_motor.speed(0.0f);
+                m_motor.setSpeed(0.0f);
             }
             break;
 
         case positionPID:
             m_positionPIDController.setInterval( interval );
             m_positionPIDController.setProcessValue( getPosition() );
-            m_motor.speed( m_positionPIDController.compute() );
+            m_motor.setSpeed( m_positionPIDController.compute() );
             break;
     }
 }

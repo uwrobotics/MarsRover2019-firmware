@@ -1,6 +1,5 @@
 // Controller for the centrifuge
 
-#include <CentrifugeController.h>
 #include "../inc/CentrifugeController.h"
 
 CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
@@ -36,7 +35,7 @@ float CentrifugeController::getEncoderPulses()
 mbed_error_status_t CentrifugeController::setControlMode(CentrifugeController::t_centrifugeControlMode controlMode)
 {
     m_centrifugeControlMode = controlMode;
-    m_motor.speed( 0.0f );
+    m_motor.setSpeed( 0.0f );
 
     switch (m_centrifugeControlMode) {
         case motorDutyCycle:
@@ -59,7 +58,7 @@ mbed_error_status_t CentrifugeController::setMotorSpeedPercent( float percent )
     if (m_centrifugeControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
-    m_motor.speed( percent );
+    m_motor.setSpeed( percent );
     return MBED_SUCCESS;
 }
 
@@ -81,16 +80,16 @@ void CentrifugeController::update()
 
     switch( m_centrifugeControlMode ) {
         case motorDutyCycle:
-            if ( m_motor.read() > 1.1f || m_motor.read() < 1.1f ) // If speed is > bounds, something is wrong
+            if ( m_motor.getSpeed() > 1.1f || m_motor.getSpeed() < 1.1f ) // If speed is > bounds, something is wrong
             {
-                m_motor.speed(0.0f);
+                m_motor.setSpeed(0.0f);
             }
             break;
 
         case positionPID:
             m_positionPIDController.setInterval( interval );
             m_positionPIDController.setProcessValue( getEncoderPulses() );
-            m_motor.speed(m_positionPIDController.compute());
+            m_motor.setSpeed(m_positionPIDController.compute());
             break;
     }
 }

@@ -4,9 +4,9 @@
 
 #include "mbed.h"
 #include "Motor.h"
-#include "PwmIn.h"
 #include "QEI.h"
 #include "PID.h"
+#include "PinNames.h"
 
 class ElevatorController{
     public:
@@ -16,7 +16,7 @@ class ElevatorController{
             Motor::t_motorConfig motor;
 
             // Encoder Configuration
-            QEI::t_encoderConfig encoder;
+            QEI::t_relativeEncoderConfig encoder;
 
             // PID Configuration
             PID::t_pidConfig positionPID;
