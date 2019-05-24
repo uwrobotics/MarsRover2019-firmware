@@ -6,14 +6,16 @@
 
 Serial              pc(SERIAL_TX, SERIAL_RX);
 #ifdef NUCLEO_PINMAP
-CAN                 can(CAN_GPIO_RX_PIN, CAN_GPIO_TX_PIN, ROVER_CANBUS_FREQUENCY);
+CAN                 can(PB_8, PB_9, ROVER_CANBUS_FREQUENCY);
 #else
 CAN                 can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 #endif
 CANMsg              rxMsg;
 CANMsg              txMsg;
 DigitalOut          ledErr(LED1);
-DigitalOut          ledCAN(LED4);
+DigitalOut			ledDebug(LED2);
+DigitalOut          ledCANRX(LED3);
+DigitalOut          ledCANTX(LED4);
 Timer               canSendTimer; // For debugging CAN transmissions
 
 const unsigned int  ULTRA_LEFT_TX_ID = 0x520;
@@ -23,32 +25,41 @@ const unsigned int  GREEN = 1;
 const unsigned int  ORANGE = 2;
 const unsigned int  RED = 3;
 
-const double        UPDATE_INTERVAL = 0.1; // In seconds
+const float         UPDATE_INTERVAL = 0.1; // In seconds
 const unsigned int  TIMEOUT = 1; // In seconds
-int                 sonarDistanceLeft;
-int                 sonarDistanceRight;
+const float			EXPO_FILTER_FACTOR = 0.2;
+const int			RUNNING_AVERAGE_NUM = 20;
+int				    running_average_buffer_left[RUNNING_AVERAGE_NUM] = { 0 };
+int				    running_average_buffer_right[RUNNING_AVERAGE_NUM] = { 0 };
+const int			DIST_LOWER_LIM = 25;   // when ultrasonic sensor is close to obstacles, readings are garbage
+const int			DIST_HIGHER_LIM = 300; // according to https://www.robotshop.com/ca/en/weatherproof-ultrasonic-sensor-separate-probe.html#Useful-Links
+volatile int        sonarDistanceLeft;
+volatile int        sonarDistanceRight;
+bool				arrived = false;
 
-void dist(int distance);
 void printMsg(CANMsg& msg);
-void sendDistance(CANMsg& msg, int TX_ID, int distance);
-void checkState(CANMsg& msg);
+void CANSendDistance(CANMsg& msg, int TX_ID, int distance);
+void CANCheckState(CANMsg& msg);
 void selectColor(int color_index);
+void dist_dummy(int distance);
+float lowPassRunningAverage(int* buffer, int input, float average);
+float lowPassExponential(int input, float average, float factor = EXPO_FILTER_FACTOR);
+float capValue(int input, int lower_lim = DIST_LOWER_LIM, int upper_lim = DIST_HIGHER_LIM);
 int main();
 
-void dist(int distance) {
-	// Put code here to execute when the distance changes if necessary
-	pc.printf("distance: %d cm\r\n", distance);
-}
-
 #ifdef ROVERBOARD_SCIENCE_PINMAP
-ultrasonic          sonarLeft(ULTRA_TRIG_1, ULTRA_ECHO_1, UPDATE_INTERVAL, TIMEOUT, &dist);
-ultrasonic          sonarRight(ULTRA_TRIG_2, ULTRA_ECHO_2, UPDATE_INTERVAL, TIMEOUT, &dist);
+ultrasonic          sonarLeft(ULTRA_TRIG_1, ULTRA_ECHO_1, UPDATE_INTERVAL, TIMEOUT, &dist_dummy);
+ultrasonic          sonarRight(ULTRA_TRIG_2, ULTRA_ECHO_2, UPDATE_INTERVAL, TIMEOUT, &dist_dummy);
 neopixel            pixelStrip(NEO_PIXEL_SIGNAL, 13);
 #else
-ultrasonic          sonarLeft(D7, D8, UPDATE_INTERVAL, TIMEOUT, &dist);
-ultrasonic          sonarRight(D9, D10, UPDATE_INTERVAL, TIMEOUT, &dist);
+ultrasonic          sonarLeft(D7, D8, UPDATE_INTERVAL, TIMEOUT, &dist_dummy);
+ultrasonic          sonarRight(D9, D10, UPDATE_INTERVAL, TIMEOUT, &dist_dummy);
 neopixel            pixelStrip(PA_5, 10);
 #endif
+
+void dist_dummy(int distance) {
+	pc.printf("distance: %d cm\r\n", distance);
+}
 
 void printMsg(CANMsg& msg) {
 	pc.printf("  ID      = 0x%.3x\r\n", msg.id);
@@ -61,36 +72,31 @@ void printMsg(CANMsg& msg) {
 	pc.printf("\r\n");
 }
 
-void sendDistance(CANMsg& msg, int TX_ID, int distance) {
+void CANSendDistance(CANMsg& msg, int TX_ID, int distance) {
 	msg.clear();
 	msg.id = TX_ID;
 	msg << distance;
 	pc.printf("-------------------------------------\r\n");
 	if (can.write(msg)) {
-		ledCAN = !ledCAN;
+		ledCANTX = !ledCANTX;
 		pc.printf("CAN message sent\r\n");
-		printMsg(txMsg);
+		//printMsg(txMsg);
 	}
 	else {
 		ledErr = 1;
-		pc.printf("Transmission error for message with id %d\r\n");
+		pc.printf("Transmission error for message with id 0x%.3x\r\n", TX_ID);
 	}
 }
 
-void checkState(CANMsg& msg) {
+void CANCheckState(CANMsg& msg) {
 	if (can.read(msg)) {
-		ledCAN = !ledCAN;
 		if (msg.id == NEO_STATE_RX_ID) {
-			pc.printf("CAN message received\r\n");
+			ledCANRX = !ledCANRX;
 			printMsg(msg);
 			sonarLeft.pauseUpdates();
 			sonarRight.pauseUpdates();
-			selectColor(rxMsg.data[0]);
+			selectColor(msg.data[0]);
 		}
-	}
-	else {
-		ledErr = 1;
-		pc.printf("Reception error for message\r\n");
 	}
 }
 
@@ -98,39 +104,83 @@ void selectColor(int state) {
 	switch (state) {
 	case GREEN:
 		pixelStrip.showColor(0, 255, 0);
+		arrived = true;
 		break;
 	case ORANGE:
 		pixelStrip.showColor(255, 127, 80);
+		arrived = true;
 		break;
 	case RED:
 		pixelStrip.showColor(255, 0, 0);
+		arrived = true;
 		break;
 	}
 }
 
+float lowPassExponential(int input, float average, float factor) {
+	return input * factor + (1 - factor)*average;
+}
+
+float lowPassRunningAverage(int* buffer, int input, float average) {
+	static int	count = 0;
+	count++;
+	if (count < RUNNING_AVERAGE_NUM*2) { // we have two buffers, so times 2. I'm too lazy to do it the proper way...
+										 // @TODO: make a class for this
+		return DIST_LOWER_LIM;
+	}
+
+	for (int i = RUNNING_AVERAGE_NUM - 1; i > 0; i--) {
+		buffer[i] = buffer[i - 1];
+	}
+	buffer[0] = input;
+
+	int sum = 0;
+	for (int i = 0; i < RUNNING_AVERAGE_NUM; i++) {
+		sum += buffer[i];
+	}
+
+	return sum / float(RUNNING_AVERAGE_NUM);
+}
+
+float capValue(int input, int lower_lim, int upper_lim) {
+	if (input < lower_lim)
+		return lower_lim;
+	else if (input > upper_lim)
+		return upper_lim;
+	return input;
+}
+
 // main() runs in its own thread in the OS
 int main(void) {
-	ledErr = 0;
-	ledCAN = 0;
-
 	canSendTimer.start();
 
 	sonarLeft.startUpdates();
 	sonarRight.startUpdates();
 
 	while (true) {
-		sonarLeft.checkDistance();
-		sonarRight.checkDistance();
-		sonarDistanceLeft = sonarLeft.getCurrentDistance();
-		sonarDistanceRight = sonarRight.getCurrentDistance();
+		ledDebug = !ledDebug;
+		if (!arrived) {
+			//sonarLeft.checkDistance();
+			//sonarRight.checkDistance();
 
-		if (canSendTimer.read_ms() >= 1000) {
-			canSendTimer.stop();
-			canSendTimer.reset();
-			sendDistance(txMsg, ULTRA_LEFT_TX_ID, sonarDistanceLeft);
-			sendDistance(txMsg, ULTRA_RIGHT_TX_ID, sonarDistanceRight);
+			sonarDistanceLeft = capValue(lowPassRunningAverage(running_average_buffer_left, 
+				                                               sonarLeft.getCurrentDistance(), 
+				                                               sonarDistanceLeft));
+			sonarDistanceRight = capValue(lowPassRunningAverage(running_average_buffer_right, 
+				                                                sonarRight.getCurrentDistance(), 
+				                                                sonarDistanceRight));
+
+			if (canSendTimer.read_ms() >= 1000) {
+				printf("dist lef : %d, dist right: %d \r\n", sonarDistanceLeft, sonarDistanceRight);
+
+				canSendTimer.stop();
+				canSendTimer.reset();
+				canSendTimer.start();
+				CANSendDistance(txMsg, ULTRA_LEFT_TX_ID, sonarDistanceLeft);
+				CANSendDistance(txMsg, ULTRA_RIGHT_TX_ID, sonarDistanceRight);
+			}
 		}
-
-		checkState(rxMsg);
+	
+		CANCheckState(rxMsg);
 	}
 }

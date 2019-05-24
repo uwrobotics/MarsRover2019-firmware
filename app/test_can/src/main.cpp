@@ -17,7 +17,7 @@
  *
  */
   
-#define BOARD1 1 // comment out this line when compiling for board #2
+//#define BOARD1 1 // comment out this line when compiling for board #2
 
 #if defined(BOARD1)
 const unsigned int  RX_ID = 0x100; 
@@ -57,7 +57,7 @@ void printMsg(CANMessage& msg) {
  
 int main(void)
 {
-    can.frequency(1000000); // set bit rate to 1Mbps
+    can.frequency(500000); // set bit rate to 50kbps
 #if defined(BOARD1)
     led = 1;                // turn the LED on
     timer.start();          // start timer

@@ -10,8 +10,13 @@ const double UPDATE_INTERVAL = 0.1; // in seconds
 const unsigned int HIGH = 1;
 const unsigned int LOW = 0;
 Timer tmr;
+#ifdef ROVERBOARD_SCIENCE_PINMAP
+DigitalOut trig(ULTRA_TRIG_1);
+DigitalIn echo(ULTRA_ECHO_1);
+#else
 DigitalOut trig(D7);
 DigitalIn echo(D8);
+#endif
 long duration; // Time interval associated with echo pulse, in us (microseconds)
 int distance; // Distance calculated based on formula (duration(us)/58) (cm)
 int output;

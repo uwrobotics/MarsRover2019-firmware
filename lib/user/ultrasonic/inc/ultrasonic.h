@@ -32,7 +32,7 @@ class ultrasonic
         InterruptIn _echo;
         Timer _t;
         Timeout _tout;
-        int _distance;
+        volatile int _distance;
         float _updateSpeed;
         int start;
         int end;
