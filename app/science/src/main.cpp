@@ -4,41 +4,38 @@
 #include "PwmIn.h"
 #include "PID.h"
 #include "Motor.h"
-#include "AugerController.h"
-#include "CentrifugeController.h"
-#include "ElevatorController.h"
+#include "../inc/AugerController.h"
+#include "../inc/CentrifugeController.h"
+#include "../inc/ElevatorController.h"
 
-//TODO: CHECK ALL CONFIGS
+//TODO: CHECK ALL CONFIGS - NEED TO VERIFY FROM SOMEONE WHO KNOWS THE WIRING
+//TODO: MAP ENCODER PULSES TO DISTANCE FOR THE ELEVATOR
+//TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
         .motor = {
-                .pwmPin = MOTOR1,
-                .dirPin = MOTOR1_DIR,
-                .inverted = true
-        },
-
-        .encoder = {
-                .PwmInPin = ENCR1_CH1,
+                .pwmPin = MOTOR5,
+                .dirPin = MOTOR5_DIR,
                 .inverted = true
         }
 };
 
 const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         .motor = {
-                .pwmPin = MOTOR2,
-                .dirPin = MOTOR2_DIR,
+                .pwmPin = MOTOR6,
+                .dirPin = MOTOR6_DIR,
                 .inverted = true
         },
 
         .encoder = {
-                .channelAPin = ENCR2_CH1,
-                .channelAPin = ENCR2_CH2,
-                .indexPin    = ENCR2_INDEX,
+                .channelAPin = E_C_CH1,
+                .channelAPin = E_C_CH2,
+                .indexPin    = E_C_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
                 .inverted = true
         },
 
-        .limitSwitchPin = LIM_1A,
+        .limitSwitchPin = C_LS,
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -58,22 +55,22 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
 
 const ElevatorController::t_elevatorConfig elevatorConfig = {
         .motor = {
-                .pwmPin = MOTOR3,
-                .dirPin = MOTOR3_DIR,
+                .pwmPin = MOTOR4,
+                .dirPin = MOTOR4_DIR,
                 .inverted = true
         },
 
         .encoder = {
-                .channelAPin = ENCR3_CH1,
-                .channelAPin = ENCR3_CH2,
-                .indexPin    = ENCR3_INDEX,
+                .channelAPin = E_E_CH1,
+                .channelAPin = E_E_CH2,
+                .indexPin    = E_E_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
                 .inverted = true
         },
 
-        .limitSwitchTop = LIM_2A,
-        .limitSwitchBottom = LIM_3A,
+        .limitSwitchTop = E_LS_T,
+        .limitSwitchBottom = E_LS_B,
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,

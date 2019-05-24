@@ -1,6 +1,5 @@
 // Controller for the auger drill
 
-#include <AugerController.h>
 #include "../inc/AugerController.h"
 
 #include "mbed.h"
@@ -11,12 +10,11 @@
 
 AugerController::AugerController( AugerController::t_augerConfig controllerConfig )
 :   m_augerConfig( controllerConfig ),
-    m_motor( controllerConfig.motor ),
-    m_encoder( controllerConfig.encoder )
+    m_motor( controllerConfig.motor )
 {}
 
 mbed_error_status_t AugerController::setMotorSpeedPercent( float percent )
 {
-    m_motor.speed( percent );
+    m_motor.setSpeed( percent );
     return MBED_SUCCESS;
 }
