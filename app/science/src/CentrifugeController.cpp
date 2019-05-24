@@ -116,7 +116,8 @@ mbed_error_status_t CentrifugeController::runInitCalibration() {
         }
     }
 
-    //TODO: ROTATE 15 DEGREES TO LINE UP TUBE 0
+    m_positionPIDController.setSetPoint( m_centrifugeConfig.maxEncoderPulsePerRev / 360 * m_centrifugeConfig.limitSwitchOffset );
+
 
     m_encoder.reset();
 

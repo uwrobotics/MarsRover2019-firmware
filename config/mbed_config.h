@@ -21,8 +21,6 @@
 #ifndef __MBED_CONFIG_DATA__
 #define __MBED_CONFIG_DATA__
 
-#include "mbed_assert.h"
-
 // Macros
 #define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {    \
     mbed_error_status_t result = functionCall;              \

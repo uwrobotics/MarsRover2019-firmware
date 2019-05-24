@@ -29,10 +29,10 @@ int ElevatorController::getPosition()
     return m_encoder.getPulses();
 }
 
-/*int ElevatorController::getCurrentDistanceCM()
+int ElevatorController::getCurrentDistanceCM()
 {
-    return getPosition() * ; //TODO: WRITE CONVERSION FROM ENCODER PULSES TO CM
-}*/
+    return getPosition() * m_elevatorConfig.pulseToCMConversion; //TODO: WRITE CONVERSION FROM ENCODER PULSES TO CM
+}
 
 mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode controlMode )
 {
@@ -106,7 +106,7 @@ mbed_error_status_t ElevatorController::setPositionInCM( float centimeter )
         centimeter = getCurrentDistanceCM();
     }
     // Convert cm distance into encoder value
-    //centimeter = ; //TODO: WRITE UNIT TRANSFORMATION
+    centimeter /= m_elevatorConfig.pulseToCMConversion; // cm / (pulse/cm)
     m_positionPIDController.setSetPoint( centimeter );
     return MBED_SUCCESS;
 }
