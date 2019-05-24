@@ -154,6 +154,14 @@ public:
 
     } Encoding;
 
+    typedef struct {
+        PinName channelAPin, channelBPin, indexPin;
+        int pulsesPerRevolution;
+        QEI::Encoding encoding;
+        bool inverted;
+
+    } t_relativeEncoderConfig;
+
     /**
      * Constructor.
      *
@@ -177,6 +185,10 @@ public:
      *                 channels.
      */
     QEI(PinName channelA, PinName channelB, PinName index, int pulsesPerRev, Encoding encoding = X2_ENCODING);
+
+    QEI(QEI::t_relativeEncoderConfig);
+
+    QEI();
 
     /**
      * Reset the encoder.

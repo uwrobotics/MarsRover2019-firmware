@@ -152,8 +152,16 @@ typedef enum {
     MOTOR3_DIR = PC_8,
 
     // Buttons
-    SW2 = PA_0,
-    SW3 = PA_1,
+    BUTTON_1 = PA_0,
+    BUTTON_2 = PA_1,
+
+    // Limit switches
+    LIM_1A = PB_11,
+    LIM_1B = PB_12,
+    LIM_2A = PB_3,
+    LIM_2B = PB_4,
+    LIM_3A = PA_11,
+    LIM_3B = PA_12,
     
     // TODO: Add remaining pins
     
@@ -162,6 +170,14 @@ typedef enum {
 
 #ifdef ROVERBOARD_SCIENCE_PINMAP    // SCIENCE BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
+
+    // PWM Output
+    MOTOR4 = PB_13, //Elevator
+    MOTOR4_DIR = PB_14,
+    MOTOR5 = PB_15, //Auger
+    MOTOR5_DIR = PC_6,
+    MOTOR6 = PC_7, //Centrifuge
+    MOTOR6_DIR = PC_8,
 
     // Elevator encoders
     E_E_CH1 = PB_0,
@@ -172,6 +188,11 @@ typedef enum {
     E_C_CH1 = PA_7,
     E_C_CH2 = PC_4,
     E_C_INDEX = PC_5,
+
+    // Limit Switches
+    E_LS_T = PA_11,
+    E_LS_B = PA_12,
+    C_LS = PA_8,
 
 #endif                              // SCIENCE BOARD PIN MAPPINGS END
 

@@ -6,15 +6,13 @@
 #include "Motor.h"
 #include "PwmIn.h"
 #include "PID.h"
+#include "PinNames.h"
 
 class AugerController{
     public:
         typedef struct{
             // Motor Configuration
             Motor::t_motorConfig motor;
-
-            // Encoder Configuration
-            PwmIn::t_encoderConfig encoder;
 
         } t_augerConfig;
         
@@ -25,7 +23,6 @@ class AugerController{
         t_augerConfig m_augerConfig;
 
         Motor m_motor;
-        PwmIn m_encoder;
 
         float m_inversionMultiplier;  
 };

@@ -16,7 +16,7 @@ class CentrifugeController{
             Motor::t_motorConfig motor;
 
             // Encoder Configuration
-            QEI::t_encoderConfig encoder;
+            QEI::t_relativeEncoderConfig encoder;
 
             // Limit switch
             PinName limitSwitchPin;
