@@ -20,6 +20,7 @@ class CentrifugeController{
 
             // Limit switch
             PinName limitSwitchPin;
+            float   limitSwitchOffset;
             float   calibrationDutyCycle;
             float   calibrationTimeoutSeconds;
 
