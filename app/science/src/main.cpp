@@ -8,8 +8,6 @@
 #include "../inc/CentrifugeController.h"
 #include "../inc/ElevatorController.h"
 
-//TODO: CHECK ALL CONFIGS - NEED TO VERIFY FROM SOMEONE WHO KNOWS THE WIRING
-//TODO: MAP ENCODER PULSES TO DISTANCE FOR THE ELEVATOR
 //TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
         .motor = {
@@ -28,7 +26,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
 
         .encoder = {
                 .channelAPin = E_C_CH1,
-                .channelAPin = E_C_CH2,
+                .channelBPin = E_C_CH2,
                 .indexPin    = E_C_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
@@ -36,6 +34,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         },
 
         .limitSwitchPin = C_LS,
+        .limitSwitchOffset = 15.0f, // Limit switch is offset 15 degrees
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -48,7 +47,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
                 .interval = 0.1f
         },
 
-        .maxEncoderPulsePerRev = 360,
+        .maxEncoderPulsePerRev = 2112, // From counts per rev * gear ratio
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -62,7 +61,7 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
 
         .encoder = {
                 .channelAPin = E_E_CH1,
-                .channelAPin = E_E_CH2,
+                .channelBPin = E_E_CH2,
                 .indexPin    = E_E_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
@@ -83,7 +82,9 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .interval = 0.1f
         },
 
-        .maxEncoderPulses = 360,
+        .maxEncoderPulses = 160000, // Gotten from maxDistanceInCM / pulseToCMConversion
+        .maxDistanceInCM = 26, // 10 inch range distance
+        .pulseToCMConversion = 0.00016235795f, // Unit is cm/pulse
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -141,7 +142,7 @@ float handleSetElevatorHeight(CANMsg *p_newMsg) {
     if( controlMode != ElevatorController::positionPID ) {
         mbed_error_status_t status = elevatorController.setControlMode( ElevatorController::positionPID );
         if( status != MBED_SUCCESS ) {
-            MBED_ASSERT_FAILURE();
+            MBED_ASSERT( 0 );
         }
     }
     MBED_ASSERT_SUCCESS(elevatorController.setPositionInCM( setHeight ));
@@ -162,7 +163,7 @@ float handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
     if( controlMode != CentrifugeController::motorDutyCycle ) {
         mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::motorDutyCycle );
         if( status != MBED_SUCCESS ) {
-            MBED_ASSERT_FAILURE();
+            MBED_ASSERT( 0 );
         }
     }
     MBED_ASSERT_SUCCESS(centrifugeController.setMotorSpeedPercent( spin ));
@@ -179,11 +180,35 @@ float handleSetCentrifugePosition(CANMsg *p_newMsg) {
     if( controlMode != CentrifugeController::positionPID ) {
         mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::positionPID );
         if( status != MBED_SUCCESS ) {
-            MBED_ASSERT_FAILURE();
+            MBED_ASSERT( 0 );
         }
     }
     MBED_ASSERT_SUCCESS(centrifugeController.setTubePosition(tube_num));
 
+}
+
+void processCANMsg(CANMsg *p_newMsg) {
+    switch (p_newMsg->id) {
+
+        case setElevatorHeight:
+            handleSetElevatorHeight(p_newMsg);
+            break;
+
+        case setAugerSpeed:
+            handleSetAugerSpeed(p_newMsg);
+            break;
+
+        case setCentrifugeSpinning:
+            handleSetCentrifugeSpinning(p_newMsg);
+
+        case setCentrifugePosition:
+            handleSetCentrifugePosition(p_newMsg);
+            break;
+
+        default:
+            pc.printf("Recieved unimplemented command\r\n");
+            break;
+    }
 }
 
 void sendJetsonInfo() {

@@ -18,9 +18,6 @@ class ElevatorController{
             // Encoder Configuration
             QEI::t_relativeEncoderConfig encoder;
 
-            // PID Configuration
-            PID::t_pidConfig positionPID;
-
             // Limit Switch Configurations
             PinName limitSwitchTop;
             PinName limitSwitchBottom;
@@ -28,8 +25,12 @@ class ElevatorController{
             float   calibrationTimeoutSeconds;
 
             // PID Configuration
+            PID::t_pidConfig positionPID;
+
+            // PID Configuration
             unsigned int    maxEncoderPulses; // Should be an int
             unsigned int    maxDistanceInCM; // Should be an int
+            float           pulseToCMConversion; // Unit is cm/pulse
             float           PIDOutputMotorMinDutyCycle;
             float           PIDOutputMotorMaxDutyCycle;
 
