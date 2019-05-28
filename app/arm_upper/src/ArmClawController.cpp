@@ -23,10 +23,14 @@ mbed_error_status_t ArmClawController::setControlMode(ArmClawController::t_clawC
     switch (m_controlMode) {
 
         case motorDutyCycle:
+            m_controlMode = motorDutyCycle;
+            setMotorSpeedPercent(0.0f);
             break;
 
         case positionPID:
             m_positionPIDController.reset();
+            m_controlMode = positionPID;
+            setSeparationDistanceMm(getSeparationDistanceMm());
             break;
 
         default:

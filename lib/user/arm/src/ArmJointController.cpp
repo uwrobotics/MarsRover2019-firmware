@@ -44,22 +44,25 @@ mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode contro
     switch (m_controlMode) {
 
         case motorDutyCycle:
+            m_controlMode = motorDutyCycle;
+            setMotorSpeedPercent(0.0f);
             break;
 
         case velocityPID:
             m_velocityPIDController.reset();
+            m_controlMode = velocityPID;
+            setVelocityDegreesPerSec(0.0f);
             break;
 
         case positionPID:
             m_positionPIDController.reset();
+            m_controlMode = positionPID;
+            setAngleDegrees(getAngleDegrees());
             break;
 
         default:
             return MBED_ERROR_INVALID_ARGUMENT;
     }
-
-    m_controlMode = controlMode;
-    m_motor.setSpeed(0.0f);
 
     timer.reset();
 
