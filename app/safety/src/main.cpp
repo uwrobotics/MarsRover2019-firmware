@@ -14,6 +14,7 @@ CANMsg              txMsg;
 DigitalOut          ledErr(LED1);
 DigitalOut			ledI2C(LED3);
 DigitalOut          ledCAN(LED4);
+AnalogIn            battery(V_MONITOR);
 
 //Sensor Address Indices
 enum {
@@ -46,6 +47,16 @@ const float bitsPerVolt_30A = 255/5;
 const int bitRange_30A = round((upperV_30A - lowerV_30A) * bitsPerVolt_30A);
 const float iConversion_30A = bitRange_30A/ampRange_30A;
 
+// Voltage monitoring specific
+const float compression_factor = 0.110629;
+const int cell_num = 6;
+const float full_cell = 4.20;
+const float low_cell = 3.75; // TODO verify this value
+const float full_bat = full_cell * cell_num * compression_factor/3.3;
+const float low_bat = low_cell * cell_num * compression_factor/3.3;
+float bat_value = 0;
+#define V_INDEX 3
+
 void initCAN() {
     can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
 
@@ -65,6 +76,9 @@ int main() {
     while(1) {
 		raw_adc_sum = 0.0;
 		
+        /* avgReading -= avgReading/sampleSize;
+           avgReading += newReading/sampleSize
+        */
 		// Take multiple samples of each sensor
 		for(int i = 0; i < 3; i++) {			
 			for (int j = 0; j < TOTAL_SAMPLE; j++) { 
@@ -99,7 +113,18 @@ int main() {
 				ledErr = 1;
 			}
 		}
-		
+
+        // Reading of battery voltage
+        /* Battery voltage conversion 
+        * Voltage divider of 82k and 10.2k provide a compression factor of 0.110629
+        * Does CAN Msg need to be sent out?
+        */
+       bat_value = battery.read();
+       pc.printf("Battery Level: %f\r\n", bat_value);
+       if (bat_value < low_cell){
+           CANMsg txMsg(TX_ID + V_INDEX);
+           pc.printf("REPLACE BATTERY, Battery Level LOW!!! \r\n");
+       }
 		wait(1);
     }
 }

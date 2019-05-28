@@ -196,6 +196,9 @@ SW3 = PA_1,
     // I2C
     I2C_SCL = PB_6,
     I2C_SDA = PB_7,
+
+    // Voltage monitoring
+    V_MONITOR = PA_5,
     
     // TODO: Add remaining pins
 

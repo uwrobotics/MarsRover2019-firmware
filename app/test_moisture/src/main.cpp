@@ -4,9 +4,9 @@
 
 
 
-AnalogIn moisture(MOIST_DATA);
-DigitalOut moisture_pwr(MOIST_PWR);
-Serial pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
+AnalogIn        moisture(MOIST_DATA);
+DigitalOut      moisture_pwr(MOIST_PWR);
+Serial          pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
 
 int main() {
     moist_init(); // Init moisture
