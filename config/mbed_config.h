@@ -21,6 +21,17 @@
 #ifndef __MBED_CONFIG_DATA__
 #define __MBED_CONFIG_DATA__
 
+// Macros
+#define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {    \
+    mbed_error_status_t result = functionCall;              \
+    MBED_ASSERT(result == MBED_SUCCESS);                    \
+    if (result != MBED_SUCCESS) {                           \
+        return result;                                      \
+    }                                                       \
+}
+
+#define MBED_ASSERT_SUCCESS(functionCall)   MBED_ASSERT(functionCall == MBED_SUCCESS)
+
 // Configuration parameters
 #define CLOCK_SOURCE                                        USE_PLL_HSE_EXTC|USE_PLL_HSI            // set by target:NUCLEO_F091RC
 #define LPTICKER_DELAY_TICKS                                1                                       // set by target:NUCLEO_F091RC

@@ -22,6 +22,10 @@
  
 #ifndef MBED_MOTOR_H
 #define MBED_MOTOR_H
+
+#ifndef MOTOR_DEFAULT_FREQUENCY_HZ
+#define MOTOR_DEFAULT_FREQUENCY_HZ 1000 // 1 kHz
+#endif
  
 #include "mbed.h"
  
@@ -30,29 +34,40 @@
  * with an H-bridge using a PwmOut and 2 DigitalOuts
  */
 class Motor {
+
 public:
+
+    typedef struct {
+        PinName pwmPin;
+        PinName dirPin;
+        bool inverted;
+
+    } t_motorConfig;
  
     /** Create a motor control interface    
      *
      * @param pwm       A PwmOut pin, driving the H-bridge enable line to control the speed
      * @param dir       A DigitalOut, set high when the motor should go forward, low when backwards
-     * @param freqInHz  Output PWM frequency
+     * @param freqInHz  Output PWM frequency, default 1kHz
      * @param inverted  If true, then forward speed will set dir to 0 instead of 1, otherwise inverse
      * @param limit     Maximum speed magnitude
      */
-    Motor(PinName pwm, PinName dir, int freqInHz, bool inverted = false, float limit = 1.0);
-    
+    Motor(PinName pwm, PinName dir, bool inverted = false, int freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ, float limit = 1.0);
+
+    Motor(t_motorConfig motorConfig);
+
     /** Set the speed of the motor
      * 
      * @param speed The speed of the motor as a normalised value between -1.0 and 1.0
      */
-    void speed(float speed);
+    void setSpeed(float speed);
+    Motor& operator=(int speed);
 
     /** Read the current speed of the motor
      * 
      * @return Current speed of motor
      */
-    float read();
+    float getSpeed();
  
 protected:
     PwmOut _pwm;
