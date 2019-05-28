@@ -4,9 +4,9 @@
 #include "PwmIn.h"
 #include "PID.h"
 #include "Motor.h"
-#include "../inc/AugerController.h"
-#include "../inc/CentrifugeController.h"
-#include "../inc/ElevatorController.h"
+#include "AugerController.h"
+#include "CentrifugeController.h"
+#include "ElevatorController.h"
 
 //TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
@@ -53,6 +53,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
 };
 
 const ElevatorController::t_elevatorConfig elevatorConfig = {
+
         .motor = {
                 .pwmPin = MOTOR4,
                 .dirPin = MOTOR4_DIR,
@@ -82,9 +83,9 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .interval = 0.1f
         },
 
-        .maxEncoderPulses = 160000, // Gotten from maxDistanceInCM / pulseToCMConversion
+        .maxEncoderPulses = 160000, // Gotten from maxDistanceInCM / centimetresPerPulse
         .maxDistanceInCM = 26, // 10 inch range distance
-        .pulseToCMConversion = 0.00016235795f, // Unit is cm/pulse
+        .centimetresPerPulse = 0.00016235795f, // Unit is cm/pulse
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
@@ -145,7 +146,7 @@ float handleSetElevatorHeight(CANMsg *p_newMsg) {
             MBED_ASSERT( 0 );
         }
     }
-    MBED_ASSERT_SUCCESS(elevatorController.setPositionInCM( setHeight ));
+    MBED_ASSERT_SUCCESS(elevatorController.setPositionInCm(setHeight));
 }
 
 float handleSetAugerSpeed(CANMsg *p_newMsg) {
@@ -166,7 +167,7 @@ float handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
             MBED_ASSERT( 0 );
         }
     }
-    MBED_ASSERT_SUCCESS(centrifugeController.setMotorSpeedPercent( spin ));
+    MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle(spin));
 
 
 }
@@ -222,7 +223,7 @@ int main(void)
     initCAN();
 
     elevatorController.runInitCalibration();
-    centrifugeController.runInitCalibration();
+    centrifugeController.runEndpointCalibration();
 
     canSendTimer.start();
 
