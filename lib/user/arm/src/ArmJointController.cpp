@@ -45,7 +45,7 @@ mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode contro
 
         case motorDutyCycle:
             m_controlMode = motorDutyCycle;
-            setMotorSpeedPercent(0.0f);
+            setMotorDutyCycle(0.0f);
             break;
 
         case velocityPID:
@@ -69,17 +69,17 @@ mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode contro
     return MBED_SUCCESS;
 }
 
-mbed_error_status_t ArmJointController::setMotorSpeedPercent(float speedPercent) {
+mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
     if (m_controlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && speedPercent < 0.0f) ||
-        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && speedPercent > 0.0f)) {
-        speedPercent = 0.0f;
+    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && dutyCycle < 0.0f) ||
+        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && dutyCycle > 0.0f)) {
+        dutyCycle = 0.0f;
     }
 
-    m_motor.setSpeed(speedPercent);
+    m_motor.setSpeed(dutyCycle);
 
     return MBED_SUCCESS;
 }

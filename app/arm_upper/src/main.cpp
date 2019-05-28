@@ -199,7 +199,7 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setPitchSpeedPercent(motionData));
+            MBED_ASSERT_SUCCESS(wristController.setPitchDutyCycle(motionData));
             break;
 
         case ArmJointController::velocityPID:
@@ -223,7 +223,7 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setRollSpeedPercent(motionData));
+            MBED_ASSERT_SUCCESS(wristController.setRollDutyCycle(motionData));
             break;
 
         case ArmJointController::velocityPID:
@@ -247,7 +247,7 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmClawController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(clawController.setMotorSpeedPercent(motionData));
+            MBED_ASSERT_SUCCESS(clawController.setMotorDutyCycle(motionData));
             break;
 
         case ArmClawController::positionPID:
@@ -311,8 +311,6 @@ int main(void)
     pc.printf("Program Started\r\n\r\n");
 
     initCAN();
-
-    clawController.runEndpointCalibration();
 
     canSendTimer.start();
 
