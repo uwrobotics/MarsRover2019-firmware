@@ -312,8 +312,6 @@ int main(void)
 
     initCAN();
 
-    clawController.runEndpointCalibration();
-
     canSendTimer.start();
 
     while (1) {

@@ -30,7 +30,7 @@ mbed_error_status_t ArmClawController::setControlMode(ArmClawController::t_clawC
         case positionPID:
             m_positionPIDController.reset();
             m_controlMode = positionPID;
-            setSeparationDistanceMm(getSeparationDistanceMm());
+            clawController.runEndpointCalibration();
             break;
 
         default:
@@ -129,6 +129,8 @@ void ArmClawController::initializePIDController() {
 
 mbed_error_status_t ArmClawController::runEndpointCalibration() {
 
+    t_controlMode prevControlMode = getControlMode();
+
     MBED_ASSERT_SUCCESS_RETURN_ERROR(setControlMode(motorDutyCycle));
     MBED_ASSERT_SUCCESS_RETURN_ERROR(setMotorSpeedPercent(m_armClawConfig.calibrationDutyCycle));
 
@@ -141,6 +143,8 @@ mbed_error_status_t ArmClawController::runEndpointCalibration() {
     }
 
     m_encoder.reset();
+
+    setControlMode(prevControlMode);
 
     return MBED_SUCCESS;
 }
