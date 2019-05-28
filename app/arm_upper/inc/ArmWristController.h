@@ -27,7 +27,7 @@ public:
 
     } t_armWristConfig;
 
-    explicit ArmWristController(t_armWristConfig armWristConfig, ArmJointController::t_jointControlMode controlMode = ArmJointController::velocityPID);
+    explicit ArmWristController(t_armWristConfig armWristConfig, ArmJointController::t_jointControlMode controlMode = ArmJointController::motorDutyCycle);
 
     mbed_error_status_t setControlMode(ArmJointController::t_jointControlMode controlMode);
 

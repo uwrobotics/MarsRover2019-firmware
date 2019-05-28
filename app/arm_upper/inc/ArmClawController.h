@@ -43,7 +43,7 @@ public:
 
     } t_clawControlMode;
 
-    explicit ArmClawController(t_clawConfig armClawConfig, t_clawControlMode controlMode = positionPID);
+    explicit ArmClawController(t_clawConfig armClawConfig, t_clawControlMode controlMode = motorDutyCycle);
 
     mbed_error_status_t setControlMode(t_clawControlMode controlMode);
 

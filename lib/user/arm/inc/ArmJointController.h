@@ -40,7 +40,7 @@ public:
 
     } t_jointControlMode;
 
-    explicit ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode = velocityPID);
+    explicit ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode = motorDutyCycle);
 
     mbed_error_status_t setControlMode(t_jointControlMode controlMode);
 
