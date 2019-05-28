@@ -3,12 +3,12 @@
 #include "../inc/CentrifugeController.h"
 
 CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
-                                            CentrifugeController::t_centrifugeControlMode   controlMode )
-:   m_centrifugeControlMode( controlMode ),
+                                            CentrifugeController::t_centrifugeControlMode   controlMode ):
+    m_centrifugeControlMode( controlMode ),
     m_centrifugeConfig( controllerConfig ),
     m_motor( controllerConfig.motor ),
     m_encoder( controllerConfig.encoder ),
-    m_limitSwitch(controllerConfig.limitSwitchPin),
+    m_limitSwitch(controllerConfig.limitSwitchPin ),
     m_positionPIDController( controllerConfig.positionPID.P, controllerConfig.positionPID.I, controllerConfig.positionPID.D, controllerConfig.positionPID.interval )
 {
     initializePID();
@@ -23,7 +23,7 @@ CentrifugeController::t_centrifugeControlMode CentrifugeController::getControlMo
 // Get the current test tube # that is under the auger - note, this rounds down
 unsigned int CentrifugeController::getTestTubeIndex()
 {
-    return static_cast<int>( getEncoderPulses()/m_centrifugeConfig.maxEncoderPulsePerRev * 12 );
+    return static_cast<int>( getEncoderPulses() / m_centrifugeConfig.maxEncoderPulsePerRev * 12 );
 }
 
 // Get the current encoder value
@@ -38,11 +38,18 @@ mbed_error_status_t CentrifugeController::setControlMode(CentrifugeController::t
     m_motor.setSpeed( 0.0f );
 
     switch (m_centrifugeControlMode) {
+
         case motorDutyCycle:
+            m_centrifugeControlMode = motorDutyCycle;
+            setMotorDutyCycle(0.0f);
             break;
+
         case positionPID:
             m_positionPIDController.reset();
+            m_centrifugeControlMode = positionPID;
+            setTubePosition(0);
             break;
+
         default:
             return MBED_ERROR_CODE_INVALID_ARGUMENT;
     }
@@ -53,22 +60,24 @@ mbed_error_status_t CentrifugeController::setControlMode(CentrifugeController::t
 }
 
 // Set the motor speed in terms of % of the total speed
-mbed_error_status_t CentrifugeController::setMotorSpeedPercent( float percent )
+mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
 {
     if (m_centrifugeControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
-    m_motor.setSpeed( percent );
+
+    m_motor.setSpeed( dutyCycle );
     return MBED_SUCCESS;
 }
 
 // Set the PID in terms of the test tube number
-mbed_error_status_t  CentrifugeController::setTubePosition( unsigned int tube_num )
+mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num )
 {
     // Might shift the placement by one test tube due to rounding when fetching current tube #
     if( tube_num > 11 ){
         tube_num = getTestTubeIndex();
     }
+
     m_positionPIDController.setSetPoint( tube_num / 11 * m_centrifugeConfig.maxEncoderPulsePerRev );
     return MBED_SUCCESS;
 }
@@ -79,11 +88,14 @@ void CentrifugeController::update()
     timer.reset();
 
     switch( m_centrifugeControlMode ) {
+
         case motorDutyCycle:
+
             if ( m_motor.getSpeed() > 1.1f || m_motor.getSpeed() < 1.1f ) // If speed is > bounds, something is wrong
             {
                 m_motor.setSpeed(0.0f);
             }
+
             break;
 
         case positionPID:
@@ -103,10 +115,12 @@ void CentrifugeController::initializePID( void )
     m_positionPIDController.setMode( PID_AUTO_MODE );
 }
 
-mbed_error_status_t CentrifugeController::runInitCalibration() {
+mbed_error_status_t CentrifugeController::runEndpointCalibration() {
+
+    t_centrifugeControlMode prevControlMode = getControlMode();
 
     MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorSpeedPercent( m_centrifugeConfig.calibrationDutyCycle ) );
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorDutyCycle(m_centrifugeConfig.calibrationDutyCycle) );
 
     timer.reset();
 
@@ -117,9 +131,9 @@ mbed_error_status_t CentrifugeController::runInitCalibration() {
     }
 
     m_positionPIDController.setSetPoint( m_centrifugeConfig.maxEncoderPulsePerRev / 360 * m_centrifugeConfig.limitSwitchOffset );
-
-
     m_encoder.reset();
+
+    setControlMode(prevControlMode);
 
     return MBED_SUCCESS;
 }

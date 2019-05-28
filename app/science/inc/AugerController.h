@@ -8,9 +8,12 @@
 #include "PID.h"
 #include "PinNames.h"
 
-class AugerController{
+class AugerController {
+
     public:
-        typedef struct{
+
+        typedef struct {
+
             // Motor Configuration
             Motor::t_motorConfig motor;
 
@@ -19,12 +22,11 @@ class AugerController{
         AugerController( t_augerConfig controllerConfig );
                          
         mbed_error_status_t setMotorSpeedPercent( float percent );
+
     private:
+
         t_augerConfig m_augerConfig;
-
         Motor m_motor;
-
-        float m_inversionMultiplier;  
 };
 
 

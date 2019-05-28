@@ -9,7 +9,9 @@
 #include "PinNames.h"
 
 class ElevatorController{
+
     public:
+
         // General config
         typedef struct{
             // Motor Configuration
@@ -30,7 +32,7 @@ class ElevatorController{
             // PID Configuration
             unsigned int    maxEncoderPulses; // Should be an int
             unsigned int    maxDistanceInCM; // Should be an int
-            float           pulseToCMConversion; // Unit is cm/pulse
+            float           centimetresPerPulse; // Unit is cm/pulse
             float           PIDOutputMotorMinDutyCycle;
             float           PIDOutputMotorMaxDutyCycle;
 
@@ -46,21 +48,21 @@ class ElevatorController{
         ElevatorController( t_elevatorConfig        controllerConfig,
                             t_elevatorControlMode   controlMode );
 
-        mbed_error_status_t  setControlMode( t_elevatorControlMode controlMode );
-        mbed_error_status_t  setMotorSpeedPercent( float percent );
-        mbed_error_status_t  setEncoderPositionPercent( float percent );
-        mbed_error_status_t  setPositionInCM( float centimeter );
+        mbed_error_status_t setControlMode( t_elevatorControlMode controlMode );
+        mbed_error_status_t setMotorSpeedPercent( float percent );
+        mbed_error_status_t setEncoderPositionPercent( float percent );
+        mbed_error_status_t setPositionInCm(float centimeters);
 
         mbed_error_status_t runInitCalibration();
 
-
         t_elevatorControlMode getControlMode() const;
 
-        int     getPosition(); // Return encoder value
-        int     getCurrentDistanceCM(); // Return encoder transformed value into cm
-        void    update();
+        int  getPositionEncoderPulses(); // Return encoder value
+        int  getCurrentDistanceCm(); // Return encoder transformed value into cm
+        void update();
 
     private:
+
         void initializePID( void );
         
         t_elevatorControlMode   m_elevatorControlMode;
@@ -71,11 +73,9 @@ class ElevatorController{
         Motor   m_motor;
         QEI     m_encoder;
 
-        PID m_positionPIDController;
+        PID     m_positionPIDController;
 
-        float m_inversionMultiplier;
-
-        Timer timer;
+        Timer   timer;
 };
 
 #endif // ELEVATOR_CONTROLLER_H

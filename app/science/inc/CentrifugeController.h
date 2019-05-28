@@ -9,9 +9,12 @@
 #include "PID.h"
 #include "PinNames.h"
 
-class CentrifugeController{
+class CentrifugeController {
+
     public:
-        typedef struct{
+
+        typedef struct {
+
             // Motor Configuration
             Motor::t_motorConfig motor;
 
@@ -40,13 +43,13 @@ class CentrifugeController{
         } t_centrifugeControlMode;
 
         explicit CentrifugeController( t_centrifugeConfig controllerConfig,
-                                       t_centrifugeControlMode      controlMode = motorDutyCycle );
+                                       t_centrifugeControlMode controlMode = motorDutyCycle );
 
-        mbed_error_status_t  setControlMode( t_centrifugeControlMode control );
-        mbed_error_status_t  setMotorSpeedPercent( float percent );
-        mbed_error_status_t  setTubePosition( unsigned int tube_num ); // Range of [0-11]
+        mbed_error_status_t setControlMode( t_centrifugeControlMode control );
+        mbed_error_status_t setMotorDutyCycle(float dutyCycle);
+        mbed_error_status_t setTubePosition( unsigned int tube_num ); // Range of [0-11]
 
-        mbed_error_status_t runInitCalibration();
+        mbed_error_status_t runEndpointCalibration();
 
         t_centrifugeControlMode getControlMode();
 
@@ -55,6 +58,7 @@ class CentrifugeController{
         void            update();
 
     private:
+
         void initializePID( void );
 
         t_centrifugeControlMode m_centrifugeControlMode;
@@ -67,6 +71,7 @@ class CentrifugeController{
         PID m_positionPIDController;       
 
         Timer timer;
+
 };
 
 #endif // CENTRIFUGE_CONTROLLER_H
