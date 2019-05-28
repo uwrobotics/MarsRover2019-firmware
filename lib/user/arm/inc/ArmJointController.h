@@ -44,7 +44,7 @@ public:
 
     mbed_error_status_t setControlMode(t_jointControlMode controlMode);
 
-    mbed_error_status_t setMotorSpeedPercent(float speedPercent);
+    mbed_error_status_t setMotorDutyCycle(float dutyCycle);
 
     mbed_error_status_t setVelocityDegreesPerSec(float velocityDegreesPerSec);
 

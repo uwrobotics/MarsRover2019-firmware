@@ -35,13 +35,13 @@ mbed_error_status_t ArmWristController::setControlMode(ArmJointController::t_joi
     return MBED_SUCCESS;
 }
 
-mbed_error_status_t ArmWristController::setRollSpeedPercent(float speedPercent) {
-    m_rollMotorSpeed = speedPercent;
+mbed_error_status_t ArmWristController::setRollDutyCycle(float dutyCycle) {
+    m_rollMotorSpeed = dutyCycle;
     return setMotorSpeeds();
 }
 
-mbed_error_status_t ArmWristController::setPitchSpeedPercent(float speedPercent) {
-    m_pitchMotorSpeed = speedPercent;
+mbed_error_status_t ArmWristController::setPitchDutyCycle(float dutyCycle) {
+    m_pitchMotorSpeed = dutyCycle;
     return setMotorSpeeds();
 }
 
@@ -84,8 +84,8 @@ void ArmWristController::update() {
 }
 
 mbed_error_status_t ArmWristController::setMotorSpeeds(void) {
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setMotorSpeedPercent(-m_rollMotorSpeed + m_pitchMotorSpeed));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setMotorSpeedPercent(m_rollMotorSpeed + m_pitchMotorSpeed));
+    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setMotorDutyCycle(-m_rollMotorSpeed + m_pitchMotorSpeed));
+    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setMotorDutyCycle(m_rollMotorSpeed + m_pitchMotorSpeed));
 
     return MBED_SUCCESS;
 }
