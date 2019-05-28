@@ -31,9 +31,9 @@ public:
 
     mbed_error_status_t setControlMode(ArmJointController::t_jointControlMode controlMode);
 
-    mbed_error_status_t setRollSpeedPercent(float speedPercent);
+    mbed_error_status_t setRollDutyCycle(float dutyCycle);
 
-    mbed_error_status_t setPitchSpeedPercent(float speedPercent);
+    mbed_error_status_t setPitchDutyCycle(float dutyCycle);
 
     mbed_error_status_t setRollVelocityDegreesPerSec(float velocityDegreesPerSec);
 
