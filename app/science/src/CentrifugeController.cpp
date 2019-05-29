@@ -11,6 +11,14 @@ CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeCo
     m_limitSwitch(controllerConfig.limitSwitchPin ),
     m_positionPIDController( controllerConfig.positionPID.P, controllerConfig.positionPID.I, controllerConfig.positionPID.D, controllerConfig.positionPID.interval )
 {
+
+    if (controllerConfig.encoder.inverted) {
+        m_encoderInversionMultiplier = -1;
+    }
+    else {
+        m_encoderInversionMultiplier = 1;
+    }
+
     initializePID();
     timer.start();
 }
@@ -29,7 +37,7 @@ unsigned int CentrifugeController::getTestTubeIndex()
 // Get the current encoder value
 float CentrifugeController::getEncoderPulses()
 {
-    return m_encoder.getPulses() % m_centrifugeConfig.maxEncoderPulsePerRev;
+    return m_encoderInversionMultiplier * fmodf(m_encoder.getPulses(), m_centrifugeConfig.maxEncoderPulsePerRev);
 }
 
 mbed_error_status_t CentrifugeController::setControlMode(CentrifugeController::t_centrifugeControlMode controlMode)
@@ -65,7 +73,8 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
     if (m_centrifugeControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
-
+    Serial pc(SERIAL_TX, SERIAL_RX);
+    pc.printf("sdfsdfsdf");
     m_motor.setSpeed( dutyCycle );
     return MBED_SUCCESS;
 }

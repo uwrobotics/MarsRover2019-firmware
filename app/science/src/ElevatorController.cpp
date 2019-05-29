@@ -44,13 +44,13 @@ mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode co
 
         case motorDutyCycle:
             m_elevatorControlMode = motorDutyCycle;
-            setMotorSpeedPercent(0.0f);
+            setMotorDutyCycle(0.0f);
             break;
 
         case positionPID:
             m_elevatorControlMode = positionPID;
             m_positionPIDController.reset();
-            setPositionInCm(getPositionCm);
+            setPositionInCm(getPositionCm());
             break;
 
         default:
@@ -63,7 +63,7 @@ mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode co
 }
 
 // Set the motor speed as a percentage of the maximum motor speed [-1.0, 1.0]
-mbed_error_status_t ElevatorController::setMotorSpeedPercent(float percent)
+mbed_error_status_t ElevatorController::setMotorDutyCycle(float percent)
 {
     if (m_elevatorControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
@@ -109,7 +109,7 @@ mbed_error_status_t ElevatorController::setPositionInCm(float centimeters)
     }
 
     if( centimeters < 0 || centimeters > m_elevatorConfig.maxDistanceInCM ){
-        centimeters = getCurrentDistanceCm();
+        centimeters = getPositionCm();
     }
 
     // Convert cm distance into encoder value
@@ -153,7 +153,7 @@ void ElevatorController::initializePID( void ) {
 mbed_error_status_t ElevatorController::runInitCalibration() {
 
     MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorSpeedPercent( m_elevatorConfig.calibrationDutyCycle ) );
+    MBED_ASSERT_SUCCESS_RETURN_ERROR(setMotorDutyCycle(m_elevatorConfig.calibrationDutyCycle) );
 
     timer.reset();
 

@@ -68,7 +68,9 @@ class CentrifugeController {
         QEI         m_encoder;
         DigitalIn   m_limitSwitch;
 
-        PID m_positionPIDController;       
+        PID m_positionPIDController;
+
+        float m_encoderInversionMultiplier;
 
         Timer timer;
 

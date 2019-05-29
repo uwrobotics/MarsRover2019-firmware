@@ -11,24 +11,28 @@
 //TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
         .motor = {
-                .pwmPin = MOTOR5,
-                .dirPin = MOTOR5_DIR,
-                .inverted = true
+                .pwmPin = MOTOR_A,
+                .dirPin = MOTOR_A_DIR,
+                .inverted = false,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         }
 };
 
 const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         .motor = {
-                .pwmPin = MOTOR6,
-                .dirPin = MOTOR6_DIR,
-                .inverted = true
+                .pwmPin = MOTOR_C,
+                .dirPin = MOTOR_C_DIR,
+                .inverted = false,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 0.5
         },
 
         .encoder = {
-                .channelAPin = E_C_CH1,
-                .channelBPin = E_C_CH2,
-                .indexPin    = E_C_INDEX,
-                .pulsesPerRevolution = 360,
+                .channelAPin = ENC_C_CH1,
+                .channelBPin = ENC_C_CH2,
+                .indexPin    = ENC_C_INDEX,
+                .pulsesPerRevolution = 211,
                 .encoding = QEI::X4_ENCODING,
                 .inverted = true
         },
@@ -55,15 +59,17 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
 const ElevatorController::t_elevatorConfig elevatorConfig = {
 
         .motor = {
-                .pwmPin = MOTOR4,
-                .dirPin = MOTOR4_DIR,
-                .inverted = true
+                .pwmPin = MOTOR_E,
+                .dirPin = MOTOR_E_DIR,
+                .inverted = true,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {
-                .channelAPin = E_E_CH1,
-                .channelBPin = E_E_CH2,
-                .indexPin    = E_E_INDEX,
+                .channelAPin = ENC_E_CH1,
+                .channelBPin = ENC_E_CH2,
+                .indexPin    = ENC_E_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
                 .inverted = true
@@ -117,16 +123,15 @@ void printCANMsg(CANMessage& msg) {
 
 enum scienceCommand {
 
-    setElevatorHeight = ROVER_SCIENCE_CANID,
-    setAugerSpeed,
+    setElevatorControlMode = ROVER_SCIENCE_CANID,
+    setElevatorMotion,
+    setAugerDutyCycle,
+    setCentrifugeControlMode,
+    setCentrifugeDutyCycle,
     setCentrifugeSpinning,
     setCentrifugePosition,
-    //setFunnelOpen,
-    //setSensorMountPosition,
-
-    firstCommand = setElevatorHeight,
-    lastCommand  = setCentrifugePosition
-    // lastCommand  = setSensorMountPosition
+    setFunnelOpen,
+    setSensorMountPosition
 
 };
 
@@ -134,73 +139,117 @@ void initCAN() {
     can.filter(ROVER_SCIENCE_CANID, ROVER_CANID_FILTER_MASK, CANStandard);
 }
 
-float handleSetElevatorHeight(CANMsg *p_newMsg) {
-    float setHeight = 0;
-    *p_newMsg >> setHeight;
+ElevatorController::t_elevatorControlMode handleSetElevatorControlMode(CANMsg *p_newMsg) {
+    ElevatorController::t_elevatorControlMode controlMode;
+    *p_newMsg >> controlMode;
+
+    MBED_ASSERT_SUCCESS(elevatorController.setControlMode(controlMode));
+
+    return controlMode;
+}
+
+
+float handleSetElevatorMotion(CANMsg *p_newMsg) {
+    float motionData = 0;
+    *p_newMsg >> motionData;
 
     ElevatorController::t_elevatorControlMode controlMode = elevatorController.getControlMode();
 
-    if( controlMode != ElevatorController::positionPID ) {
-        mbed_error_status_t status = elevatorController.setControlMode( ElevatorController::positionPID );
-        if( status != MBED_SUCCESS ) {
-            MBED_ASSERT( 0 );
-        }
+    switch (controlMode) {
+        case ElevatorController::motorDutyCycle:
+            MBED_ASSERT_SUCCESS(elevatorController.setMotorDutyCycle(motionData));
+            break;
+        case ElevatorController::positionPID:
+            MBED_ASSERT_SUCCESS(elevatorController.setPositionInCm(motionData));
+            break;
     }
-    MBED_ASSERT_SUCCESS(elevatorController.setPositionInCm(setHeight));
+
+    return motionData;
 }
 
-float handleSetAugerSpeed(CANMsg *p_newMsg) {
-    float speed = 0;
-    *p_newMsg >> speed;
-    MBED_ASSERT_SUCCESS(augerController.setMotorSpeedPercent( speed ));
+float handleSetAugerDutyCycle(CANMsg *p_newMsg) {
+    float dutyCycle = 0;
+    *p_newMsg >> dutyCycle;
+
+    MBED_ASSERT_SUCCESS(augerController.setMotorDutyCycle(dutyCycle));
+
+    return dutyCycle;
 }
 
-float handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
-    bool spin = 0;
+CentrifugeController::t_centrifugeControlMode handleSetCentrifugeControlMode(CANMsg *p_newMsg) {
+    CentrifugeController::t_centrifugeControlMode controlMode;
+    *p_newMsg >> controlMode;
+
+    MBED_ASSERT_SUCCESS(centrifugeController.setControlMode(controlMode));
+
+    return controlMode;
+}
+
+float handleSetCentrifugeDutyCycle(CANMsg *p_newMsg) {
+    float dutyCycle = 0;
+    *p_newMsg >> dutyCycle;
+
+    MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle( dutyCycle ));
+
+    return dutyCycle;
+}
+
+bool handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
+    bool spin = false;
     *p_newMsg >> spin;
 
-    CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
+    CentrifugeController::t_centrifugeControlMode prevControlMode = centrifugeController.getControlMode();
 
-    if( controlMode != CentrifugeController::motorDutyCycle ) {
-        mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::motorDutyCycle );
-        if( status != MBED_SUCCESS ) {
-            MBED_ASSERT( 0 );
-        }
+    if( prevControlMode != CentrifugeController::motorDutyCycle ) {
+        MBED_ASSERT_SUCCESS(centrifugeController.setControlMode( CentrifugeController::motorDutyCycle ));
     }
+
     MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle(spin));
 
-
+    return spin;
 }
 
-float handleSetCentrifugePosition(CANMsg *p_newMsg) {
+int handleSetCentrifugePosition(CANMsg *p_newMsg) {
     int tube_num = 0;
     *p_newMsg >> tube_num;
 
     CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
 
     if( controlMode != CentrifugeController::positionPID ) {
-        mbed_error_status_t status = centrifugeController.setControlMode( CentrifugeController::positionPID );
-        if( status != MBED_SUCCESS ) {
-            MBED_ASSERT( 0 );
-        }
+        MBED_ASSERT_SUCCESS(centrifugeController.setControlMode( CentrifugeController::positionPID ));
     }
+
     MBED_ASSERT_SUCCESS(centrifugeController.setTubePosition(tube_num));
 
+    return tube_num;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
     switch (p_newMsg->id) {
 
-        case setElevatorHeight:
-            handleSetElevatorHeight(p_newMsg);
+        case setElevatorControlMode:
+            handleSetElevatorControlMode(p_newMsg);
             break;
 
-        case setAugerSpeed:
-            handleSetAugerSpeed(p_newMsg);
+        case setElevatorMotion:
+            handleSetElevatorMotion(p_newMsg);
+            break;
+
+        case setAugerDutyCycle:
+            handleSetAugerDutyCycle(p_newMsg);
+            break;
+
+        case setCentrifugeControlMode:
+            handleSetElevatorControlMode(p_newMsg);
+            break;
+
+        case setCentrifugeDutyCycle:
+            pc.printf("Setting centrifuge duty cycle to %f\r\n", handleSetCentrifugeDutyCycle(p_newMsg));
             break;
 
         case setCentrifugeSpinning:
             handleSetCentrifugeSpinning(p_newMsg);
+            break;
 
         case setCentrifugePosition:
             handleSetCentrifugePosition(p_newMsg);

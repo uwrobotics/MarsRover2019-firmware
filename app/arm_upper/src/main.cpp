@@ -13,7 +13,9 @@ const ArmWristController::t_armWristConfig wristConfig = {
                 .motor = {
                         .pwmPin = MOTOR1,
                         .dirPin = MOTOR1_DIR,
-                        .inverted = true
+                        .inverted = true,
+                        .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                        .limit = 1.0
                 },
 
                 .encoder = {
@@ -50,7 +52,9 @@ const ArmWristController::t_armWristConfig wristConfig = {
                 .motor = {
                         .pwmPin = MOTOR2,
                         .dirPin = MOTOR2_DIR,
-                        .inverted = false
+                        .inverted = false,
+                        .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                        .limit = 1.0
                 },
 
                 .encoder = {
@@ -90,7 +94,9 @@ const ArmClawController::t_clawConfig clawConfig = {
         .motor = {
                 .pwmPin   = MOTOR3,
                 .dirPin   = MOTOR3_DIR,
-                .inverted = true
+                .inverted = true,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {

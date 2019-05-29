@@ -17,7 +17,7 @@
  *
  */
   
-//#define BOARD1 1 // comment out this line when compiling for board #2
+#define BOARD1 1 // comment out this line when compiling for board #2
 
 #if defined(BOARD1)
 const unsigned int  RX_ID = 0x100; 
@@ -68,7 +68,7 @@ int main(void)
 #endif
     while(1) {
         if(timer.read_ms() >= 1000) {    // check for timeout
-            timer.stop();                // stop timer
+//            timer.stop();                // stop timer
             timer.reset();               // reset timer
             counter++;                   // increment counter
             txMsg.clear();               // clear Tx message storage

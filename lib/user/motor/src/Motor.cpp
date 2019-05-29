@@ -35,7 +35,8 @@ Motor::Motor(PinName pwm, PinName dir, bool inverted, int freqInHz, float limit)
     _dir = 0.0;
 }
 
-Motor::Motor(t_motorConfig motorConfig) : Motor(motorConfig.pwmPin, motorConfig.dirPin, motorConfig.inverted) {}
+Motor::Motor(t_motorConfig motorConfig) : Motor(motorConfig.pwmPin, motorConfig.dirPin, motorConfig.inverted,
+        motorConfig.freqInHz, motorConfig.limit) {}
 
 void Motor::setSpeed(float speed) {
     _dir = (speed > 0.0) != _inverted;
