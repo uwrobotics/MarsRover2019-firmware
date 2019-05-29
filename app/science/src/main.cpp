@@ -25,7 +25,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
                 .dirPin = MOTOR_C_DIR,
                 .inverted = false,
                 .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
-                .limit = 0.5
+                .limit = 0.4
         },
 
         .encoder = {
@@ -40,11 +40,11 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         .limitSwitchPin = C_LS,
         .limitSwitchOffset = 15.0f, // Limit switch is offset 15 degrees
 
-        .calibrationDutyCycle = 0.2f,
+        .calibrationDutyCycle = 0.3f,
         .calibrationTimeoutSeconds = 7.0f,
 
         .positionPID = {
-                .P    = 3.5f,
+                .P    = 8.5f,
                 .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f,
@@ -52,8 +52,8 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         },
 
         .maxEncoderPulsePerRev = 2112, // From counts per rev * gear ratio
-        .PIDOutputMotorMinDutyCycle = -1.0f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        .PIDOutputMotorMinDutyCycle = -0.3f,
+        .PIDOutputMotorMaxDutyCycle = 0.3f
 };
 
 const ElevatorController::t_elevatorConfig elevatorConfig = {
@@ -72,7 +72,7 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .indexPin    = ENC_E_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
-                .inverted = true
+                .inverted = false
         },
 
         .limitSwitchTop = E_LS_T,
@@ -158,9 +158,11 @@ float handleSetElevatorMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
         case ElevatorController::motorDutyCycle:
             MBED_ASSERT_SUCCESS(elevatorController.setMotorDutyCycle(motionData));
+            pc.printf("Set elevator motor duty cycle to %f\r\n", motionData);
             break;
         case ElevatorController::positionPID:
             MBED_ASSERT_SUCCESS(elevatorController.setPositionInCm(motionData));
+            pc.printf("Set elevator position to %f cm\r\n", motionData);
             break;
     }
 
@@ -191,6 +193,8 @@ float handleSetCentrifugeDutyCycle(CANMsg *p_newMsg) {
 
     MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle( dutyCycle ));
 
+    pc.printf("Set cent DC to %f", dutyCycle);
+
     return dutyCycle;
 }
 
@@ -219,6 +223,8 @@ int handleSetCentrifugePosition(CANMsg *p_newMsg) {
         MBED_ASSERT_SUCCESS(centrifugeController.setControlMode( CentrifugeController::positionPID ));
     }
 
+    pc.printf("Tube num %d\r\n", tube_num);
+
     MBED_ASSERT_SUCCESS(centrifugeController.setTubePosition(tube_num));
 
     return tube_num;
@@ -228,7 +234,7 @@ void processCANMsg(CANMsg *p_newMsg) {
     switch (p_newMsg->id) {
 
         case setElevatorControlMode:
-            handleSetElevatorControlMode(p_newMsg);
+            pc.printf("Set elevator control mode to %d\r\n", handleSetElevatorControlMode(p_newMsg));
             break;
 
         case setElevatorMotion:
@@ -240,7 +246,7 @@ void processCANMsg(CANMsg *p_newMsg) {
             break;
 
         case setCentrifugeControlMode:
-            handleSetElevatorControlMode(p_newMsg);
+            pc.printf("Set centrifuge control mode to %d\r\n", handleSetElevatorControlMode(p_newMsg));
             break;
 
         case setCentrifugeDutyCycle:
@@ -252,7 +258,7 @@ void processCANMsg(CANMsg *p_newMsg) {
             break;
 
         case setCentrifugePosition:
-            handleSetCentrifugePosition(p_newMsg);
+            pc.printf("Set centrifuge position to %d\r\n", handleSetCentrifugePosition(p_newMsg));
             break;
 
         default:
@@ -271,7 +277,7 @@ int main(void)
 
     initCAN();
 
-    elevatorController.runInitCalibration();
+    elevatorController.runEndpointCalibration();
     centrifugeController.runEndpointCalibration();
 
     canSendTimer.start();

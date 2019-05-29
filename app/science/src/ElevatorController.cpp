@@ -37,10 +37,7 @@ int ElevatorController::getPositionCm()
 
 mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode controlMode )
 {
-    m_elevatorControlMode = controlMode;
-    m_motor.setSpeed( 0.0f );
-
-    switch (m_elevatorControlMode) {
+    switch (controlMode) {
 
         case motorDutyCycle:
             m_elevatorControlMode = motorDutyCycle;
@@ -63,7 +60,7 @@ mbed_error_status_t ElevatorController::setControlMode( t_elevatorControlMode co
 }
 
 // Set the motor speed as a percentage of the maximum motor speed [-1.0, 1.0]
-mbed_error_status_t ElevatorController::setMotorDutyCycle(float percent)
+mbed_error_status_t ElevatorController::setMotorDutyCycle(float dutyCycle)
 {
     if (m_elevatorControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
@@ -71,15 +68,15 @@ mbed_error_status_t ElevatorController::setMotorDutyCycle(float percent)
 
     // We want double protection in case a sensor goes down or an encoder breaks
     // TODO: ISSUE - WHAT IF A SENSOR/ENCODER GOES OFFLINE AND IS ALWAYS SET TO HIGH?
-    if ((getPositionEncoderPulses() <= 0 && percent < 0.0f )                                    ||
-        (getPositionEncoderPulses() >= m_elevatorConfig.maxEncoderPulses && percent > 0.0f )    ||
-        ( m_limitSwitchTop.read() && percent < 0.0f)                                ||
-        ( m_limitSwitchBottom.read() && percent > 0.0f))
+    if ((m_limitSwitchTop.read() == 0 && m_motor.getSpeed() < 0.0f) ||
+        (m_limitSwitchBottom.read() == 0 && m_motor.getSpeed() > 0.0f))
     {
-        percent = 0.0f;
+        dutyCycle = 0.0f;
     }
 
-    m_motor.setSpeed(percent);
+    m_motor.setSpeed(dutyCycle);
+    Serial pc(SERIAL_TX, SERIAL_RX);
+    pc.printf("Set raw motor speed to %f\r\n", dutyCycle);
 
     return MBED_SUCCESS;
 }
@@ -108,7 +105,7 @@ mbed_error_status_t ElevatorController::setPositionInCm(float centimeters)
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if( centimeters < 0 || centimeters > m_elevatorConfig.maxDistanceInCM ){
+    if( centimeters < 0 || centimeters > m_elevatorConfig.maxDistanceInCM ) {
         centimeters = getPositionCm();
     }
 
@@ -125,10 +122,8 @@ void ElevatorController::update() {
     switch (m_elevatorControlMode) {
 
         case motorDutyCycle:
-            if ((getPositionEncoderPulses() <= 0 && m_motor.getSpeed() < 0.0f )                                 ||
-                (getPositionEncoderPulses() >= m_elevatorConfig.maxEncoderPulses && m_motor.getSpeed() > 0.0f ) ||
-                ( m_limitSwitchTop.read() && m_motor.getSpeed() < 0.0f)                             ||
-                ( m_limitSwitchBottom.read() && m_motor.getSpeed() > 0.0f))
+            if ((m_limitSwitchTop.read() == 0 && m_motor.getSpeed() < 0.0f) ||
+                (m_limitSwitchBottom.read() == 0 && m_motor.getSpeed() > 0.0f))
             {
                 m_motor.setSpeed(0.0f);
             }
@@ -150,20 +145,25 @@ void ElevatorController::initializePID( void ) {
     m_positionPIDController.setMode( PID_AUTO_MODE );
 }
 
-mbed_error_status_t ElevatorController::runInitCalibration() {
+mbed_error_status_t ElevatorController::runEndpointCalibration() {
+
+    t_elevatorControlMode prevControlMode = getControlMode();
 
     MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(setMotorDutyCycle(m_elevatorConfig.calibrationDutyCycle) );
+    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorDutyCycle(m_elevatorConfig.calibrationDutyCycle) );
 
     timer.reset();
 
     while ( m_limitSwitchTop.read() == 0 ) {
         if ( timer.read() > m_elevatorConfig.calibrationTimeoutSeconds ) {
+            setControlMode(prevControlMode);
             return MBED_ERROR_TIME_OUT;
         }
     }
 
     m_encoder.reset();
+    setMotorDutyCycle(0.0f);
+    setControlMode(prevControlMode);
 
     return MBED_SUCCESS;
 }

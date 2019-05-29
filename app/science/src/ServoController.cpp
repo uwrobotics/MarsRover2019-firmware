@@ -1,20 +1,33 @@
 // Controller for the auger drill
 
-#include "../inc/AugerController.h"
+#include "ServoController.h"
 
 #include "mbed.h"
-#include "Motor.h"
-#include "PwmIn.h"
-#include "PID.h"
+#include "Servo.h"
 #include "PinNames.h"
 
-AugerController::AugerController( AugerController::t_augerConfig controllerConfig )
-:   m_augerConfig( controllerConfig ),
-    m_motor( controllerConfig.motor )
-{}
+ServoController::ServoController(ServoController::t_servoConfig servoConfig) :
+    m_servoConfig(servoConfig), m_funnelServo(servoConfig.funnelServoPin), m_probeServo(servoConfig.probeServoPin) {}
 
-mbed_error_status_t AugerController::setMotorDutyCycle(float percent)
-{
-    m_motor.setSpeed( percent );
-    return MBED_SUCCESS;
+void ServoController::setFunnelRest() {
+    m_funnelServo = m_servoConfig.funnelRestPos;
+    m_ticker.detach();
+}
+
+void ServoController::setFunnelUp() {
+    m_funnelServo = m_servoConfig.funnelUpPos;
+    m_ticker.attach(callback(this, &ServoController::setFunnelRest), 1.0);
+}
+
+void ServoController::setFunnelDown() {
+    m_funnelServo = m_servoConfig.funnelDownPos;
+    m_ticker.attach(callback(this, &ServoController::setFunnelRest), 1.0);
+}
+
+void ServoController::setProbeUp() {
+    m_funnelServo = m_servoConfig.probeUpPos;
+}
+
+void ServoController::setProbeDown() {
+    m_funnelServo = m_servoConfig.probeDownPos;
 }

@@ -70,8 +70,9 @@ PID::PID(float Kc, float tauI, float tauD, float interval) {
     controllerOutput_     = 0.0;
     prevControllerOutput_ = 0.0;
 
-    accError_ = 0.0;
-    bias_     = 0.0;
+    accError_       = 0.0;
+    deadZoneError_  = 0.0;
+    bias_           = 0.0;
     
     realOutput_ = 0.0;
 
@@ -220,6 +221,12 @@ void PID::setBias(float bias){
 
 }
 
+void PID::setDeadZoneError(float error) {
+
+    deadZoneError_ = error;
+
+}
+
 float PID::compute() {
 
     //Pull in the input and setpoint, and scale them into percent span.
@@ -239,6 +246,10 @@ float PID::compute() {
     }
 
     float error = scaledSP - scaledPV;
+
+    if (fabs(error) < deadZoneError_) {
+        error = 0;
+    }
 
     //Check and see if the output is pegged at a limit and only
     //integrate if it is not. This is to prevent reset-windup.
