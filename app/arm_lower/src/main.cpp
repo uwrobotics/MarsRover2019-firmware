@@ -10,7 +10,9 @@ const ArmJointController::t_jointConfig turnTableConfig = {
         .motor = {
                 .pwmPin = MOTOR1,
                 .dirPin = MOTOR1_DIR,
-                .inverted = true
+                .inverted = true,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {
@@ -47,7 +49,9 @@ const ArmJointController::t_jointConfig shoulderConfig = {
         .motor = {
                 .pwmPin = MOTOR2,
                 .dirPin = MOTOR2_DIR,
-                .inverted = false
+                .inverted = false,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {
@@ -84,7 +88,9 @@ const ArmJointController::t_jointConfig elbowConfig = {
         .motor = {
                 .pwmPin = MOTOR3,
                 .dirPin = MOTOR3_DIR,
-                .inverted = true
+                .inverted = true,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {

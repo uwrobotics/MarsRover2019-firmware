@@ -13,7 +13,7 @@ AugerController::AugerController( AugerController::t_augerConfig controllerConfi
     m_motor( controllerConfig.motor )
 {}
 
-mbed_error_status_t AugerController::setMotorSpeedPercent( float percent )
+mbed_error_status_t AugerController::setMotorDutyCycle(float percent)
 {
     m_motor.setSpeed( percent );
     return MBED_SUCCESS;

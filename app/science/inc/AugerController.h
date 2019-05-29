@@ -21,7 +21,7 @@ class AugerController {
         
         AugerController( t_augerConfig controllerConfig );
                          
-        mbed_error_status_t setMotorSpeedPercent( float percent );
+        mbed_error_status_t setMotorDutyCycle(float percent);
 
     private:
 

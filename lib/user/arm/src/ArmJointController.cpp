@@ -16,10 +16,10 @@ ArmJointController::ArmJointController(t_jointConfig armJointConfig, t_jointCont
         m_positionPIDController(armJointConfig.positionPID.P, armJointConfig.positionPID.I, armJointConfig.positionPID.D, armJointConfig.positionPID.interval) {
 
     if (armJointConfig.encoder.inverted) {
-        m_inversionMultiplier = -1;
+        m_encoderInversionMultiplier = -1;
     }
     else {
-        m_inversionMultiplier = 1;
+        m_encoderInversionMultiplier = 1;
     }
 
     initializePIDControllers();
@@ -32,11 +32,11 @@ ArmJointController::t_jointControlMode ArmJointController::getControlMode() {
 }
 
 float ArmJointController::getAngleDegrees() {
-    return m_inversionMultiplier * 360.0f * (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle);
+    return m_encoderInversionMultiplier * 360.0f * (m_encoder.avgDutyCycle() - m_armJointConfig.encoder.zeroAngleDutyCycle);
 }
 
 float ArmJointController::getAngleVelocityDegreesPerSec() {
-    return m_inversionMultiplier * 360.0f * m_encoder.avgDutyCycleVelocity();
+    return m_encoderInversionMultiplier * 360.0f * m_encoder.avgDutyCycleVelocity();
 }
 
 mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode controlMode) {

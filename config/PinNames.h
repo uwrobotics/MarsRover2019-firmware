@@ -173,22 +173,24 @@ typedef enum {
 #define ROVERBOARD_COMMON_PINMAP
 
     // PWM Output
-    MOTOR4 = PB_13, //Elevator
-    MOTOR4_DIR = PB_14,
-    MOTOR5 = PB_15, //Auger
-    MOTOR5_DIR = PC_6,
-    MOTOR6 = PC_7, //Centrifuge
-    MOTOR6_DIR = PC_8,
+    MOTOR_A = PB_15,		// Auger
+    MOTOR_A_DIR = PC_6,
+    MOTOR_C = PC_7,			// Centrifuge
+    MOTOR_C_DIR = PC_8,
+    MOTOR_E = PB_13,		// Elevator
+    MOTOR_E_DIR = PB_14,
+	SERVO_F = PA_9,			// Funnel
+	SERVO_P = PC_9,			// Probe
 
     // Elevator encoders
-    E_E_CH1 = PB_0,
-    E_E_CH2 = PB_1,
-    E_E_INDEX = PB_2,
+    ENC_E_CH1 = PB_0,
+    ENC_E_CH2 = PB_1,
+    ENC_E_INDEX = PB_2,
 
 	// Centrifuge encoder,
-	E_C_CH1 = PA_7,
-	E_C_CH2 = PC_4,
-	E_C_INDEX = PC_5,
+	ENC_C_CH1 = PA_7,
+	ENC_C_CH2 = PC_4,
+	ENC_C_INDEX = PC_5,
 
     // Limit Switches
     E_LS_T = PA_11,

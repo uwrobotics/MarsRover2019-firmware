@@ -1,7 +1,8 @@
 #include "mbed.h"
- 
+
 DigitalOut led(LED1);
-PwmOut 	   pwm1(MOTOR1);
+PwmOut 	   pwm1(MOTOR_C);
+Serial pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
  
 int main() {
 
@@ -20,7 +21,7 @@ int main() {
 
     	// Set the duty cycle on the pins
     	pwm1.write(duty);
-    	printf("pwm set to %.2f %%\n", pwm1.read() * 100);
+    	pc.printf("pwm set to %.2f %%\n", pwm1.read() * 100);
 
     	// Increment the duty cycle
     	duty += 0.1f;

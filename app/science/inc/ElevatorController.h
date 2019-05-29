@@ -49,7 +49,7 @@ class ElevatorController{
                             t_elevatorControlMode   controlMode );
 
         mbed_error_status_t setControlMode( t_elevatorControlMode controlMode );
-        mbed_error_status_t setMotorSpeedPercent( float percent );
+        mbed_error_status_t setMotorDutyCycle(float percent);
         mbed_error_status_t setEncoderPositionPercent( float percent );
         mbed_error_status_t setPositionInCm(float centimeters);
 
@@ -58,7 +58,7 @@ class ElevatorController{
         t_elevatorControlMode getControlMode() const;
 
         int  getPositionEncoderPulses(); // Return encoder value
-        int  getCurrentDistanceCm(); // Return encoder transformed value into cm
+        int  getPositionCm(); // Return encoder transformed value into cm
         void update();
 
     private:

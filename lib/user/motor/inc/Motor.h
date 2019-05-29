@@ -41,6 +41,8 @@ public:
         PinName pwmPin;
         PinName dirPin;
         bool inverted;
+        int freqInHz;
+        float limit;
 
     } t_motorConfig;
  
