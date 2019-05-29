@@ -33,6 +33,7 @@
 
 #include "cmsis.h"
 #include "PinNamesTypes.h"
+#include "mbed_config.h"
 
 #ifdef __cplusplus
 extern "C" {
