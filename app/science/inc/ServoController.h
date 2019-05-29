@@ -1,33 +1,46 @@
-#ifndef AUGER_CONTROLLER_H
-#define AUGER_CONTROLLER_H
+#ifndef SERVO_CONTROLLER_H
+#define SERVO_CONTROLLER_H
 // Controller for the Auger
 
 #include "mbed.h"
-#include "Motor.h"
-#include "PwmIn.h"
-#include "PID.h"
+#include "Servo.h"
 #include "PinNames.h"
 
-class AugerController {
+class ServoController {
 
     public:
 
         typedef struct {
 
-            // Motor Configuration
-            Motor::t_motorConfig motor;
+            // Funnel servo configuration
+            PinName funnelServoPin;
+            float funnelUpPos, funnelRestPos, funnelDownPos;
 
-        } t_augerConfig;
+            // Probe servo configuration
+            PinName probeServoPin;
+            float probeUpPos, probeDownPos;
+
+        } t_servoConfig;
         
-        AugerController( t_augerConfig controllerConfig );
+        ServoController(t_servoConfig servoConfig);
                          
-        mbed_error_status_t setMotorDutyCycle(float percent);
+        void setFunnelUp(void);
+        void setFunnelDown(void);
+
+        void setProbeUp(void);
+        void setProbeDown(void);
 
     private:
 
-        t_augerConfig m_augerConfig;
-        Motor m_motor;
+        t_servoConfig m_servoConfig;
+
+        Servo m_funnelServo;
+        Servo m_probeServo;
+
+        Ticker m_ticker;
+
+        void setFunnelRest(void);
 };
 
 
-#endif // AUGER_CONTROLLER_H
+#endif // SERVO_CONTROLLER_H

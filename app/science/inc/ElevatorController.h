@@ -46,14 +46,14 @@ class ElevatorController{
         } t_elevatorControlMode;
 
         ElevatorController( t_elevatorConfig        controllerConfig,
-                            t_elevatorControlMode   controlMode );
+                            t_elevatorControlMode   controlMode = motorDutyCycle );
 
         mbed_error_status_t setControlMode( t_elevatorControlMode controlMode );
-        mbed_error_status_t setMotorDutyCycle(float percent);
+        mbed_error_status_t setMotorDutyCycle(float dutyCycle);
         mbed_error_status_t setEncoderPositionPercent( float percent );
         mbed_error_status_t setPositionInCm(float centimeters);
 
-        mbed_error_status_t runInitCalibration();
+        mbed_error_status_t runEndpointCalibration();
 
         t_elevatorControlMode getControlMode() const;
 

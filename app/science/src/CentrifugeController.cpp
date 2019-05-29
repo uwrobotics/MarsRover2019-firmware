@@ -31,7 +31,7 @@ CentrifugeController::t_centrifugeControlMode CentrifugeController::getControlMo
 // Get the current test tube # that is under the auger - note, this rounds down
 unsigned int CentrifugeController::getTestTubeIndex()
 {
-    return static_cast<int>( getEncoderPulses() / m_centrifugeConfig.maxEncoderPulsePerRev * 12 );
+    return static_cast<int>( getEncoderPulses() / m_centrifugeConfig.maxEncoderPulsePerRev * 12.0f );
 }
 
 // Get the current encoder value
@@ -42,10 +42,7 @@ float CentrifugeController::getEncoderPulses()
 
 mbed_error_status_t CentrifugeController::setControlMode(CentrifugeController::t_centrifugeControlMode controlMode)
 {
-    m_centrifugeControlMode = controlMode;
-    m_motor.setSpeed( 0.0f );
-
-    switch (m_centrifugeControlMode) {
+    switch (controlMode) {
 
         case motorDutyCycle:
             m_centrifugeControlMode = motorDutyCycle;
@@ -73,8 +70,7 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
     if (m_centrifugeControlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
-    Serial pc(SERIAL_TX, SERIAL_RX);
-    pc.printf("sdfsdfsdf");
+
     m_motor.setSpeed( dutyCycle );
     return MBED_SUCCESS;
 }
@@ -82,12 +78,17 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
 // Set the PID in terms of the test tube number
 mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num )
 {
+    if (m_centrifugeControlMode != positionPID) {
+        return MBED_ERROR_INVALID_OPERATION;
+    }
+
     // Might shift the placement by one test tube due to rounding when fetching current tube #
     if( tube_num > 11 ){
         tube_num = getTestTubeIndex();
     }
 
-    m_positionPIDController.setSetPoint( tube_num / 11 * m_centrifugeConfig.maxEncoderPulsePerRev );
+    m_positionPIDController.setSetPoint( tube_num / 12.0f * m_centrifugeConfig.maxEncoderPulsePerRev );
+
     return MBED_SUCCESS;
 }
 
@@ -100,7 +101,7 @@ void CentrifugeController::update()
 
         case motorDutyCycle:
 
-            if ( m_motor.getSpeed() > 1.1f || m_motor.getSpeed() < 1.1f ) // If speed is > bounds, something is wrong
+            if ( m_motor.getSpeed() > 1.1f || m_motor.getSpeed() < -1.1f ) // If speed is > bounds, something is wrong
             {
                 m_motor.setSpeed(0.0f);
             }
@@ -108,9 +109,11 @@ void CentrifugeController::update()
             break;
 
         case positionPID:
+
             m_positionPIDController.setInterval( interval );
             m_positionPIDController.setProcessValue( getEncoderPulses() );
             m_motor.setSpeed(m_positionPIDController.compute());
+
             break;
     }
 }
@@ -121,6 +124,7 @@ void CentrifugeController::initializePID( void )
     m_positionPIDController.setInputLimits( 0 , m_centrifugeConfig.maxEncoderPulsePerRev );
     m_positionPIDController.setOutputLimits( m_centrifugeConfig.PIDOutputMotorMinDutyCycle, m_centrifugeConfig.PIDOutputMotorMaxDutyCycle );
     m_positionPIDController.setBias( m_centrifugeConfig.positionPID.bias );
+    m_positionPIDController.setDeadZoneError( 0.01 );
     m_positionPIDController.setMode( PID_AUTO_MODE );
 }
 
@@ -133,15 +137,15 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
 
     timer.reset();
 
-    while ( m_limitSwitch.read() == 0 ) {
+    while ( m_limitSwitch.read() != 0 ) {
         if ( timer.read() > m_centrifugeConfig.calibrationTimeoutSeconds ) {
+            setControlMode(prevControlMode);
             return MBED_ERROR_TIME_OUT;
         }
     }
 
-    m_positionPIDController.setSetPoint( m_centrifugeConfig.maxEncoderPulsePerRev / 360 * m_centrifugeConfig.limitSwitchOffset );
     m_encoder.reset();
-
+    setMotorDutyCycle(0.0f);
     setControlMode(prevControlMode);
 
     return MBED_SUCCESS;

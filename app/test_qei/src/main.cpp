@@ -11,9 +11,9 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 //QEI wheel (ENC_C_CH1, ENC_C_CH2, ENC_C_INDEX, 48, QEI::X4_ENCODING);
 
 // configured for use with arm claw encoder
-QEI wheel(ENC_C_CH1, ENC_C_CH2, ENC_C_INDEX, 211, QEI::X4_ENCODING);
+QEI wheel(ENC_E_CH1, ENC_E_CH2, ENC_E_INDEX, 211, QEI::X4_ENCODING);
 
-Motor motor(MOTOR_C, MOTOR_C_DIR);
+Motor motor(MOTOR_E, MOTOR_E_DIR);
 
 // pin mappings when using science board EC1:
 // ENC_CENT_1 -> PA7 -> LQFP64 -> 23
