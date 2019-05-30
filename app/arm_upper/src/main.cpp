@@ -13,7 +13,9 @@ const ArmWristController::t_armWristConfig wristConfig = {
                 .motor = {
                         .pwmPin = MOTOR1,
                         .dirPin = MOTOR1_DIR,
-                        .inverted = true
+                        .inverted = true,
+                        .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                        .limit = 1.0
                 },
 
                 .encoder = {
@@ -50,7 +52,9 @@ const ArmWristController::t_armWristConfig wristConfig = {
                 .motor = {
                         .pwmPin = MOTOR2,
                         .dirPin = MOTOR2_DIR,
-                        .inverted = false
+                        .inverted = false,
+                        .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                        .limit = 1.0
                 },
 
                 .encoder = {
@@ -90,7 +94,9 @@ const ArmClawController::t_clawConfig clawConfig = {
         .motor = {
                 .pwmPin   = MOTOR3,
                 .dirPin   = MOTOR3_DIR,
-                .inverted = true
+                .inverted = true,
+                .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
+                .limit = 1.0
         },
 
         .encoder = {
@@ -176,7 +182,7 @@ ArmJointController::t_jointControlMode handleSetWristControlMode(CANMsg *p_newMs
     ArmJointController::t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(wristController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(wristController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -185,7 +191,7 @@ ArmClawController::t_clawControlMode handleSetClawControlMode(CANMsg *p_newMsg) 
     ArmClawController::t_clawControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(clawController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(clawController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -199,15 +205,15 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setPitchDutyCycle(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchDutyCycle(motionData));
             break;
 
         case ArmJointController::velocityPID:
-            MBED_ASSERT_SUCCESS(wristController.setPitchVelocityDegreesPerSec(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchVelocityDegreesPerSec(motionData));
             break;
 
         case ArmJointController::positionPID:
-            MBED_ASSERT_SUCCESS(wristController.setPitchAngleDegrees(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchAngleDegrees(motionData));
             break;
     }
 
@@ -223,15 +229,15 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setRollDutyCycle(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollDutyCycle(motionData));
             break;
 
         case ArmJointController::velocityPID:
-            MBED_ASSERT_SUCCESS(wristController.setRollVelocityDegreesPerSec(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollVelocityDegreesPerSec(motionData));
             break;
 
         case ArmJointController::positionPID:
-            MBED_ASSERT_SUCCESS(wristController.setRollAngleDegrees(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollAngleDegrees(motionData));
             break;
     }
 
@@ -247,11 +253,11 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmClawController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(clawController.setMotorDutyCycle(motionData));
+            MBED_WARN_ON_ERROR(clawController.setMotorDutyCycle(motionData));
             break;
 
         case ArmClawController::positionPID:
-            MBED_ASSERT_SUCCESS(clawController.setSeparationDistanceCm(motionData));
+            MBED_WARN_ON_ERROR(clawController.setSeparationDistanceCm(motionData));
             break;
     }
 

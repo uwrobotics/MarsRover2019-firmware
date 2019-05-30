@@ -71,7 +71,7 @@ private:
     PID m_velocityPIDController;
     PID m_positionPIDController;
 
-    float m_inversionMultiplier;
+    float m_encoderInversionMultiplier;
 
     Timer timer;
 

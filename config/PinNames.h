@@ -33,6 +33,7 @@
 
 #include "cmsis.h"
 #include "PinNamesTypes.h"
+#include "mbed_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -171,23 +172,38 @@ typedef enum {
 #ifdef ROVERBOARD_SCIENCE_PINMAP    // SCIENCE BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
 
-	// Elevator encoders
-	E_E_CH1 = PB_0,
-	E_E_CH2 = PB_1,
-	E_E_INDEX = PB_2,
+    // PWM Output
+    MOTOR_A = PB_15,		// Auger
+    MOTOR_A_DIR = PC_6,
+    MOTOR_C = PC_7,			// Centrifuge
+    MOTOR_C_DIR = PC_8,
+    MOTOR_E = PB_13,		// Elevator
+    MOTOR_E_DIR = PB_14,
+	SERVO_F = PA_9,			// Funnel
+	SERVO_P = PC_9,			// Probe
+
+    // Elevator encoders
+    ENC_E_CH1 = PB_0,
+    ENC_E_CH2 = PB_1,
+    ENC_E_INDEX = PB_2,
 
 	// Centrifuge encoder,
-	E_C_CH1 = PA_7,
-	E_C_CH2 = PC_4,
-	E_C_INDEX = PC_5,
+	ENC_C_CH1 = PA_7,
+	ENC_C_CH2 = PC_4,
+	ENC_C_INDEX = PC_5,
 
-	//ultrasonic sensors,
+    // Limit Switches
+    E_LS_T = PA_11,
+    E_LS_B = PA_12,
+    C_LS = PA_8,
+
+	// Ultrasonic sensors,
 	ULTRA_TRIG_1 = PB_10,
 	ULTRA_ECHO_1 = PB_11,
 	ULTRA_TRIG_2 = PA_2,
 	ULTRA_ECHO_2 = PA_3,
 
-	//neopixel signal
+	// Neopixel signal
 	NEO_PIXEL_SIGNAL = PB_5,
 
 #endif                              // SCIENCE BOARD PIN MAPPINGS END
