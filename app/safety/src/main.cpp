@@ -21,10 +21,13 @@ AnalogIn            temp(PA_4);
 Timer               canSendTimer;
 
 //Sensor Address Indices
-enum Sensor_Index{
+enum CAN_Index{
 	I_100A1 = 0, 
 	I_100A2 = 1, 
 	I_30A = 2,
+    //todo: put these on the sheet
+    V_MONITOR_INDEX = 3,
+    THERM = 4,
 };
 enum Sensor_Address{
 	A_100A1 = 0x54, 
@@ -89,12 +92,8 @@ const float R1 = 150000;
 const float R2 = 10000;
 const float VDD = 3.3;
 
-//todo: put this on the sheet
-#define THERM_INDEX 4
 
 //voltage monitoring specific
-//todo: change this in the sheets
-#define V_INDEX 3
 void initCAN() {
     can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
 
@@ -138,7 +137,7 @@ Send out averaged current value over CAN
 @param	address: the I2C address for ADC on the current sensor
 @return None
 */
-void CAN_send(float value, Sensor_Index can_index){
+void CAN_send(float value, CAN_Index can_index){
 	uint8_t data = value; // Convert current data to int
     //some data loss because of float rounding to int but it's ok because you don't really need hella resolution
 	CANMsg txMsg(TX_ID + can_index);
@@ -161,12 +160,12 @@ float read_temp(void){
     return temp_val;
 }
 //sends all the relevant safety data over CAN
-git void sendSafetyValues(void){
+void sendSafetyValues(void){
     CAN_send(C_100A1_avg, I_100A1);
     CAN_send(C_100A2_avg, I_100A2);
     CAN_send(C_30A_avg, I_30A);
-    CAN_send(bat_avg, V_INDEX);
-    CAN_send(temp_avg,THERM_INDEX);
+    CAN_send(bat_avg, V_MONITOR_INDEX);
+    CAN_send(temp_avg,THERM);
 
 }
 
@@ -233,7 +232,7 @@ int main() {
         bat_avg += bat_value/TOTAL_SAMPLE;
        pc.printf("Battery Level: %f\r\n", bat_avg);
        if (bat_value < low_bat){
-           CAN_send(bat_avg, V_INDEX_CAN);
+           CAN_send(bat_avg, V_MONITOR_INDEX);
            pc.printf("REPLACE BATTERY, Battery Level LOW!!! \r\n");
        }
         pc.printf("Hello World! %d\r\n", i);
