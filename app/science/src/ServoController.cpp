@@ -7,7 +7,7 @@
 #include "PinNames.h"
 
 ServoController::ServoController(ServoController::t_servoConfig servoConfig) :
-    m_servoConfig(servoConfig), m_funnelServo(servoConfig.funnelServoPin), m_probeServo(servoConfig.probeServoPin) {}
+    m_servoConfig(servoConfig), m_funnelServo(servoConfig.funnelServoPin) {} //, m_probeServo(servoConfig.probeServoPin) {}
 
 void ServoController::setFunnelRest() {
     m_funnelServo = m_servoConfig.funnelRestPos;

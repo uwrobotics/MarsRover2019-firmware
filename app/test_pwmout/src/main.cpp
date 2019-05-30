@@ -2,7 +2,7 @@
 #include "Motor.h"
 
 DigitalOut led(LED1);
-PwmOut 	   pwm1(SERVO_F);
+PwmOut 	   pwm1(MOTOR_E);
 Serial pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
  
 int main() {

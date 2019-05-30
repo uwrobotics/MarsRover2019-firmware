@@ -7,6 +7,7 @@
 #include "AugerController.h"
 #include "CentrifugeController.h"
 #include "ElevatorController.h"
+#include "ServoController.h"
 
 //TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
@@ -40,7 +41,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         .limitSwitchPin = C_LS,
         .limitSwitchOffset = 15.0f, // Limit switch is offset 15 degrees
 
-        .calibrationDutyCycle = 0.3f,
+        .calibrationDutyCycle = 0.25f,
         .calibrationTimeoutSeconds = 7.0f,
 
         .positionPID = {
@@ -92,8 +93,19 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
         .maxEncoderPulses = 160000, // Gotten from maxDistanceCm / centimetresPerPulse
         .maxDistanceCm = 26, // 10 inch range distance
         .centimetresPerPulse = 0.00016235795f, // Unit is cm/pulse
-        .PIDOutputMotorMinDutyCycle = -1.0f,
+        .PIDOutputMotorMinDutyCycle = -0.5f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
+};
+
+const ServoController::t_servoConfig servoConfig {
+    .funnelServoPin = SERVO_F,
+    .funnelUpPos = 0.7,
+    .funnelRestPos = 0.55,
+    .funnelDownPos = 0.3,
+
+    .probeServoPin = SERVO_P,
+    .probeUpPos = 0.5,
+    .probeDownPos = 0.5
 };
 
 Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
@@ -107,6 +119,7 @@ DigitalOut         ledCAN(LED4);
 AugerController         augerController( augerConfig );
 CentrifugeController    centrifugeController( centrifugeConfig );
 ElevatorController      elevatorController( elevatorConfig );
+ServoController         servoController( servoConfig );
 
 Timer              canSendTimer;
 
@@ -131,7 +144,7 @@ enum scienceCommand {
     setCentrifugeSpinning,
     setCentrifugePosition,
     setFunnelOpen,
-    setSensorMountPosition
+    setProbeDeployed
 
 };
 
@@ -230,6 +243,34 @@ int handleSetCentrifugePosition(CANMsg *p_newMsg) {
     return tube_num;
 }
 
+bool handleSetFunnelOpen(CANMsg *p_newMsg) {
+    bool open = false;
+    *p_newMsg >> open;
+
+    if (open) {
+        servoController.setFunnelDown();
+    }
+    else {
+        servoController.setFunnelUp();
+    }
+
+    return open;
+}
+
+bool handleSetProbeDeployed(CANMsg *p_newMsg) {
+    bool deployed = false;
+    *p_newMsg >> deployed;
+
+    if (deployed) {
+        servoController.setProbeDown();
+    }
+    else {
+        servoController.setProbeUp();
+    }
+
+    return deployed;
+}
+
 void processCANMsg(CANMsg *p_newMsg) {
     switch (p_newMsg->id) {
 
@@ -261,6 +302,14 @@ void processCANMsg(CANMsg *p_newMsg) {
             pc.printf("Set centrifuge position to %d\r\n", handleSetCentrifugePosition(p_newMsg));
             break;
 
+        case setFunnelOpen:
+            handleSetFunnelOpen(p_newMsg);
+            break;
+
+        case setProbeDeployed:
+            handleSetProbeDeployed(p_newMsg);
+            break;
+
         default:
             pc.printf("Recieved unimplemented command\r\n");
             break;
@@ -277,6 +326,7 @@ int main(void)
 
     initCAN();
 
+//    servoController.setFunnelUp();
     elevatorController.runEndpointCalibration();
     centrifugeController.runEndpointCalibration();
 

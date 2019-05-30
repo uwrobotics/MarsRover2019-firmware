@@ -35,7 +35,7 @@ class ServoController {
         t_servoConfig m_servoConfig;
 
         Servo m_funnelServo;
-        Servo m_probeServo;
+//        Servo m_probeServo;
 
         Ticker m_ticker;
 
