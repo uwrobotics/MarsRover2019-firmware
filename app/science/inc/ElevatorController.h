@@ -31,7 +31,7 @@ class ElevatorController{
 
             // PID Configuration
             unsigned int    maxEncoderPulses; // Should be an int
-            unsigned int    maxDistanceInCM; // Should be an int
+            unsigned int    maxDistanceCm; // Should be an int
             float           centimetresPerPulse; // Unit is cm/pulse
             float           PIDOutputMotorMinDutyCycle;
             float           PIDOutputMotorMaxDutyCycle;
@@ -50,7 +50,6 @@ class ElevatorController{
 
         mbed_error_status_t setControlMode( t_elevatorControlMode controlMode );
         mbed_error_status_t setMotorDutyCycle(float dutyCycle);
-        mbed_error_status_t setEncoderPositionPercent( float percent );
         mbed_error_status_t setPositionInCm(float centimeters);
 
         mbed_error_status_t runEndpointCalibration();
@@ -72,8 +71,9 @@ class ElevatorController{
     
         Motor   m_motor;
         QEI     m_encoder;
-
         PID     m_positionPIDController;
+
+        int   m_encoderInversionMultiplier;
 
         Timer   timer;
 };

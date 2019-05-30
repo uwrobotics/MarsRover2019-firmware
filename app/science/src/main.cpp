@@ -61,7 +61,7 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
         .motor = {
                 .pwmPin = MOTOR_E,
                 .dirPin = MOTOR_E_DIR,
-                .inverted = true,
+                .inverted = false,
                 .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
                 .limit = 1.0
         },
@@ -72,14 +72,14 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .indexPin    = ENC_E_INDEX,
                 .pulsesPerRevolution = 360,
                 .encoding = QEI::X4_ENCODING,
-                .inverted = false
+                .inverted = true
         },
 
         .limitSwitchTop = E_LS_T,
         .limitSwitchBottom = E_LS_B,
 
-        .calibrationDutyCycle = 0.2f,
-        .calibrationTimeoutSeconds = 7.0f,
+        .calibrationDutyCycle = -0.2f,
+        .calibrationTimeoutSeconds = 30.0f,
 
         .positionPID = {
                 .P    = 3.5f,
@@ -89,8 +89,8 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .interval = 0.1f
         },
 
-        .maxEncoderPulses = 160000, // Gotten from maxDistanceInCM / centimetresPerPulse
-        .maxDistanceInCM = 26, // 10 inch range distance
+        .maxEncoderPulses = 160000, // Gotten from maxDistanceCm / centimetresPerPulse
+        .maxDistanceCm = 26, // 10 inch range distance
         .centimetresPerPulse = 0.00016235795f, // Unit is cm/pulse
         .PIDOutputMotorMinDutyCycle = -1.0f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
@@ -105,8 +105,8 @@ DigitalOut         ledErr(LED1);
 DigitalOut         ledCAN(LED4);
 
 AugerController         augerController( augerConfig );
-CentrifugeController    centrifugeController( centrifugeConfig, CentrifugeController::motorDutyCycle );
-ElevatorController      elevatorController( elevatorConfig, ElevatorController::positionPID );
+CentrifugeController    centrifugeController( centrifugeConfig );
+ElevatorController      elevatorController( elevatorConfig );
 
 Timer              canSendTimer;
 

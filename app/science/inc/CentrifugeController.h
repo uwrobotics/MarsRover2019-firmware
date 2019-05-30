@@ -70,7 +70,7 @@ class CentrifugeController {
 
         PID m_positionPIDController;
 
-        float m_encoderInversionMultiplier;
+        int m_encoderInversionMultiplier;
 
         Timer timer;
 
