@@ -131,6 +131,7 @@ void ElevatorController::initializePID( void ) {
     m_positionPIDController.setInputLimits( 0, m_elevatorConfig.maxEncoderPulses );
     m_positionPIDController.setOutputLimits( m_elevatorConfig.PIDOutputMotorMinDutyCycle, m_elevatorConfig.PIDOutputMotorMaxDutyCycle );
     m_positionPIDController.setBias( m_elevatorConfig.positionPID.bias );
+    m_positionPIDController.setDeadZoneError( 0.02 );
     m_positionPIDController.setMode( PID_AUTO_MODE );
 }
 
