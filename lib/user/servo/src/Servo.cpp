@@ -35,6 +35,7 @@ static float clamp(float value, float min, float max) {
 }
 
 Servo::Servo(PinName pin) : _pwm(pin) {
+//    _pwm.period(1.0 / 1000);
     calibrate();
     write(0.5);
 }

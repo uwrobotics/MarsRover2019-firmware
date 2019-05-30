@@ -232,7 +232,7 @@ int handleSetCentrifugePosition(CANMsg *p_newMsg) {
 
     pc.printf("Tube num %d\r\n", tube_num);
 
-    MBED_WARN_ON_ERROR(centrifugeController.setTubePosition(tube_num));
+    centrifugeController.setTubePosition(tube_num);
 
     return tube_num;
 }
@@ -252,6 +252,8 @@ bool handleSetFunnelOpen(CANMsg *p_newMsg) {
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+    pc.printf("Got CAN msg with ID %X", p_newMsg->id);
+
     switch (p_newMsg->id) {
 
         case setElevatorControlMode:
