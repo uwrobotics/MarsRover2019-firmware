@@ -1,6 +1,6 @@
 // Controller for the centrifuge
 
-#include "../inc/CentrifugeController.h"
+#include "CentrifugeController.h"
 
 CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
                                             CentrifugeController::t_centrifugeControlMode   controlMode ):
@@ -18,6 +18,8 @@ CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeCo
     else {
         m_encoderInversionMultiplier = 1;
     }
+
+    m_isSpinning = false;
 
     initializePID();
     timer.start();
@@ -78,8 +80,8 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
 // Set the PID in terms of the test tube number
 mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num )
 {
-    if (m_centrifugeControlMode != positionPID) {
-        return MBED_ERROR_INVALID_OPERATION;
+    if (getControlMode() != positionPID) {
+        MBED_ASSERT_SUCCESS(setControlMode(positionPID));
     }
 
     // Might shift the placement by one test tube due to rounding when fetching current tube #
@@ -149,4 +151,31 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
     setControlMode(prevControlMode);
 
     return MBED_SUCCESS;
+}
+
+mbed_error_status_t CentrifugeController::setSpinning(bool spin) {
+
+    if ( getControlMode() != CentrifugeController::motorDutyCycle ) {
+        MBED_ASSERT_SUCCESS(setControlMode( CentrifugeController::motorDutyCycle ));
+    }
+
+    if (spin) {
+        MBED_ASSERT_SUCCESS(setMotorDutyCycle(spin));
+        m_isSpinning = true;
+    }
+
+    else {
+        MBED_ASSERT_SUCCESS(setMotorDutyCycle(0.0f));
+        m_isSpinning = false;
+    }
+
+    return MBED_SUCCESS;
+}
+
+bool CentrifugeController::isSpinning() {
+    return m_isSpinning;
+}
+
+float CentrifugeController::getDutyCycle() {
+    return m_motor.getSpeed();
 }

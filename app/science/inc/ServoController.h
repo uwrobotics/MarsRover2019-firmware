@@ -16,10 +16,6 @@ class ServoController {
             PinName funnelServoPin;
             float funnelUpPos, funnelRestPos, funnelDownPos;
 
-            // Probe servo configuration
-            PinName probeServoPin;
-            float probeUpPos, probeDownPos;
-
         } t_servoConfig;
         
         ServoController(t_servoConfig servoConfig);
@@ -27,17 +23,17 @@ class ServoController {
         void setFunnelUp(void);
         void setFunnelDown(void);
 
-        void setProbeUp(void);
-        void setProbeDown(void);
+        bool isFunnelOpen(void);
 
     private:
 
         t_servoConfig m_servoConfig;
 
         Servo m_funnelServo;
-//        Servo m_probeServo;
 
         Ticker m_ticker;
+
+        bool m_isFunnelOpen;
 
         void setFunnelRest(void);
 };

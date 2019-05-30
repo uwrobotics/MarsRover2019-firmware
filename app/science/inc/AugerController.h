@@ -23,6 +23,8 @@ class AugerController {
                          
         mbed_error_status_t setMotorDutyCycle(float percent);
 
+        float getDutyCycle(void);
+
     private:
 
         t_augerConfig m_augerConfig;

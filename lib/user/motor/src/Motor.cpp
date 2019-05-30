@@ -49,5 +49,10 @@ Motor& Motor::operator=(int speed) {
 }
 
 float Motor::getSpeed() {
-	return _pwm.read();
+    if (_dir) {
+        return _pwm.read();
+    }
+    else {
+        return -_pwm.read();
+    }
 }
