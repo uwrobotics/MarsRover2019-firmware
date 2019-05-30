@@ -8,6 +8,7 @@
 #include "CentrifugeController.h"
 #include "ElevatorController.h"
 #include "ServoController.h"
+#include "MoistureSensor.h"
 
 const AugerController::t_augerConfig augerConfig = {
         .motor = {
@@ -104,20 +105,22 @@ const ServoController::t_servoConfig servoConfig {
     .funnelDownPos = 0.2
 };
 
-Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
-CAN                can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
-CANMsg             rxMsg;
-CANMsg             txMsg;
+Serial                  pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
+CAN                     can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
+CANMsg                  rxMsg;
+CANMsg                  txMsg;
 
-DigitalOut         ledErr(LED1);
-DigitalOut         ledCAN(LED4);
+DigitalOut              ledErr(LED1);
+DigitalOut              ledCAN(LED4);
 
 AugerController         augerController( augerConfig );
 CentrifugeController    centrifugeController( centrifugeConfig );
 ElevatorController      elevatorController( elevatorConfig );
 ServoController         servoController( servoConfig );
 
-Timer              canSendTimer;
+MoistureSensor          moistureSensor(MOIST_DATA, MOIST_PWR);
+
+Timer                   canSendTimer;
 
 void printCANMsg(CANMessage& msg) {
     pc.printf("  ID      = 0x%.3x\r\n", msg.id);
@@ -150,7 +153,10 @@ enum jetsonFeedback {
     centrifugeSpinning,
     centrifugeSpeed,
     centrifugePosition,
-    funnelStatus
+    funnelStatus,
+    sensorMountStatus,
+    temperature,
+    moisture
 };
 
 void initCAN() {
@@ -332,6 +338,18 @@ void sendJetsonInfoB() {
     txMsg.id = funnelStatus;
     txMsg << servoController.isFunnelOpen();
     MBED_ASSERT_WARN(can.write(txMsg) == true);
+
+    moistureSensor.powerOn();
+}
+
+void sendJetsonInfoC() {
+    CANMsg txMsg(0);
+
+    txMsg.clear();
+    txMsg.id = moisture;
+    txMsg << moistureSensor.readPercentage();
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
+    moistureSensor.powerOff();
 }
 
 int main(void)
@@ -346,7 +364,7 @@ int main(void)
 
     canSendTimer.start();
 
-    bool switchCAN = false;
+    int sendCANSwitch = 0;
 
     while (1) {
 
@@ -358,13 +376,21 @@ int main(void)
 
         if (canSendTimer.read() > 0.1) {
 
-            if (!switchCAN) {
-                sendJetsonInfoA();
-            } else {
-                sendJetsonInfoB();
+            switch (sendCANSwitch) {
+                case 0:
+                    sendJetsonInfoA();
+                    sendCANSwitch = 1;
+                    break;
+                case 1:
+                    sendJetsonInfoB();
+                    sendCANSwitch = 2;
+                    break;
+                case 2:
+                    sendJetsonInfoC();
+                    sendCANSwitch = 0;
+                    break;
             }
 
-            switchCAN = !switchCAN;
             canSendTimer.reset();
         }
 
