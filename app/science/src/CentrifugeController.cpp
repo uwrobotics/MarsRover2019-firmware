@@ -5,7 +5,7 @@
 CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
                                             CentrifugeController::t_centrifugeControlMode   controlMode ):
     m_centrifugeControlMode( controlMode ),
-    m_centrifugeConfig( controllerConfig ),
+    m_centrifugeConfig(   ),
     m_motor( controllerConfig.motor ),
     m_encoder( controllerConfig.encoder ),
     m_limitSwitch(controllerConfig.limitSwitchPin ),
@@ -81,7 +81,7 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
 mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num )
 {
     if (getControlMode() != positionPID) {
-        MBED_ASSERT_SUCCESS(setControlMode(positionPID));
+        MBED_WARN_ON_ERROR(setControlMode(positionPID));
     }
 
     // Might shift the placement by one test tube due to rounding when fetching current tube #
@@ -134,8 +134,8 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
 
     t_centrifugeControlMode prevControlMode = getControlMode();
 
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorDutyCycle(m_centrifugeConfig.calibrationDutyCycle) );
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setControlMode( motorDutyCycle ) );
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setMotorDutyCycle(m_centrifugeConfig.calibrationDutyCycle) );
 
     timer.reset();
 
@@ -156,16 +156,16 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
 mbed_error_status_t CentrifugeController::setSpinning(bool spin) {
 
     if ( getControlMode() != CentrifugeController::motorDutyCycle ) {
-        MBED_ASSERT_SUCCESS(setControlMode( CentrifugeController::motorDutyCycle ));
+        MBED_WARN_ON_ERROR(setControlMode( CentrifugeController::motorDutyCycle ));
     }
 
     if (spin) {
-        MBED_ASSERT_SUCCESS(setMotorDutyCycle(spin));
+        MBED_WARN_ON_ERROR(setMotorDutyCycle(m_centrifugeConfig.spinningDutyCycle));
         m_isSpinning = true;
     }
 
     else {
-        MBED_ASSERT_SUCCESS(setMotorDutyCycle(0.0f));
+        MBED_WARN_ON_ERROR(setMotorDutyCycle(0.0f));
         m_isSpinning = false;
     }
 

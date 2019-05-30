@@ -129,8 +129,8 @@ void ArmClawController::initializePIDController() {
 
 mbed_error_status_t ArmClawController::runEndpointCalibration() {
 
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(setControlMode(motorDutyCycle));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(setMotorSpeedPercent(m_armClawConfig.calibrationDutyCycle));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(setControlMode(motorDutyCycle));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(setMotorSpeedPercent(m_armClawConfig.calibrationDutyCycle));
 
     timer.reset();
 

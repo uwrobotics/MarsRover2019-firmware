@@ -16,8 +16,8 @@ ArmWristController::ArmWristController(t_armWristConfig armWristConfig, ArmJoint
 
 mbed_error_status_t ArmWristController::setControlMode(ArmJointController::t_jointControlMode controlMode) {
 
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setControlMode(controlMode));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setControlMode(controlMode));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_leftJointController.setControlMode(controlMode));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_rightJointController.setControlMode(controlMode));
 
     m_controlMode = controlMode;
 
@@ -84,22 +84,22 @@ void ArmWristController::update() {
 }
 
 mbed_error_status_t ArmWristController::setMotorSpeeds(void) {
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setMotorSpeedPercent(-m_rollMotorSpeed + m_pitchMotorSpeed));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setMotorSpeedPercent(m_rollMotorSpeed + m_pitchMotorSpeed));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_leftJointController.setMotorSpeedPercent(-m_rollMotorSpeed + m_pitchMotorSpeed));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_rightJointController.setMotorSpeedPercent(m_rollMotorSpeed + m_pitchMotorSpeed));
 
     return MBED_SUCCESS;
 }
 
 mbed_error_status_t ArmWristController::setVelocities(void) {
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setVelocityDegreesPerSec(-m_rollVelocitiyDegreesPerSec + m_pitchVelocityDegreesPerSec));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setVelocityDegreesPerSec(m_rollVelocitiyDegreesPerSec + m_pitchVelocityDegreesPerSec));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_leftJointController.setVelocityDegreesPerSec(-m_rollVelocitiyDegreesPerSec + m_pitchVelocityDegreesPerSec));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_rightJointController.setVelocityDegreesPerSec(m_rollVelocitiyDegreesPerSec + m_pitchVelocityDegreesPerSec));
 
     return MBED_SUCCESS;
 }
 
 mbed_error_status_t ArmWristController::setAngles(void) {
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_leftJointController.setAngleDegrees(-m_rollAngleDegrees + m_pitchAngleDegrees));
-    MBED_ASSERT_SUCCESS_RETURN_ERROR(m_rightJointController.setAngleDegrees(m_rollAngleDegrees + m_pitchAngleDegrees));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_leftJointController.setAngleDegrees(-m_rollAngleDegrees + m_pitchAngleDegrees));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_rightJointController.setAngleDegrees(m_rollAngleDegrees + m_pitchAngleDegrees));
 
     return MBED_SUCCESS;
 }

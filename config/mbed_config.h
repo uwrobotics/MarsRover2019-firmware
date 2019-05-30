@@ -22,15 +22,26 @@
 #define __MBED_CONFIG_DATA__
 
 // Macros
-#define MBED_ASSERT_SUCCESS_RETURN_ERROR(functionCall) {    \
-    mbed_error_status_t result = functionCall;              \
-    MBED_ASSERT(result == MBED_SUCCESS);                    \
-    if (result != MBED_SUCCESS) {                           \
-        return result;                                      \
-    }                                                       \
+#define MBED_WARN_AND_RETURN_STATUS_ON_ERROR(functionCall) {    \
+    mbed_error_status_t result = functionCall;                  \
+    if (result != MBED_SUCCESS) {                               \
+        MBED_WARNING(result, "Unsuccessful operation");         \
+        return result;                                          \
+    }                                                           \
 }
 
-#define MBED_ASSERT_SUCCESS(functionCall)   MBED_ASSERT(functionCall == MBED_SUCCESS)
+#define MBED_WARN_ON_ERROR(functionCall) {                      \
+    mbed_error_status_t result = functionCall;                  \
+    if (result != MBED_SUCCESS) {                               \
+        MBED_WARNING(result, "Unsuccessful operation");         \
+    }                                                           \
+}                                                               \
+
+#define MBED_ASSERT_WARN(assertion) {                                   \
+    if (!(assertion)) {                                                 \
+        MBED_WARNING(MBED_ERROR_FAILED_OPERATION, "Failed assertion");  \
+    }                                                                   \
+}                                                                       \
 
 // Configuration parameters
 #define CLOCK_SOURCE                                        USE_PLL_HSE_EXTC|USE_PLL_HSI            // set by target:NUCLEO_F091RC

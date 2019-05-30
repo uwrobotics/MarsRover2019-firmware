@@ -138,8 +138,8 @@ mbed_error_status_t ElevatorController::runEndpointCalibration() {
 
     t_elevatorControlMode prevControlMode = getControlMode();
 
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_ASSERT_SUCCESS_RETURN_ERROR( setMotorDutyCycle(m_elevatorConfig.calibrationDutyCycle) );
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setControlMode( motorDutyCycle ) );
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setMotorDutyCycle(m_elevatorConfig.calibrationDutyCycle) );
 
     timer.reset();
 

@@ -182,7 +182,7 @@ ArmJointController::t_jointControlMode handleSetWristControlMode(CANMsg *p_newMs
     ArmJointController::t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(wristController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(wristController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -191,7 +191,7 @@ ArmClawController::t_clawControlMode handleSetClawControlMode(CANMsg *p_newMsg) 
     ArmClawController::t_clawControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(clawController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(clawController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -205,15 +205,15 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setPitchSpeedPercent(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchSpeedPercent(motionData));
             break;
 
         case ArmJointController::velocityPID:
-            MBED_ASSERT_SUCCESS(wristController.setPitchVelocityDegreesPerSec(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchVelocityDegreesPerSec(motionData));
             break;
 
         case ArmJointController::positionPID:
-            MBED_ASSERT_SUCCESS(wristController.setPitchAngleDegrees(motionData));
+            MBED_WARN_ON_ERROR(wristController.setPitchAngleDegrees(motionData));
             break;
     }
 
@@ -229,15 +229,15 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmJointController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(wristController.setRollSpeedPercent(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollSpeedPercent(motionData));
             break;
 
         case ArmJointController::velocityPID:
-            MBED_ASSERT_SUCCESS(wristController.setRollVelocityDegreesPerSec(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollVelocityDegreesPerSec(motionData));
             break;
 
         case ArmJointController::positionPID:
-            MBED_ASSERT_SUCCESS(wristController.setRollAngleDegrees(motionData));
+            MBED_WARN_ON_ERROR(wristController.setRollAngleDegrees(motionData));
             break;
     }
 
@@ -253,11 +253,11 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
     switch (controlMode) {
 
         case ArmClawController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(clawController.setMotorSpeedPercent(motionData));
+            MBED_WARN_ON_ERROR(clawController.setMotorSpeedPercent(motionData));
             break;
 
         case ArmClawController::positionPID:
-            MBED_ASSERT_SUCCESS(clawController.setSeparationDistanceCm(motionData));
+            MBED_WARN_ON_ERROR(clawController.setSeparationDistanceCm(motionData));
             break;
     }
 
