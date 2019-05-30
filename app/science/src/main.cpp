@@ -230,12 +230,6 @@ int handleSetCentrifugePosition(CANMsg *p_newMsg) {
     int tube_num = 0;
     *p_newMsg >> tube_num;
 
-    CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
-
-    if( controlMode != CentrifugeController::positionPID ) {
-        MBED_WARN_ON_ERROR(centrifugeController.setControlMode( CentrifugeController::positionPID ));
-    }
-
     pc.printf("Tube num %d\r\n", tube_num);
 
     MBED_WARN_ON_ERROR(centrifugeController.setTubePosition(tube_num));
