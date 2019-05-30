@@ -1,7 +1,6 @@
 // Controller for the auger drill
 
-#include "../inc/AugerController.h"
-
+#include "AugerController.h"
 #include "mbed.h"
 #include "Motor.h"
 #include "PwmIn.h"
@@ -17,4 +16,8 @@ mbed_error_status_t AugerController::setMotorDutyCycle(float percent)
 {
     m_motor.setSpeed( percent );
     return MBED_SUCCESS;
+}
+
+float AugerController::getDutyCycle(void) {
+    return m_motor.getSpeed();
 }

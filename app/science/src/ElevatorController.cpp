@@ -74,8 +74,8 @@ mbed_error_status_t ElevatorController::setMotorDutyCycle(float dutyCycle)
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((m_limitSwitchTop.read() == 0 && m_motor.getSpeed() < 0.0f) ||
-        (m_limitSwitchBottom.read() == 0 && m_motor.getSpeed() > 0.0f))
+    if ((m_limitSwitchTop.read() == 0 && dutyCycle < 0.0f) ||
+        (m_limitSwitchBottom.read() == 0 && dutyCycle > 0.0f))
     {
         dutyCycle = 0.0f;
     }
@@ -113,6 +113,8 @@ void ElevatorController::update() {
                 (m_limitSwitchBottom.read() == 0 && m_motor.getSpeed() > 0.0f))
             {
                 m_motor.setSpeed(0.0f);
+                Serial pc(SERIAL_TX, SERIAL_RX);
+                pc.printf("Motor limit hit with speed %din update loop, set motor speed to 0\r\n", m_motor.getSpeed());
             }
             break;
 

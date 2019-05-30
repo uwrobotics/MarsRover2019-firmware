@@ -47,14 +47,18 @@ class CentrifugeController {
 
         mbed_error_status_t setControlMode( t_centrifugeControlMode control );
         mbed_error_status_t setMotorDutyCycle(float dutyCycle);
+        mbed_error_status_t setSpinning(bool spin);
         mbed_error_status_t setTubePosition( unsigned int tube_num ); // Range of [0-11]
 
         mbed_error_status_t runEndpointCalibration();
 
         t_centrifugeControlMode getControlMode();
 
+        bool isSpinning();
+
         unsigned int    getTestTubeIndex(); // Return the test tube # that is currently under the auger
         float           getEncoderPulses(); // Return the # of encoder pulses within a single revolution
+        float           getDutyCycle();
         void            update();
 
     private:
@@ -71,6 +75,7 @@ class CentrifugeController {
         PID m_positionPIDController;
 
         int m_encoderInversionMultiplier;
+        bool m_isSpinning;
 
         Timer timer;
 

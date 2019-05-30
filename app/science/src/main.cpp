@@ -90,22 +90,18 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
                 .interval = 0.1f
         },
 
-        .maxEncoderPulses = 160000, // Gotten from maxDistanceCm / centimetresPerPulse
-        .maxDistanceCm = 26, // 10 inch range distance
-        .centimetresPerPulse = 0.00016235795f, // Unit is cm/pulse
+        .maxEncoderPulses = 467352, // Gotten from maxDistanceCm / centimetresPerPulse
+        .maxDistanceCm = 16, // 6.5 inch range distance
+        .centimetresPerPulse = 0.00003532669f, // Unit is cm/pulse
         .PIDOutputMotorMinDutyCycle = -0.5f,
         .PIDOutputMotorMaxDutyCycle = 1.0f
 };
 
 const ServoController::t_servoConfig servoConfig {
-    .funnelServoPin = SERVO_F,
-    .funnelUpPos = 0.7,
+    .funnelServoPin = SERVO_P,
+    .funnelUpPos = 0.8,
     .funnelRestPos = 0.55,
-    .funnelDownPos = 0.3,
-
-    .probeServoPin = SERVO_P,
-    .probeUpPos = 0.5,
-    .probeDownPos = 0.5
+    .funnelDownPos = 0.2
 };
 
 Serial             pc(SERIAL_TX, SERIAL_RX, ROVER_DEFAULT_BAUD_RATE);
@@ -145,7 +141,17 @@ enum scienceCommand {
     setCentrifugePosition,
     setFunnelOpen,
     setProbeDeployed
+};
 
+enum jetsonFeedback {
+
+    augerHeight = ROVER_JETSON_START_CANID_MSG_SCIENCE,
+    augerSpeed,
+    centrifugeSpinning,
+    centrifugeSpeed,
+    centrifugePosition,
+    funnelStatus,
+    sensorMountStatus
 };
 
 void initCAN() {
@@ -215,13 +221,7 @@ bool handleSetCentrifugeSpinning(CANMsg *p_newMsg) {
     bool spin = false;
     *p_newMsg >> spin;
 
-    CentrifugeController::t_centrifugeControlMode prevControlMode = centrifugeController.getControlMode();
-
-    if( prevControlMode != CentrifugeController::motorDutyCycle ) {
-        MBED_ASSERT_SUCCESS(centrifugeController.setControlMode( CentrifugeController::motorDutyCycle ));
-    }
-
-    MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle(spin));
+    centrifugeController.setSpinning(spin);
 
     return spin;
 }
@@ -255,20 +255,6 @@ bool handleSetFunnelOpen(CANMsg *p_newMsg) {
     }
 
     return open;
-}
-
-bool handleSetProbeDeployed(CANMsg *p_newMsg) {
-    bool deployed = false;
-    *p_newMsg >> deployed;
-
-    if (deployed) {
-        servoController.setProbeDown();
-    }
-    else {
-        servoController.setProbeUp();
-    }
-
-    return deployed;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
@@ -307,7 +293,6 @@ void processCANMsg(CANMsg *p_newMsg) {
             break;
 
         case setProbeDeployed:
-            handleSetProbeDeployed(p_newMsg);
             break;
 
         default:
@@ -317,7 +302,37 @@ void processCANMsg(CANMsg *p_newMsg) {
 }
 
 void sendJetsonInfo() {
-    
+    CANMsg txMsg(0);
+
+    txMsg.clear();
+    txMsg.id = augerHeight;
+    txMsg << elevatorController.getPositionCm();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = augerSpeed;
+    txMsg << augerController.getDutyCycle();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = centrifugeSpinning;
+    txMsg << centrifugeController.isSpinning();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = centrifugeSpeed;
+    txMsg << centrifugeController.getDutyCycle();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = centrifugePosition;
+    txMsg << centrifugeController.getTestTubeIndex();
+    MBED_ASSERT(can.write(txMsg) == true);
+
+    txMsg.clear();
+    txMsg.id = funnelStatus;
+    txMsg << servoController.isFunnelOpen();
+    MBED_ASSERT(can.write(txMsg) == true);
 }
 
 int main(void)
@@ -326,7 +341,7 @@ int main(void)
 
     initCAN();
 
-//    servoController.setFunnelUp();
+    servoController.setFunnelUp();
     elevatorController.runEndpointCalibration();
     centrifugeController.runEndpointCalibration();
 
