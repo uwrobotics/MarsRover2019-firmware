@@ -180,8 +180,8 @@ SW3 = PA_1,
 	ULTRA_ECHO_2 = PA_3,
 
     // moisture sensor
-    MOIST_PWR = PA_5,
-    MOIST_DATA = PA_6,
+    MOIST_PWR = PA_4,
+    MOIST_DATA = PA_5,
     TEMP_DATA = PB_12,
 
 	//neopixel signal
