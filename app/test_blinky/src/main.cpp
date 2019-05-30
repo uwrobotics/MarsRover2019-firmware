@@ -30,8 +30,9 @@ int main() {
                 count = 0;
                 break;
         }
-
+        if (count == 4) count=0;
         count++;
+        
         wait(0.5);
     }
 }

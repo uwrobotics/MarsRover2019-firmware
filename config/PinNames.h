@@ -181,6 +181,8 @@ typedef enum {
     MOTOR_E_DIR = PB_14,
 	SERVO_F = PA_9,			// Funnel
 	SERVO_P = PC_9,			// Probe
+    BUT_1 = PA_0,
+    BUT_2 = PA_1,
 
     // Elevator encoders
     ENC_E_CH1 = PB_0,
@@ -219,6 +221,14 @@ typedef enum {
     // TODO: Add remaining pins
 
 #endif                              // SAFETY BOARD PIN MAPPINGS END
+
+#ifdef ROVERBOARD_GIMBAL_PINMAP     // GIMBAL BOARD PIN MAPPINGS BEGIN
+#define ROVERBOARD_COMMON_PINMAP
+    // servo on gimbal
+    SERVO_YAW = PB_13,
+    SERVO_PITCH = PB_15,
+
+#endif                              // GIMBAL BOARD PIN MAPPINGS END
 
     
 #ifdef ROVERBOARD_COMMON_PINMAP     // COMMON PIN MAPPINGS FOR ROVER BOARDS BEGIN

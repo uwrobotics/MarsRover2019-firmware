@@ -7,7 +7,7 @@
 // CAN bus config
 #define ROVER_CANBUS_FREQUENCY                  500000 // 500 kbps
 #define ROVER_CANID_FILTER_MASK                 0xF00  // Use bits 8:11 for addressing and 0:7 for command/message type
-#define ROVER_SAFETY_CANID	                    0x100
+#define ROVER_GIMBAL_CANID	                    0x100
 #define ROVER_SCIENCE_CANID	                    0x200
 #define ROVER_ARM_LOWER_CANID                   0x300
 #define ROVER_ARM_UPPER_CANID                   0x400

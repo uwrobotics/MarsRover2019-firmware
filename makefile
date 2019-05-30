@@ -57,8 +57,8 @@ ifeq ($(filter $(APP), $(patsubst app/%/,%,$(sort $(dir $(wildcard app/*/))))),)
 	$(error APP is not set or is not supported. ${\n}Select an app to build with APP=app_name:${\n}${\n}$(subst ${ },${\n},$(patsubst $(APPS_PATH)/%/,%,$(sort $(dir $(wildcard app/*/)))))${\n}${\n})
 endif
 
-ifeq ($(filter $(BOARD)," nucleo arm science safety "),)
-	$(error BOARD is not set or is not supported. Set BOARD=board_name:${\n}${\n}safety${\n}arm${\n}science${\n}nucleo${\n}${\n}))
+ifeq ($(filter $(BOARD)," nucleo arm science safety gimbal "),)
+	$(error BOARD is not set or is not supported. Set BOARD=board_name:${\n}${\n}safety${\n}arm${\n}science${\n}nucleo${\n}gimbal${\n}${\n}))
 endif
 
 	+@$(call MAKE_DIR,$(BUILD_PATH)/$(APP))
@@ -303,6 +303,8 @@ else ifeq ($(BOARD),science)
 	COMMON_FLAGS += -DROVERBOARD_SCIENCE_PINMAP
 else ifeq ($(BOARD),safety)
 	COMMON_FLAGS += -DROVERBOARD_SAFETY_PINMAP
+else ifeq ($(BOARD),gimbal)
+	COMMON_FLAGS += -DROVERBOARD_GIMBAL_PINMAP
 endif
 
 COMMON_FLAGS += -include
