@@ -16,6 +16,7 @@ DigitalOut          ledTest(LED2);
 DigitalOut			ledI2C(LED3);
 DigitalOut          ledCAN(LED4);
 AnalogIn            battery(V_MONITOR);
+Timer               canSendTimer;
 
 //Sensor Address Indices
 enum Sensor_Index{
@@ -64,15 +65,17 @@ char raw_adc_value = 0;
 const float compression_factor = 0.110629;
 const int cell_num = 6;
 const float full_cell = 4.20;
-const float low_cell = 3.75; // TODO verify this value
+const float low_cell = 3.5; // TODO verify this value
 const float full_bat = full_cell * cell_num;
 const float low_bat = low_cell * cell_num;
 const float board_voltage = 3.3;
 float bat_value = 0;
 float bat_value_raw = 0;
 float bat_avg = 0;
-#define V_INDEX 3
 
+
+#define V_INDEX 3
+#define V_INDEX_CAN 0x29
 void initCAN() {
     can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
 
@@ -117,7 +120,8 @@ Send out averaged current value over CAN
 @return None
 */
 void CAN_send(float value, Sensor_Index can_index){
-	uint8_t data = value; // Convert current data to int 
+	uint8_t data = value; // Convert current data to int
+    //some data loss because of float rounding to int but it's ok
 	CANMsg txMsg(TX_ID + can_index);
 	txMsg << data; // append data to CANMsg
 	ledCAN = !ledCAN;
@@ -130,12 +134,22 @@ void CAN_send(float value, Sensor_Index can_index){
 	}
 }
 
+//sends all the relevant safety data over CAN
+//TODO: add Emma's thermistor code here
+void sendSafetyValues(void){
+    CAN_send(C_100A1_avg, I_100A1);
+    CAN_send(C_100A2_avg, I_100A2);
+    CAN_send(C_30A_avg, I_30A);
+    CAN_send(bat_avg, V_INDEX_CAN);
+
+}
 
 int main() {
 	pc.printf("Program Started\r\n\r\n");
 	
 	i2c.frequency(100000);
     initCAN();
+    canSendTimer.start();
 	ledI2C = 1;
 	ledCAN = 1;
 	int i = 1;
@@ -153,23 +167,25 @@ int main() {
 	   * 		100A1_avg -= 100A1_avg/TOTAL_SAMPLE
 	   * 		100A1_avg += newreading/TOTAL_SAMPLE
 	   */
+        //
+        if(canSendTimer.read() > 0.1){
+            sendSafetyValues();
+            canSendTimer.reset();
+        }
 		// Take sensor 1 reading
 		new_reading = read_current(A_100A1);
 		C_100A1_avg -= C_100A1_avg/TOTAL_SAMPLE;
 		C_100A1_avg += new_reading/TOTAL_SAMPLE;
-		CAN_send(C_100A1_avg, I_100A1);
 
 		// // Take sensor 2 reading
 		read_current(A_100A2);
 		C_100A2_avg -= C_100A2_avg/TOTAL_SAMPLE;
 		C_100A2_avg += new_reading/TOTAL_SAMPLE;
-		CAN_send(C_100A2_avg, I_100A2);
 
 		// // Take sensor 3 reading
 		read_current(A_30A);
 		C_30A_avg -= C_30A_avg/TOTAL_SAMPLE;
 		C_30A_avg += new_reading/TOTAL_SAMPLE;
-		CAN_send(C_30A_avg, I_30A);
 
 
         // Reading of battery voltage
@@ -184,16 +200,14 @@ int main() {
        bat_value_raw = battery.read();
        bat_value = bat_value_raw * board_voltage/ compression_factor;
 		bat_avg -= bat_avg/TOTAL_SAMPLE;
-		bat_avg += bat_value/TOTAL_SAMPLE;
+        bat_avg += bat_value/TOTAL_SAMPLE;
        pc.printf("Battery Level: %f\r\n", bat_avg);
-       if (bat_value < low_cell){
-		   // TODO: send out CAN here
-           // CANMsg txMsg(TX_ID + V_INDEX);
+       if (bat_value < low_bat){
+           CAN_send(bat_avg, V_INDEX_CAN);
            pc.printf("REPLACE BATTERY, Battery Level LOW!!! \r\n");
        }
         pc.printf("Hello World! %d\r\n", i);
-		// TODO: send out CAN here with proper battery voltage
-
+        
         i++;
         ledTest = i % 2;
 		wait(1);
