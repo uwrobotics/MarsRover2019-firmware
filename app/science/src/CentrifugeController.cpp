@@ -2,17 +2,17 @@
 
 #include "CentrifugeController.h"
 
-CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        controllerConfig,
+CentrifugeController::CentrifugeController( CentrifugeController::t_centrifugeConfig        centrifugeConfig,
                                             CentrifugeController::t_centrifugeControlMode   controlMode ):
     m_centrifugeControlMode( controlMode ),
-    m_centrifugeConfig(   ),
-    m_motor( controllerConfig.motor ),
-    m_encoder( controllerConfig.encoder ),
-    m_limitSwitch(controllerConfig.limitSwitchPin ),
-    m_positionPIDController( controllerConfig.positionPID.P, controllerConfig.positionPID.I, controllerConfig.positionPID.D, controllerConfig.positionPID.interval )
+    m_centrifugeConfig( centrifugeConfig ),
+    m_motor( centrifugeConfig.motor ),
+    m_encoder( centrifugeConfig.encoder ),
+    m_limitSwitch(centrifugeConfig.limitSwitchPin ),
+    m_positionPIDController( centrifugeConfig.positionPID.P, centrifugeConfig.positionPID.I, centrifugeConfig.positionPID.D, centrifugeConfig.positionPID.interval )
 {
 
-    if (controllerConfig.encoder.inverted) {
+    if (centrifugeConfig.encoder.inverted) {
         m_encoderInversionMultiplier = -1;
     }
     else {
@@ -81,7 +81,7 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
 mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num )
 {
     if (getControlMode() != positionPID) {
-        MBED_WARN_ON_ERROR(setControlMode(positionPID));
+        setControlMode(positionPID);
     }
 
     // Might shift the placement by one test tube due to rounding when fetching current tube #
@@ -134,13 +134,14 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
 
     t_centrifugeControlMode prevControlMode = getControlMode();
 
-    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setControlMode( motorDutyCycle ) );
-    MBED_WARN_AND_RETURN_STATUS_ON_ERROR( setMotorDutyCycle(m_centrifugeConfig.calibrationDutyCycle) );
+    setControlMode( motorDutyCycle );
+    setMotorDutyCycle(m_centrifugeConfig.calibrationDutyCycle);
 
     timer.reset();
 
     while ( m_limitSwitch.read() != 0 ) {
         if ( timer.read() > m_centrifugeConfig.calibrationTimeoutSeconds ) {
+            setMotorDutyCycle(0.0f);
             setControlMode(prevControlMode);
             return MBED_ERROR_TIME_OUT;
         }
@@ -156,16 +157,16 @@ mbed_error_status_t CentrifugeController::runEndpointCalibration() {
 mbed_error_status_t CentrifugeController::setSpinning(bool spin) {
 
     if ( getControlMode() != CentrifugeController::motorDutyCycle ) {
-        MBED_WARN_ON_ERROR(setControlMode( CentrifugeController::motorDutyCycle ));
+        setControlMode( CentrifugeController::motorDutyCycle);
     }
 
     if (spin) {
-        MBED_WARN_ON_ERROR(setMotorDutyCycle(m_centrifugeConfig.spinningDutyCycle));
+        setMotorDutyCycle(m_centrifugeConfig.spinningDutyCycle);
         m_isSpinning = true;
     }
 
     else {
-        MBED_WARN_ON_ERROR(setMotorDutyCycle(0.0f));
+        setMotorDutyCycle(0.0f);
         m_isSpinning = false;
     }
 

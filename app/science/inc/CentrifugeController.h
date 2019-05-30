@@ -43,7 +43,7 @@ class CentrifugeController {
             positionPID
         } t_centrifugeControlMode;
 
-        explicit CentrifugeController( t_centrifugeConfig controllerConfig,
+        explicit CentrifugeController( t_centrifugeConfig centrifugeConfig,
                                        t_centrifugeControlMode controlMode = motorDutyCycle );
 
         mbed_error_status_t setControlMode( t_centrifugeControlMode control );

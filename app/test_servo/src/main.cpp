@@ -3,7 +3,7 @@
 
 DigitalOut led(LED1);
 Serial pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
-Servo myservo(SERVO_F);
+Servo myservo(SERVO_P);
 
 int main() {
     while(1) {

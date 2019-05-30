@@ -28,7 +28,7 @@ Motor::Motor(PinName pwm, PinName dir, bool inverted, int freqInHz, float limit)
 	_pwm(pwm), _dir(dir), _inverted(inverted), _limit(limit) {
  
     // Set initial condition of PWM
-    _pwm.period(1.0 / freqInHz);
+//    _pwm.period(1.0 / freqInHz);
     _pwm = 0.0;
  
     // Initial condition of output enables
