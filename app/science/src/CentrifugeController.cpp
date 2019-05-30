@@ -86,7 +86,7 @@ mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num
 
     // Might shift the placement by one test tube due to rounding when fetching current tube #
     if( tube_num > 11 ){
-        tube_num = getTestTubeIndex();
+        tube_num = 11;
     }
 
     m_positionPIDController.setSetPoint( (tube_num / 12.0f * m_centrifugeConfig.maxEncoderPulsePerRev) + m_centrifugeConfig.limitSwitchOffset );

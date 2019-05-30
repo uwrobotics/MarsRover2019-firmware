@@ -9,7 +9,6 @@
 #include "ElevatorController.h"
 #include "ServoController.h"
 
-//TODO: FIGURE OUT HOW TO ROTATE THE CENTRIFUGE 15 DEGREES
 const AugerController::t_augerConfig augerConfig = {
         .motor = {
                 .pwmPin = MOTOR_A,
@@ -39,7 +38,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         },
 
         .limitSwitchPin = C_LS,
-        .limitSwitchOffset = 30.0f,
+        .limitSwitchOffset = 50.0f,
 
         .calibrationDutyCycle = 0.25f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -80,8 +79,8 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
         .limitSwitchTop = E_LS_T,
         .limitSwitchBottom = E_LS_B,
 
-        .calibrationDutyCycle = -0.2f,
-        .calibrationTimeoutSeconds = 30.0f,
+        .calibrationDutyCycle = -0.3f,
+        .calibrationTimeoutSeconds = 40.0f,
 
         .positionPID = {
                 .P    = 5.5f,
@@ -101,7 +100,7 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
 const ServoController::t_servoConfig servoConfig {
     .funnelServoPin = SERVO_F,
     .funnelUpPos = 0.8,
-    .funnelRestPos = 0.55,
+    .funnelRestPos = 0.53,
     .funnelDownPos = 0.2
 };
 
@@ -212,7 +211,7 @@ float handleSetCentrifugeDutyCycle(CANMsg *p_newMsg) {
 
     MBED_WARN_ON_ERROR(centrifugeController.setMotorDutyCycle( dutyCycle ));
 
-    pc.printf("Set cent DC to %f", dutyCycle);
+    pc.printf("Set centrifuge duty cycle to %f", dutyCycle);
 
     return dutyCycle;
 }
@@ -252,7 +251,7 @@ bool handleSetFunnelOpen(CANMsg *p_newMsg) {
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
-    pc.printf("Got CAN msg with ID %X", p_newMsg->id);
+    pc.printf("Got CAN msg with ID %X\r\n", p_newMsg->id);
 
     switch (p_newMsg->id) {
 
