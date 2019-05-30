@@ -43,6 +43,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
 
         .calibrationDutyCycle = 0.25f,
         .calibrationTimeoutSeconds = 7.0f,
+        .spinningDutyCycle = 0.4f,
 
         .positionPID = {
                 .P    = 8.5f,
@@ -150,8 +151,7 @@ enum jetsonFeedback {
     centrifugeSpinning,
     centrifugeSpeed,
     centrifugePosition,
-    funnelStatus,
-    sensorMountStatus
+    funnelStatus
 };
 
 void initCAN() {
@@ -162,7 +162,7 @@ ElevatorController::t_elevatorControlMode handleSetElevatorControlMode(CANMsg *p
     ElevatorController::t_elevatorControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(elevatorController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(elevatorController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -176,11 +176,11 @@ float handleSetElevatorMotion(CANMsg *p_newMsg) {
 
     switch (controlMode) {
         case ElevatorController::motorDutyCycle:
-            MBED_ASSERT_SUCCESS(elevatorController.setMotorDutyCycle(motionData));
+            MBED_WARN_ON_ERROR(elevatorController.setMotorDutyCycle(motionData));
             pc.printf("Set elevator motor duty cycle to %f\r\n", motionData);
             break;
         case ElevatorController::positionPID:
-            MBED_ASSERT_SUCCESS(elevatorController.setPositionInCm(motionData));
+            MBED_WARN_ON_ERROR(elevatorController.setPositionInCm(motionData));
             pc.printf("Set elevator position to %f cm\r\n", motionData);
             break;
     }
@@ -192,7 +192,7 @@ float handleSetAugerDutyCycle(CANMsg *p_newMsg) {
     float dutyCycle = 0;
     *p_newMsg >> dutyCycle;
 
-    MBED_ASSERT_SUCCESS(augerController.setMotorDutyCycle(dutyCycle));
+    MBED_WARN_ON_ERROR(augerController.setMotorDutyCycle(dutyCycle));
 
     return dutyCycle;
 }
@@ -201,7 +201,7 @@ CentrifugeController::t_centrifugeControlMode handleSetCentrifugeControlMode(CAN
     CentrifugeController::t_centrifugeControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    MBED_ASSERT_SUCCESS(centrifugeController.setControlMode(controlMode));
+    MBED_WARN_ON_ERROR(centrifugeController.setControlMode(controlMode));
 
     return controlMode;
 }
@@ -210,7 +210,7 @@ float handleSetCentrifugeDutyCycle(CANMsg *p_newMsg) {
     float dutyCycle = 0;
     *p_newMsg >> dutyCycle;
 
-    MBED_ASSERT_SUCCESS(centrifugeController.setMotorDutyCycle( dutyCycle ));
+    MBED_WARN_ON_ERROR(centrifugeController.setMotorDutyCycle( dutyCycle ));
 
     pc.printf("Set cent DC to %f", dutyCycle);
 
@@ -233,12 +233,12 @@ int handleSetCentrifugePosition(CANMsg *p_newMsg) {
     CentrifugeController::t_centrifugeControlMode controlMode = centrifugeController.getControlMode();
 
     if( controlMode != CentrifugeController::positionPID ) {
-        MBED_ASSERT_SUCCESS(centrifugeController.setControlMode( CentrifugeController::positionPID ));
+        MBED_WARN_ON_ERROR(centrifugeController.setControlMode( CentrifugeController::positionPID ));
     }
 
     pc.printf("Tube num %d\r\n", tube_num);
 
-    MBED_ASSERT_SUCCESS(centrifugeController.setTubePosition(tube_num));
+    MBED_WARN_ON_ERROR(centrifugeController.setTubePosition(tube_num));
 
     return tube_num;
 }
@@ -307,32 +307,32 @@ void sendJetsonInfo() {
     txMsg.clear();
     txMsg.id = augerHeight;
     txMsg << elevatorController.getPositionCm();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 
     txMsg.clear();
     txMsg.id = augerSpeed;
     txMsg << augerController.getDutyCycle();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 
     txMsg.clear();
     txMsg.id = centrifugeSpinning;
     txMsg << centrifugeController.isSpinning();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 
     txMsg.clear();
     txMsg.id = centrifugeSpeed;
     txMsg << centrifugeController.getDutyCycle();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 
     txMsg.clear();
     txMsg.id = centrifugePosition;
     txMsg << centrifugeController.getTestTubeIndex();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 
     txMsg.clear();
     txMsg.id = funnelStatus;
     txMsg << servoController.isFunnelOpen();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg) == true);
 }
 
 int main(void)

@@ -26,6 +26,7 @@ class CentrifugeController {
             float   limitSwitchOffset;
             float   calibrationDutyCycle;
             float   calibrationTimeoutSeconds;
+            float   spinningDutyCycle;
 
             // PID Configuration
             PID::t_pidConfig positionPID;
