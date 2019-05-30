@@ -161,7 +161,7 @@ float read_temp(void){
     return temp_val;
 }
 //sends all the relevant safety data over CAN
-void sendSafetyValues(void){
+git void sendSafetyValues(void){
     CAN_send(C_100A1_avg, I_100A1);
     CAN_send(C_100A2_avg, I_100A2);
     CAN_send(C_30A_avg, I_30A);
