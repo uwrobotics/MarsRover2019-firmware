@@ -1,7 +1,8 @@
 #include "mbed.h"
 #include "rover_config.h"
 #include "CANMsg.h"
-
+#include "PinNames.h"
+#include "tgmath.h"
 const unsigned int  RX_ID = ROVER_SAFETY_CANID; 
 const unsigned int  TX_ID = ROVER_JETSON_CANID + 30; 
 const unsigned int  CAN_MASK = ROVER_CANID_FILTER_MASK;
@@ -16,6 +17,7 @@ DigitalOut          ledTest(LED2);
 DigitalOut			ledI2C(LED3);
 DigitalOut          ledCAN(LED4);
 AnalogIn            battery(V_MONITOR);
+AnalogIn            temp(PA_4);
 Timer               canSendTimer;
 
 //Sensor Address Indices
@@ -73,9 +75,26 @@ float bat_value = 0;
 float bat_value_raw = 0;
 float bat_avg = 0;
 
+//temp reading specific
+float temp_value_raw = 0;
+float voltage_reading = 0;
+float temp_val_k = 0;
+float temp_val=0;
+float R_temp = 0;
+float temp_avg = 0;
+const float R0 = 100000;
+const float T0 = 298.15;
+const float B = 4700;
+const float R1 = 150000;
+const float R2 = 10000;
+const float VDD = 3.3;
 
+//todo: put this on the sheet
+#define THERM_INDEX 4
+
+//voltage monitoring specific
+//todo: change this in the sheets
 #define V_INDEX 3
-#define V_INDEX_CAN 0x29
 void initCAN() {
     can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
 
@@ -121,7 +140,7 @@ Send out averaged current value over CAN
 */
 void CAN_send(float value, Sensor_Index can_index){
 	uint8_t data = value; // Convert current data to int
-    //some data loss because of float rounding to int but it's ok
+    //some data loss because of float rounding to int but it's ok because you don't really need hella resolution
 	CANMsg txMsg(TX_ID + can_index);
 	txMsg << data; // append data to CANMsg
 	ledCAN = !ledCAN;
@@ -133,14 +152,21 @@ void CAN_send(float value, Sensor_Index can_index){
 		ledErr = 1;
 	}
 }
-
+float read_temp(void){
+    temp_value_raw = temp.read();
+    voltage_reading = temp_value_raw * VDD;
+    R_temp = 1/((1/(R2*(VDD/voltage_reading-1)))-(1/R1));
+    temp_val_k = 1/(log(R_temp/R0)/B +(1/T0));
+    temp_val = temp_val_k - 273.15;
+    return temp_val;
+}
 //sends all the relevant safety data over CAN
-//TODO: add Emma's thermistor code here
 void sendSafetyValues(void){
     CAN_send(C_100A1_avg, I_100A1);
     CAN_send(C_100A2_avg, I_100A2);
     CAN_send(C_30A_avg, I_30A);
-    CAN_send(bat_avg, V_INDEX_CAN);
+    CAN_send(bat_avg, V_INDEX);
+    CAN_send(temp_avg,THERM_INDEX);
 
 }
 
@@ -178,15 +204,19 @@ int main() {
 		C_100A1_avg += new_reading/TOTAL_SAMPLE;
 
 		// // Take sensor 2 reading
-		read_current(A_100A2);
+		new_reading = read_current(A_100A2);
 		C_100A2_avg -= C_100A2_avg/TOTAL_SAMPLE;
 		C_100A2_avg += new_reading/TOTAL_SAMPLE;
 
 		// // Take sensor 3 reading
-		read_current(A_30A);
+		new_reading = read_current(A_30A);
 		C_30A_avg -= C_30A_avg/TOTAL_SAMPLE;
 		C_30A_avg += new_reading/TOTAL_SAMPLE;
-
+        
+        // Take thermistor reading
+        new_reading = read_temp();
+        temp_avg -= temp_avg/TOTAL_SAMPLE;
+        temp_avg += new_reading/TOTAL_SAMPLE;
 
         // Reading of battery voltage
         /* Battery voltage conversion 
