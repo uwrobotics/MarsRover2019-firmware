@@ -39,14 +39,14 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         },
 
         .limitSwitchPin = C_LS,
-        .limitSwitchOffset = 15.0f, // Limit switch is offset 15 degrees
+        .limitSwitchOffset = 30.0f,
 
         .calibrationDutyCycle = 0.25f,
         .calibrationTimeoutSeconds = 7.0f,
         .spinningDutyCycle = 0.4f,
 
         .positionPID = {
-                .P    = 8.5f,
+                .P    = 8.8f,
                 .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f,
@@ -84,7 +84,7 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
         .calibrationTimeoutSeconds = 30.0f,
 
         .positionPID = {
-                .P    = 3.5f,
+                .P    = 5.5f,
                 .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f,
@@ -95,11 +95,11 @@ const ElevatorController::t_elevatorConfig elevatorConfig = {
         .maxDistanceCm = 16, // 6.5 inch range distance
         .centimetresPerPulse = 0.00003532669f, // Unit is cm/pulse
         .PIDOutputMotorMinDutyCycle = -0.5f,
-        .PIDOutputMotorMaxDutyCycle = 1.0f
+        .PIDOutputMotorMaxDutyCycle = 0.8f
 };
 
 const ServoController::t_servoConfig servoConfig {
-    .funnelServoPin = SERVO_P,
+    .funnelServoPin = SERVO_F,
     .funnelUpPos = 0.8,
     .funnelRestPos = 0.55,
     .funnelDownPos = 0.2

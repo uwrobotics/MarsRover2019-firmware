@@ -33,7 +33,7 @@ CentrifugeController::t_centrifugeControlMode CentrifugeController::getControlMo
 // Get the current test tube # that is under the auger - note, this rounds down
 unsigned int CentrifugeController::getTestTubeIndex()
 {
-    return static_cast<int>( getEncoderPulses() / m_centrifugeConfig.maxEncoderPulsePerRev * 12.0f );
+    return static_cast<int>( getEncoderPulses() / m_centrifugeConfig.maxEncoderPulsePerRev * 11.9f );
 }
 
 // Get the current encoder value
@@ -89,7 +89,7 @@ mbed_error_status_t CentrifugeController::setTubePosition( unsigned int tube_num
         tube_num = getTestTubeIndex();
     }
 
-    m_positionPIDController.setSetPoint( tube_num / 12.0f * m_centrifugeConfig.maxEncoderPulsePerRev );
+    m_positionPIDController.setSetPoint( (tube_num / 12.0f * m_centrifugeConfig.maxEncoderPulsePerRev) + m_centrifugeConfig.limitSwitchOffset );
 
     return MBED_SUCCESS;
 }
@@ -126,7 +126,7 @@ void CentrifugeController::initializePID( void )
     m_positionPIDController.setInputLimits( 0 , m_centrifugeConfig.maxEncoderPulsePerRev );
     m_positionPIDController.setOutputLimits( m_centrifugeConfig.PIDOutputMotorMinDutyCycle, m_centrifugeConfig.PIDOutputMotorMaxDutyCycle );
     m_positionPIDController.setBias( m_centrifugeConfig.positionPID.bias );
-    m_positionPIDController.setDeadZoneError( 0.01 );
+    m_positionPIDController.setDeadZoneError( 0.02 );
     m_positionPIDController.setMode( PID_AUTO_MODE );
 }
 
