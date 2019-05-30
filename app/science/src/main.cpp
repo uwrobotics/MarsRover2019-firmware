@@ -38,7 +38,7 @@ const CentrifugeController::t_centrifugeConfig centrifugeConfig = {
         },
 
         .limitSwitchPin = C_LS,
-        .limitSwitchOffset = 50.0f,
+        .limitSwitchOffset = 70.0f,
 
         .calibrationDutyCycle = 0.25f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -296,7 +296,7 @@ void processCANMsg(CANMsg *p_newMsg) {
     }
 }
 
-void sendJetsonInfo() {
+void sendJetsonInfoA() {
     CANMsg txMsg(0);
 
     txMsg.clear();
@@ -313,6 +313,10 @@ void sendJetsonInfo() {
     txMsg.id = centrifugeSpinning;
     txMsg << centrifugeController.isSpinning();
     MBED_ASSERT_WARN(can.write(txMsg) == true);
+}
+
+void sendJetsonInfoB() {
+    CANMsg txMsg(0);
 
     txMsg.clear();
     txMsg.id = centrifugeSpeed;
@@ -342,6 +346,8 @@ int main(void)
 
     canSendTimer.start();
 
+    bool switchCAN = false;
+
     while (1) {
 
         if (can.read(rxMsg)) {
@@ -351,7 +357,14 @@ int main(void)
         }
 
         if (canSendTimer.read() > 0.1) {
-            sendJetsonInfo();
+
+            if (!switchCAN) {
+                sendJetsonInfoA();
+            } else {
+                sendJetsonInfoB();
+            }
+
+            switchCAN = !switchCAN;
             canSendTimer.reset();
         }
 
