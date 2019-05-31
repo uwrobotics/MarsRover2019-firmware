@@ -49,6 +49,7 @@ void moveRight(void){
 	wait(0.2);
 	servo_yaw = 0.50;
 	wait(1);
+    pc.printf("received move right\r\n");
 }
 
 void moveLeft(void){
@@ -56,6 +57,7 @@ void moveLeft(void){
         wait(0.2);
         servo_yaw = 0.50;
         wait(1);
+        pc.printf("received move left\r\n");
 }
 
 // bool handleStepPitch(CANMsg *p_newMsg){
@@ -78,10 +80,8 @@ bool handleStepYaw(CANMsg *p_newMsg){
 
     if (right) {
         moveRight();
-        pc.printf("received move right\r\n");
     } else { // left
         moveLeft();
-        pc.printf("received move left\r\n");
     }
     return right;
 }
