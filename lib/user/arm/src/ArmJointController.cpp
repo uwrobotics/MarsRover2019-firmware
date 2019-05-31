@@ -124,7 +124,7 @@ void ArmJointController::update() {
         case motorDutyCycle:
             if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
                 (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
-                m_motor.getDutyCycle() = 0.0f;
+                m_motor.setDutyCycle(0.0f);
             }
 
             break;

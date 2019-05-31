@@ -30,7 +30,6 @@ mbed_error_status_t ArmClawController::setControlMode(ArmClawController::t_clawC
         case positionPID:
             m_positionPIDController.reset();
             m_controlMode = positionPID;
-            runEndpointCalibration();
             break;
 
         default:
@@ -146,7 +145,8 @@ mbed_error_status_t ArmClawController::runEndpointCalibration() {
 
     m_encoder.reset();
 
-    setControlMode(prevControlMode);
+    MBED_WARN_ON_ERROR(setMotorDutyCycle(0.0f));
+    MBED_WARN_AND_RETURN_STATUS_ON_ERROR(setControlMode(prevControlMode));
 
     return MBED_SUCCESS;
 }

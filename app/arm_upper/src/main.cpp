@@ -20,11 +20,14 @@ const ArmWristController::t_armWristConfig wristConfig = {
 
                 .encoder = {
                         .pwmPin = ENC_A1,
-                        .zeroAngleDutyCycle = 0.50f,
-                        .minAngleDegrees = -162.0f,
-                        .maxAngleDegrees = 162.0f,
+                        .zeroAngleDutyCycle = 0.497f,
+                        .minAngleDegrees = -170.0f,
+                        .maxAngleDegrees = 170.0f,
                         .inverted = true
                 },
+
+                .limSwitchMinPin = LIM_1A,
+                .limSwitchMaxPin = LIM_1B,
 
                 .velocityPID = {
                         .P    = 0.15f,
@@ -59,11 +62,14 @@ const ArmWristController::t_armWristConfig wristConfig = {
 
                 .encoder = {
                         .pwmPin = ENC_A2,
-                        .zeroAngleDutyCycle = 0.50f,
-                        .minAngleDegrees = -162.0f,
-                        .maxAngleDegrees = 162.0f,
+                        .zeroAngleDutyCycle = 0.498f,
+                        .minAngleDegrees = -170.0f,
+                        .maxAngleDegrees = 170.0f,
                         .inverted = false
                 },
+
+                .limSwitchMinPin = LIM_2A,
+                .limSwitchMaxPin = LIM_2B,
 
                 .velocityPID = {
                         .P    = 0.3f,
@@ -94,7 +100,7 @@ const ArmClawController::t_clawConfig clawConfig = {
         .motor = {
                 .pwmPin   = MOTOR3,
                 .dirPin   = MOTOR3_DIR,
-                .inverted = true,
+                .inverted = false,
                 .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
                 .limit = 1.0
         },
@@ -109,7 +115,7 @@ const ArmClawController::t_clawConfig clawConfig = {
                 .inverted = false
         },
 
-        .limitSwitchPin = LIM_1A, // CHECK
+        .limitSwitchPin = LIM_3A,
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -317,8 +323,9 @@ int main(void)
     pc.printf("Program Started\r\n\r\n");
 
     initCAN();
-
     canSendTimer.start();
+
+    MBED_WARN_ON_ERROR(clawController.runEndpointCalibration());
 
     while (1) {
 

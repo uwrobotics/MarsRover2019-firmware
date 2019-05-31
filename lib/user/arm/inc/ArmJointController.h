@@ -26,7 +26,7 @@ public:
         PwmIn::t_absoluteEncoderConfig encoder;
 
         // Limit switch config
-        PinName limSwitchMaxPin, limSwitchMinPin;
+        PinName limSwitchMinPin, limSwitchMaxPin;
 
         // PID config
         PID::t_pidConfig velocityPID, positionPID;
