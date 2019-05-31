@@ -81,6 +81,8 @@ mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
 
     m_motor.setDutyCycle(dutyCycle);
 
+    printf("Set arm wrist motor duty cycle to %d");
+
     return MBED_SUCCESS;
 }
 

@@ -189,6 +189,7 @@ ArmJointController::t_jointControlMode handleSetWristControlMode(CANMsg *p_newMs
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(wristController.setControlMode(controlMode));
+    printf("Set wrist control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -198,6 +199,7 @@ ArmClawController::t_clawControlMode handleSetClawControlMode(CANMsg *p_newMsg) 
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(clawController.setControlMode(controlMode));
+    printf("Set claw control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -223,6 +225,7 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    printf("Set wrist motion to %d\r\n", motionData);
     return motionData;
 }
 
