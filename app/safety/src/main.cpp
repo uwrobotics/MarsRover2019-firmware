@@ -70,13 +70,15 @@ char raw_adc_value = 0;
 const float compression_factor = 0.110629;
 const int cell_num = 6;
 const float full_cell = 4.20;
-const float low_cell = 3.5; // TODO verify this value
+const float low_cell = 3.7; // TODO verify this value
 const float full_bat = full_cell * cell_num;
 const float low_bat = low_cell * cell_num;
 const float board_voltage = 3.3;
 float bat_value = 0;
 float bat_value_raw = 0;
 float bat_avg = 0;
+int bat_low_warning = 0;
+bool battery_low = false;
 
 //temp reading specific
 float temp_value_raw = 0;
@@ -95,7 +97,8 @@ const float VDD = 3.3;
 
 //voltage monitoring specific
 void initCAN() {
-    can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
+	// not needed since not receiving CAN message
+    //can.filter(RX_ID, ROVER_CANID_FILTER_MASK, CANStandard);
 
     // for (int canHandle = firstCommand; canHandle <= lastCommand; canHandle++) {
     //     can.filter(RX_ID + canHandle, 0xFFF, CANStandard, canHandle);
@@ -113,10 +116,10 @@ float read_current(Sensor_Address address){
 	char adc_sample[2]; 
 	status = i2c.read( (address<<1), &adc_sample[0], 2, false);
 	if (!status) // error
-		pc.printf("I2C ERROR\n");
+		//pc.printf("I2C ERROR\n");
 	raw_adc_value = (adc_sample[0] << 4) + (adc_sample[1] >> 4);
-	pc.printf("!!Adc sample[0] %x \t acd sample[1] %x \n", adc_sample[0], adc_sample[1]);
-	pc.printf("ADC value merged: %x\n", raw_adc_value);
+	//pc.printf("!!Adc sample[0] %x \t acd sample[1] %x \n", adc_sample[0], adc_sample[1]);
+	//pc.printf("ADC value merged: %x\n", raw_adc_value);
 	ledI2C = !ledI2C;
 	// conversion to current
 	if (address == A_100A1){
@@ -128,7 +131,7 @@ float read_current(Sensor_Address address){
 	else
 		current = ((bitRange_30A - raw_adc_value)/iConversion_30A);
 	// output reading
-	pc.printf("Address: 0x%.8X \tCurrent: %f\r\n", address, current);
+	//pc.printf("Address: 0x%.8X \tCurrent: %f\r\n", address, current);
 	return current;
 }
 
@@ -164,9 +167,18 @@ float read_temp(void){
 void sendSafetyValues(void){
     // CAN_send(C_100A1_avg, I_100A1);
     CAN_send(C_100A2_avg, I_100A2);
+	pc.printf("Current Sensor 100A:  %f\r\n", C_100A2_avg);
     CAN_send(C_30A_avg, I_30A);
+	pc.printf("Current Sensor 30A:  %f\r\n", C_30A_avg);
     CAN_send(bat_avg, V_MONITOR_INDEX);
+	pc.printf("Battery Level: %f\r\n", bat_avg);
     CAN_send(temp_avg,THERM);
+	pc.printf("E-Box Temperature: %f\r\n", temp_avg);
+
+	if (battery_low){
+		CAN_send(bat_low_warning, V_MONITOR_INDEX);
+        pc.printf("REPLACE BATTERY, Battery Level LOW!!! \r\n");
+	}
 
 }
 
@@ -226,20 +238,18 @@ int main() {
         * 400 mV when 5V is on
         * 0.16 reading
         */
-
        bat_value_raw = battery.read();
        bat_value = bat_value_raw * board_voltage/ compression_factor;
 		bat_avg -= bat_avg/TOTAL_SAMPLE;
         bat_avg += bat_value/TOTAL_SAMPLE;
-       pc.printf("Battery Level: %f\r\n", bat_avg);
+	   //CAN_send(bat_avg, V_MONITOR_INDEX);
        if (bat_value < low_bat){
-           CAN_send(bat_avg, V_MONITOR_INDEX);
-           pc.printf("REPLACE BATTERY, Battery Level LOW!!! \r\n");
-       }
-        pc.printf("Hello World! %d\r\n", i);
-        
+		   battery_low = true;
+       } else{
+		   battery_low = false;
+	   }   
         i++;
         ledTest = i % 2;
-		wait(1);
+		//wait(1);
     }
 }
