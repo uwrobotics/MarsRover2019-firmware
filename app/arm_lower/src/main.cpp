@@ -17,11 +17,14 @@ const ArmJointController::t_jointConfig turnTableConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A1,
-                .zeroAngleDutyCycle = 0.5f,
-                .minAngleDegrees = -90.0f,
-                .maxAngleDegrees = 90.0f,
+                .zeroAngleDutyCycle = 0.502f,
+                .minAngleDegrees = -100.0f,
+                .maxAngleDegrees = 100.0f,
                 .inverted = true
         },
+
+        .limSwitchMinPin = LIM1A,
+        .limSwitchMaxPin = LIM1B,
 
         .velocityPID = {
                 .P    = 0.4f,
@@ -56,11 +59,14 @@ const ArmJointController::t_jointConfig shoulderConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A2,
-                .zeroAngleDutyCycle = 0.7281f,
-                .minAngleDegrees = -18.7f,
-                .maxAngleDegrees = 139.0f,
+                .zeroAngleDutyCycle = 0.752f,
+                .minAngleDegrees = -1.0f,
+                .maxAngleDegrees = 140.0f,
                 .inverted = true
         },
+
+        .limSwitchMinPin = LIM2A,
+        .limSwitchMaxPin = LIM2B,
 
         .velocityPID = {
                 .P    = 0.65f,
@@ -95,11 +101,14 @@ const ArmJointController::t_jointConfig elbowConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A3,
-                .zeroAngleDutyCycle = 0.547f,
-                .minAngleDegrees = -160.9f,
-                .maxAngleDegrees = 1.1f,
+                .zeroAngleDutyCycle = 0.755f,
+                .minAngleDegrees = -160.0f,
+                .maxAngleDegrees = 1.0f,
                 .inverted = false
         },
+
+        .limSwitchMinPin = LIM3A,
+        .limSwitchMaxPin = LIM3B,
 
         .velocityPID = {
                 .P    = 0.7f,
