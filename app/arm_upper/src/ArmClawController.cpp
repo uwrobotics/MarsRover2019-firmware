@@ -55,6 +55,8 @@ mbed_error_status_t ArmClawController::setMotorDutyCycle(float dutyCycle) {
 
     m_motor.setDutyCycle(dutyCycle);
 
+    PRINT_INFO("Set claw motor duty cycle to %f\r\n", dutyCycle);
+
     return MBED_SUCCESS;
 }
 
@@ -101,12 +103,9 @@ void ArmClawController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
-            if ((getSeparationDistanceCm() < m_armClawConfig.minInputSeparationDistanceCm &&
-                    m_motor.getDutyCycle() < 0.0f) ||
-                (getSeparationDistanceCm() > m_armClawConfig.maxInputSeparationDistanceCm &&
-                        m_motor.getDutyCycle() > 0.0f)) {
-                m_motor.setDutyCycle(0.0f);
-            }
+//            if (false) {
+//                m_motor.setDutyCycle(0.0f);
+//            }
 
             break;
 

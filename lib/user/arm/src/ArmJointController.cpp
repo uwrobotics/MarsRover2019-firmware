@@ -74,10 +74,10 @@ mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((m_limSwitchMin == 0 && dutyCycle < 0.0f) ||
-        (m_limSwitchMax == 0 && dutyCycle > 0.0f)) {
-        dutyCycle = 0.0f;
-    }
+//    if ((m_limSwitchMin == 0 && dutyCycle < 0.0f) ||
+//        (m_limSwitchMax == 0 && dutyCycle > 0.0f)) {
+//        dutyCycle = 0.0f;
+//    }
 
     m_motor.setDutyCycle(dutyCycle);
 
@@ -126,10 +126,10 @@ void ArmJointController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
-            if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
-                (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
-                m_motor.setDutyCycle(0.0f);
-            }
+//            if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
+//                (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
+//                m_motor.setDutyCycle(0.0f);
+//            }
 
 //            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getDutyCycle());
 
