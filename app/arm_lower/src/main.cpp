@@ -190,7 +190,9 @@ ArmJointController::t_jointControlMode handleSetControlMode(t_joint joint, CANMs
     ArmJointController::t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    p_armJointControllers[joint]->setControlMode(controlMode);
+    MBED_WARN_ON_ERROR(p_armJointControllers[joint]->setControlMode(controlMode));
+
+    printf("Joint %d control mode set to %d\r\n", joint, controlMode);
 
     return controlMode;
 }
@@ -212,6 +214,8 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             p_armJointControllers[joint]->setAngleDegrees(motionData);
             break;
     }
+
+    printf("Set joint %d motion data to %d\r\n", joint, motionData);
 
     return motionData;
 }

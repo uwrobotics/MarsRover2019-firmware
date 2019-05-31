@@ -330,7 +330,7 @@ int main(void)
     initCAN();
     canSendTimer.start();
 
-    MBED_WARN_ON_ERROR(clawController.runEndpointCalibration());
+//    MBED_WARN_ON_ERROR(clawController.runEndpointCalibration());
 
     while (1) {
 

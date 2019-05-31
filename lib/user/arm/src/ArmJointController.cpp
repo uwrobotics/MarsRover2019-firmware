@@ -122,6 +122,8 @@ void ArmJointController::update() {
     float interval = timer.read();
     timer.reset();
 
+    printf("Control mode is %d\r\n", m_controlMode);
+
     switch (m_controlMode) {
         case motorDutyCycle:
             if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
@@ -129,7 +131,7 @@ void ArmJointController::update() {
                 m_motor.setDutyCycle(0.0f);
             }
 
-            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getSpeed());
+            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getDutyCycle());
 
             break;
 
@@ -138,7 +140,7 @@ void ArmJointController::update() {
             m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
             m_motor.setDutyCycle(m_velocityPIDController.compute());
 
-            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getSpeed();
+            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getDutyCycle();
 
             break;
 
@@ -147,7 +149,7 @@ void ArmJointController::update() {
             m_positionPIDController.setProcessValue(getAngleDegrees());
             m_motor.setDutyCycle(m_positionPIDController.compute());
 
-            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getSpeed();
+            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getDutyCycle();
 
             break;
     }
