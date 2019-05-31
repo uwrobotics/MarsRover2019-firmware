@@ -129,6 +129,8 @@ void ArmJointController::update() {
                 m_motor.setDutyCycle(0.0f);
             }
 
+            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getSpeed());
+
             break;
 
         case velocityPID:
@@ -136,12 +138,16 @@ void ArmJointController::update() {
             m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
             m_motor.setDutyCycle(m_velocityPIDController.compute());
 
+            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getSpeed();
+
             break;
 
         case positionPID:
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getAngleDegrees());
             m_motor.setDutyCycle(m_positionPIDController.compute());
+
+            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getSpeed();
 
             break;
     }

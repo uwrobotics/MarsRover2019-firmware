@@ -219,11 +219,11 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
 void processCANMsg(CANMsg *p_newMsg) {
     switch (p_newMsg->id) {
         case setTurnTableControlMode:
-            handleSetControlMode(turnTable, p_newMsg);
+            printf("Turn table control mode set to %d\r\n", handleSetControlMode(turnTable, p_newMsg));
             break;
 
         case setTurnTableMotion:
-            handleSetMotion(turnTable, p_newMsg);
+            printf("Turn table motion set to %f\r\n", handleSetMotion(turnTable, p_newMsg));
 
         case setShoulderControlMode:
             handleSetControlMode(shoulder, p_newMsg);
