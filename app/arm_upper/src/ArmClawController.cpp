@@ -38,7 +38,7 @@ mbed_error_status_t ArmClawController::setControlMode(ArmClawController::t_clawC
     }
 
     m_controlMode = controlMode;
-    m_motor.setSpeed(0.0f);
+    m_motor.setDutyCycle(0.0f);
 
     timer.reset();
 
@@ -55,7 +55,7 @@ mbed_error_status_t ArmClawController::setMotorDutyCycle(float dutyCycle) {
         dutyCycle = 0.0f;
     }
 
-    m_motor.setSpeed(dutyCycle);
+    m_motor.setDutyCycle(dutyCycle);
 
     return MBED_SUCCESS;
 }
@@ -103,9 +103,11 @@ void ArmClawController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
-            if ((getSeparationDistanceCm() < m_armClawConfig.minInputSeparationDistanceCm && m_motor.getSpeed() < 0.0f) ||
-                (getSeparationDistanceCm() > m_armClawConfig.maxInputSeparationDistanceCm && m_motor.getSpeed() > 0.0f)) {
-                m_motor.setSpeed(0.0f);
+            if ((getSeparationDistanceCm() < m_armClawConfig.minInputSeparationDistanceCm &&
+                    m_motor.getDutyCycle() < 0.0f) ||
+                (getSeparationDistanceCm() > m_armClawConfig.maxInputSeparationDistanceCm &&
+                        m_motor.getDutyCycle() > 0.0f)) {
+                m_motor.setDutyCycle(0.0f);
             }
 
             break;
@@ -113,7 +115,7 @@ void ArmClawController::update() {
         case positionPID:
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getSeparationDistanceMm());
-            m_motor.setSpeed(m_positionPIDController.compute());
+            m_motor.setDutyCycle(m_positionPIDController.compute());
 
             break;
     }

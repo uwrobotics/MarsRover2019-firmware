@@ -14,10 +14,10 @@ AugerController::AugerController( AugerController::t_augerConfig controllerConfi
 
 mbed_error_status_t AugerController::setMotorDutyCycle(float percent)
 {
-    m_motor.setSpeed( percent );
+    m_motor.setDutyCycle(percent);
     return MBED_SUCCESS;
 }
 
 float AugerController::getDutyCycle(void) {
-    return m_motor.getSpeed();
+    return m_motor.getDutyCycle();
 }

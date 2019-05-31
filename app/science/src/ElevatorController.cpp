@@ -80,7 +80,7 @@ mbed_error_status_t ElevatorController::setMotorDutyCycle(float dutyCycle)
         dutyCycle = 0.0f;
     }
 
-    m_motor.setSpeed(dutyCycle);
+    m_motor.setDutyCycle(dutyCycle);
     Serial pc(SERIAL_TX, SERIAL_RX);
     pc.printf("Set raw motor speed to %f\r\n", dutyCycle);
 
@@ -109,19 +109,20 @@ void ElevatorController::update() {
     switch (m_elevatorControlMode) {
 
         case motorDutyCycle:
-            if ((m_limitSwitchTop.read() == 0 && m_motor.getSpeed() < 0.0f) ||
-                (m_limitSwitchBottom.read() == 0 && m_motor.getSpeed() > 0.0f))
+            if ((m_limitSwitchTop.read() == 0 && m_motor.getDutyCycle() < 0.0f) ||
+                (m_limitSwitchBottom.read() == 0 && m_motor.getDutyCycle() > 0.0f))
             {
-                m_motor.setSpeed(0.0f);
+                m_motor.setDutyCycle(0.0f);
                 Serial pc(SERIAL_TX, SERIAL_RX);
-                pc.printf("Motor limit hit with speed %din update loop, set motor speed to 0\r\n", m_motor.getSpeed());
+                pc.printf("Motor limit hit with speed %din update loop, set motor speed to 0\r\n",
+                          m_motor.getDutyCycle());
             }
             break;
 
         case positionPID:
             m_positionPIDController.setInterval( interval );
             m_positionPIDController.setProcessValue( getPositionEncoderPulses() );
-            m_motor.setSpeed( m_positionPIDController.compute() );
+            m_motor.setDutyCycle(m_positionPIDController.compute());
             break;
     }
 }

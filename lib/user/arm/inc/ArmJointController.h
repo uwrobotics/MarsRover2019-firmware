@@ -25,6 +25,9 @@ public:
         // Joint encoder config
         PwmIn::t_absoluteEncoderConfig encoder;
 
+        // Limit switch config
+        PinName limSwitchMaxPin, limSwitchMinPin;
+
         // PID config
         PID::t_pidConfig velocityPID, positionPID;
 
@@ -67,6 +70,7 @@ private:
 
     Motor m_motor;
     PwmIn m_encoder;
+    DigitalIn m_limSwitchMax, m_limSwitchMin;
 
     PID m_velocityPIDController;
     PID m_positionPIDController;

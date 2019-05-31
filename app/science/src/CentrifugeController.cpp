@@ -73,7 +73,7 @@ mbed_error_status_t CentrifugeController::setMotorDutyCycle(float dutyCycle)
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    m_motor.setSpeed( dutyCycle );
+    m_motor.setDutyCycle(dutyCycle);
     return MBED_SUCCESS;
 }
 
@@ -103,9 +103,9 @@ void CentrifugeController::update()
 
         case motorDutyCycle:
 
-            if ( m_motor.getSpeed() > 1.1f || m_motor.getSpeed() < -1.1f ) // If speed is > bounds, something is wrong
+            if (m_motor.getDutyCycle() > 1.1f || m_motor.getDutyCycle() < -1.1f ) // If speed is > bounds, something is wrong
             {
-                m_motor.setSpeed(0.0f);
+                m_motor.setDutyCycle(0.0f);
             }
 
             break;
@@ -114,7 +114,7 @@ void CentrifugeController::update()
 
             m_positionPIDController.setInterval( interval );
             m_positionPIDController.setProcessValue( getEncoderPulses() );
-            m_motor.setSpeed(m_positionPIDController.compute());
+            m_motor.setDutyCycle(m_positionPIDController.compute());
 
             break;
     }
@@ -178,5 +178,5 @@ bool CentrifugeController::isSpinning() {
 }
 
 float CentrifugeController::getDutyCycle() {
-    return m_motor.getSpeed();
+    return m_motor.getDutyCycle();
 }

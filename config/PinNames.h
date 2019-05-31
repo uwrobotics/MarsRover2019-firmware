@@ -165,8 +165,8 @@ typedef enum {
     LIM_2A = PB_3,
     LIM_2B = PB_4,
     LIM_3A = PA_11,
-    LIM_3B = PA_12
-    
+    LIM_3B = PA_12,
+
 #endif                              // ARM BOARD PIN MAPPINGS END
 
 
@@ -250,8 +250,6 @@ typedef enum {
 #else
     STDIO_UART_RX = SERIAL_TX,
 #endif
-
-    // TODO: Add more!
 
 #endif                              // COMMON PIN MAPPINGS FOR ROVER BOARDS END
 

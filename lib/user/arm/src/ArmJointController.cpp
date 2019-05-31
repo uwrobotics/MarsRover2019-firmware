@@ -10,8 +10,8 @@
 #include "PinNames.h"
 
 ArmJointController::ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode) :
-        m_controlMode(controlMode), m_armJointConfig(armJointConfig),
-        m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin, armJointConfig.motor.inverted), m_encoder(armJointConfig.encoder.pwmPin),
+        m_controlMode(controlMode), m_armJointConfig(armJointConfig), m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin,
+        armJointConfig.motor.inverted), m_encoder(armJointConfig.encoder.pwmPin), m_limSwitchMin(armJointConfig.limSwitchMinPin), m_limSwitchMax(armJointConfig.limSwitchMaxPin),
         m_velocityPIDController(armJointConfig.velocityPID.P, armJointConfig.velocityPID.I, armJointConfig.velocityPID.D, armJointConfig.velocityPID.interval),
         m_positionPIDController(armJointConfig.positionPID.P, armJointConfig.positionPID.I, armJointConfig.positionPID.D, armJointConfig.positionPID.interval) {
 
@@ -41,23 +41,23 @@ float ArmJointController::getAngleVelocityDegreesPerSec() {
 
 mbed_error_status_t ArmJointController::setControlMode(t_jointControlMode controlMode) {
 
-    switch (m_controlMode) {
+    switch (controlMode) {
 
         case motorDutyCycle:
             m_controlMode = motorDutyCycle;
-            setMotorDutyCycle(0.0f);
+            MBED_WARN_ON_ERROR(setMotorDutyCycle(0.0f));
             break;
 
         case velocityPID:
             m_velocityPIDController.reset();
             m_controlMode = velocityPID;
-            setVelocityDegreesPerSec(0.0f);
+            MBED_WARN_ON_ERROR(setVelocityDegreesPerSec(0.0f));
             break;
 
         case positionPID:
             m_positionPIDController.reset();
             m_controlMode = positionPID;
-            setAngleDegrees(getAngleDegrees());
+            MBED_WARN_ON_ERROR(setAngleDegrees(getAngleDegrees()));
             break;
 
         default:
@@ -74,12 +74,12 @@ mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && dutyCycle < 0.0f) ||
-        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && dutyCycle > 0.0f)) {
+    if ((m_limSwitchMin == 0 && dutyCycle < 0.0f) ||
+        (m_limSwitchMax == 0 && dutyCycle > 0.0f)) {
         dutyCycle = 0.0f;
     }
 
-    m_motor.setSpeed(dutyCycle);
+    m_motor.setDutyCycle(dutyCycle);
 
     return MBED_SUCCESS;
 }
@@ -89,8 +89,8 @@ mbed_error_status_t ArmJointController::setVelocityDegreesPerSec(float velocityD
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && velocityDegreesPerSec < 0.0f) ||
-        (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && velocityDegreesPerSec > 0.0f)) {
+    if (((m_limSwitchMin == 0 || getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees) && velocityDegreesPerSec < 0.0f) ||
+        ((m_limSwitchMax == 0 || getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees) && velocityDegreesPerSec > 0.0f)) {
         velocityDegreesPerSec = 0.0f;
     }
 
@@ -122,9 +122,9 @@ void ArmJointController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
-            if ((getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees && m_motor.getSpeed() < 0.0f) ||
-                (getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees && m_motor.getSpeed() > 0.0f)) {
-                m_motor.setSpeed(0.0f);
+            if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
+                (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
+                m_motor.getDutyCycle() = 0.0f;
             }
 
             break;
@@ -132,14 +132,14 @@ void ArmJointController::update() {
         case velocityPID:
             m_velocityPIDController.setInterval(interval);
             m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
-            m_motor.setSpeed(m_velocityPIDController.compute());
+            m_motor.setDutyCycle(m_velocityPIDController.compute());
 
             break;
 
         case positionPID:
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getAngleDegrees());
-            m_motor.setSpeed(m_positionPIDController.compute());
+            m_motor.setDutyCycle(m_positionPIDController.compute());
 
             break;
     }
