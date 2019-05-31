@@ -283,6 +283,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setWristRollMotion:
             handleSetWristRollMotion(p_newMsg);
+            break;
 
         case setClawControlMode:
             handleSetClawControlMode(p_newMsg);
@@ -290,6 +291,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setClawMotion:
             handleSetClawMotion(p_newMsg);
+            break;
 
         default:
             pc.printf("Recieved unimplemented command\r\n");

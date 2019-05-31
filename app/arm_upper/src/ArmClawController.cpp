@@ -45,12 +45,11 @@ mbed_error_status_t ArmClawController::setControlMode(ArmClawController::t_clawC
 }
 
 mbed_error_status_t ArmClawController::setMotorDutyCycle(float dutyCycle) {
-    if (m_controlMode != motorDutyCycle || !m_encoderEndpointCalibrated) {
+    if (m_controlMode != motorDutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if ((getSeparationDistanceCm() < m_armClawConfig.minInputSeparationDistanceCm && dutyCycle < 0.0f) ||
-        (getSeparationDistanceCm() > m_armClawConfig.maxInputSeparationDistanceCm && dutyCycle > 0.0f)) {
+    if (m_limitSwitch == 0 && dutyCycle > 0.0f) {
         dutyCycle = 0.0f;
     }
 
