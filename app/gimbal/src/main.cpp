@@ -36,8 +36,8 @@ void printCANMsg(CANMessage& msg) {
 }
 
 enum gimbalCommand {
+	setStepYaw = ROVER_GIMBAL_CANID,
     setStepPitch,
-	setStepYaw,
 };
 
 void initCAN() {
@@ -78,13 +78,16 @@ bool handleStepYaw(CANMsg *p_newMsg){
 
     if (right) {
         moveRight();
+        pc.printf("received move right\r\n");
     } else { // left
         moveLeft();
+        pc.printf("received move left\r\n");
     }
     return right;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+    pc.printf("received CAN\r\n");
     if (p_newMsg->id == setStepYaw) {
 		handleStepYaw(p_newMsg);
     } else {
@@ -98,8 +101,9 @@ int main(void)
     pc.printf("Program Started\r\n\r\n");
 
     initCAN();
-
+    servo_yaw = 0.5;
     while (1) {
+        
         if (can.read(rxMsg)) {
             processCANMsg(&rxMsg);
             rxMsg.clear();
