@@ -81,7 +81,7 @@ mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
 
     m_motor.setDutyCycle(dutyCycle);
 
-    printf("Set arm wrist motor duty cycle to %d");
+//    printf("Set arm wrist motor duty cycle to %d");
 
     return MBED_SUCCESS;
 }
@@ -122,7 +122,7 @@ void ArmJointController::update() {
     float interval = timer.read();
     timer.reset();
 
-    printf("Control mode is %d\r\n", m_controlMode);
+//    printf("Control mode is %d\r\n", m_controlMode);
 
     switch (m_controlMode) {
         case motorDutyCycle:
@@ -131,7 +131,7 @@ void ArmJointController::update() {
                 m_motor.setDutyCycle(0.0f);
             }
 
-            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getDutyCycle());
+//            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getDutyCycle());
 
             break;
 
@@ -140,7 +140,7 @@ void ArmJointController::update() {
             m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
             m_motor.setDutyCycle(m_velocityPIDController.compute());
 
-            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getDutyCycle();
+//            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getDutyCycle();
 
             break;
 
@@ -149,7 +149,7 @@ void ArmJointController::update() {
             m_positionPIDController.setProcessValue(getAngleDegrees());
             m_motor.setDutyCycle(m_positionPIDController.compute());
 
-            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getDutyCycle();
+//            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getDutyCycle();
 
             break;
     }
@@ -168,5 +168,9 @@ void ArmJointController::initializePIDControllers(void) {
     m_positionPIDController.setOutputLimits(m_armJointConfig.minOutputMotorDutyCycle, m_armJointConfig.maxOutputMotorDutyCycle);
     m_positionPIDController.setBias(m_armJointConfig.positionPID.bias);
     m_positionPIDController.setMode(PID_AUTO_MODE);
+}
+
+float ArmJointController::getMotorDutyCycle() {
+    return m_motor.getDutyCycle();
 }
 

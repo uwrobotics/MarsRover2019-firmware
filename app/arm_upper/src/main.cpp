@@ -189,7 +189,7 @@ ArmJointController::t_jointControlMode handleSetWristControlMode(CANMsg *p_newMs
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(wristController.setControlMode(controlMode));
-    printf("Set wrist control mode to %d\r\n", wristController.getControlMode());
+    PRINT_INFO("Set wrist control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -199,7 +199,7 @@ ArmClawController::t_clawControlMode handleSetClawControlMode(CANMsg *p_newMsg) 
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(clawController.setControlMode(controlMode));
-    printf("Set claw control mode to %d\r\n", wristController.getControlMode());
+    PRINT_INFO("Set claw control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -225,7 +225,7 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
             break;
     }
 
-    printf("Set wrist motion to %d\r\n", motionData);
+    PRINT_INFO("Set wrist pitch motion data to %f with control mode %d\r\n", motionData, controlMode);
     return motionData;
 }
 
@@ -250,6 +250,8 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set wrist roll motion data to %f with control mode %d\r\n", motionData, controlMode);
+
     return motionData;
 }
 
@@ -270,10 +272,15 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set claw motion data to %f with control mode %d\r\n", motionData, controlMode);
+
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+
+//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+
     switch (p_newMsg->id) {
 
         case setWristControlMode:
@@ -325,10 +332,13 @@ void sendJetsonInfo() {
 
 int main(void)
 {
-    pc.printf("Program Started\r\n\r\n");
+    PRINT_INFO("Upper arm program Started\r\n\r\n");
 
     initCAN();
     canSendTimer.start();
+
+    wristController.setControlMode(ArmJointController::motorDutyCycle);
+    clawController.setControlMode(ArmClawController::motorDutyCycle);
 
 //    MBED_WARN_ON_ERROR(clawController.runEndpointCalibration());
 

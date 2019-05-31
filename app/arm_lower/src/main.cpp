@@ -146,6 +146,7 @@ ArmJointController elbowController(elbowConfig, ArmJointController::velocityPID)
 ArmJointController* p_armJointControllers[3];
 
 Timer              canSendTimer;
+Timer              canWatchDog;
 
 enum t_joint {
     turnTable,
@@ -192,7 +193,7 @@ ArmJointController::t_jointControlMode handleSetControlMode(t_joint joint, CANMs
 
     MBED_WARN_ON_ERROR(p_armJointControllers[joint]->setControlMode(controlMode));
 
-    printf("Joint %d control mode set to %d\r\n", joint, controlMode);
+    PRINT_INFO("Joint %d control mode set to %d\r\n", joint, controlMode);
 
     return controlMode;
 }
@@ -215,19 +216,22 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             break;
     }
 
-    printf("Set joint %d motion data to %d\r\n", joint, motionData);
+    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
 
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+
+//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+
     switch (p_newMsg->id) {
         case setTurnTableControlMode:
-            printf("Turn table control mode set to %d\r\n", handleSetControlMode(turnTable, p_newMsg));
+            handleSetControlMode(turnTable, p_newMsg);
             break;
 
         case setTurnTableMotion:
-            printf("Turn table motion set to %f\r\n", handleSetMotion(turnTable, p_newMsg));
+            handleSetMotion(turnTable, p_newMsg);
 
         case setShoulderControlMode:
             handleSetControlMode(shoulder, p_newMsg);
@@ -271,7 +275,7 @@ void sendJointAngles() {
             // pc.printf("Sent joint %d angle to jetson\r\n", i);
         }
         else {
-            pc.printf("ERROR: CAN now write!\r\n");
+            pc.printf("ERROR: CAN not write!\r\n");
         }
     }
 }
@@ -282,15 +286,21 @@ int main(void)
     p_armJointControllers[shoulder]  = &shoulderController;
     p_armJointControllers[elbow]     = &elbowController;
 
-    pc.printf("Program Started\r\n\r\n");
+    PRINT_INFO("Lower arm program Started\r\n\r\n");
 
     initCAN();
 
+    turnTableController.setControlMode(ArmJointController::motorDutyCycle);
+    shoulderController.setControlMode(ArmJointController::motorDutyCycle);
+    elbowController.setControlMode(ArmJointController::motorDutyCycle);
+
     canSendTimer.start();
+    canWatchDog.start();
 
     while (1) {
 
         if (can.read(rxMsg)) {
+            canWatchDog.reset();
             processCANMsg(&rxMsg);
             rxMsg.clear();
             ledCAN = !ledCAN;

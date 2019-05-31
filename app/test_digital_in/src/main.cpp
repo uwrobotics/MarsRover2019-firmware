@@ -1,7 +1,7 @@
 #include "mbed.h"
 
 DigitalOut ledA(LED1);
-DigitalIn  digIn(LIM_1A);
+DigitalIn  digIn(LIM_3A);
 Serial pc(SERIAL_TX, SERIAL_RX);
 
 int main() {

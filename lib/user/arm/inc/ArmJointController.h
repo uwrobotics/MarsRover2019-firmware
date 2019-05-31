@@ -55,6 +55,8 @@ public:
 
     t_jointControlMode getControlMode();
 
+    float getMotorDutyCycle();
+
     float getAngleDegrees();
 
     float getAngleVelocityDegreesPerSec();
