@@ -52,6 +52,9 @@ typedef enum {
 } ALTx;
 
 typedef enum {
+    // Not connected
+    NOT_CONNECTED = (int)0xFFFFFFFF,
+
     PA_0  = 0x00,
     PA_1  = 0x01,
     PA_2  = 0x02,
@@ -135,7 +138,7 @@ typedef enum {
     I2C_SDA = PB_7,
 
     // PWM Encoders
-    ENC_A3 = PC_9,
+    ENC_A3 = PA_8,
     ENC_A2 = PA_9,
     ENC_A1 = PA_10,
 
@@ -162,9 +165,7 @@ typedef enum {
     LIM_2A = PB_3,
     LIM_2B = PB_4,
     LIM_3A = PA_11,
-    LIM_3B = PA_12,
-    
-    // TODO: Add remaining pins
+    LIM_3B = PA_12
     
 #endif                              // ARM BOARD PIN MAPPINGS END
 
@@ -295,9 +296,9 @@ typedef enum {
 
     // Generic signals namings
     LED1        = PA_5,
-    LED2        = PA_5,
-    LED3        = PA_5,
-    LED4        = PA_5,
+    LED2        = NOT_CONNECTED,
+    LED3        = NOT_CONNECTED,
+    LED4        = NOT_CONNECTED,
     USER_BUTTON = PC_13,
     // Standardized button names
     BUTTON1 = USER_BUTTON,
@@ -332,7 +333,7 @@ typedef enum {
 #endif                              // NUCLEO BOARD PIN MAPPINGS END
 
     // Not connected
-    NC = (int)0xFFFFFFFF
+    NC = NOT_CONNECTED
     
 } PinName;
 
