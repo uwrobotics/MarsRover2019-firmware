@@ -160,8 +160,9 @@ float read_temp(void){
     return temp_val;
 }
 //sends all the relevant safety data over CAN
+//changed: removed 100A1 (0x54)
 void sendSafetyValues(void){
-    CAN_send(C_100A1_avg, I_100A1);
+    // CAN_send(C_100A1_avg, I_100A1);
     CAN_send(C_100A2_avg, I_100A2);
     CAN_send(C_30A_avg, I_30A);
     CAN_send(bat_avg, V_MONITOR_INDEX);
@@ -198,9 +199,9 @@ int main() {
             canSendTimer.reset();
         }
 		// Take sensor 1 reading
-		new_reading = read_current(A_100A1);
-		C_100A1_avg -= C_100A1_avg/TOTAL_SAMPLE;
-		C_100A1_avg += new_reading/TOTAL_SAMPLE;
+		// new_reading = read_current(A_100A1);
+		// C_100A1_avg -= C_100A1_avg/TOTAL_SAMPLE;
+		// C_100A1_avg += new_reading/TOTAL_SAMPLE;
 
 		// // Take sensor 2 reading
 		new_reading = read_current(A_100A2);
