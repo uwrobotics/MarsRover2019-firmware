@@ -27,8 +27,8 @@ const ArmJointController::t_jointConfig turnTableConfig = {
         .limSwitchMaxPin = LIM_1B,
 
         .velocityPID = {
-                .P    = 0.4f,
-                .I    = 0.2f,
+                .P    = 1.0f,
+                .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f,
                 .interval = 0.05f
@@ -112,7 +112,7 @@ const ArmJointController::t_jointConfig elbowConfig = {
 
         .velocityPID = {
                 .P    = 0.7f,
-                .I    = 0.2f,
+                .I    = 0.05f,
                 .D    = 0.0f,
                 .bias = 0.0f,
                 .interval = 0.05f
@@ -216,14 +216,14 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             break;
     }
 
-//    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
+    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
 
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
 
-    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
 
     switch (p_newMsg->id) {
         case setTurnTableControlMode:
