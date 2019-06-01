@@ -42,8 +42,6 @@ Motor::Motor(t_motorConfig motorConfig) : Motor(motorConfig.pwmPin, motorConfig.
         motorConfig.freqInHz, motorConfig.limit) {}
 
 void Motor::setDutyCycle(float dutyCycle) {
-    PRINT_INFO("Set motor duty cycle to %f\r\n", dutyCycle);
-
     _dir = (dutyCycle > 0.0) != _inverted;
     _pwm = min( (float) fabs(dutyCycle), _limit);
 }

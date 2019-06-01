@@ -25,7 +25,7 @@
 
 // Macros
 #define PRINT_INFO(...) {                   \
-    printf("[%s] INFO:    ", __FILENAME__); \
+    printf("[%s] INFO: ", __FILENAME__); \
     printf(__VA_ARGS__);                    \
 }                                           \
 
