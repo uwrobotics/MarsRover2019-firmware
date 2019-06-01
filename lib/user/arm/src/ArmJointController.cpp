@@ -1,13 +1,12 @@
 /* Controller for the arm base, shoulder and elbow
  */
 
-#include "../inc/ArmJointController.h"
-
 #include "mbed.h"
 #include "Motor.h"
 #include "PwmIn.h"
 #include "PID.h"
 #include "PinNames.h"
+#include "ArmJointController.h"
 
 ArmJointController::ArmJointController(t_jointConfig armJointConfig, t_jointControlMode controlMode) :
         m_controlMode(controlMode), m_armJointConfig(armJointConfig), m_motor(armJointConfig.motor.pwmPin, armJointConfig.motor.dirPin,
@@ -94,7 +93,7 @@ mbed_error_status_t ArmJointController::setVelocityDegreesPerSec(float velocityD
         velocityDegreesPerSec = 0.0f;
     }
 
-    m_positionPIDController.setSetPoint(velocityDegreesPerSec);
+    m_velocityPIDController.setSetPoint(velocityDegreesPerSec);
 
     return MBED_SUCCESS;
 }
@@ -130,9 +129,16 @@ void ArmJointController::update() {
             break;
 
         case velocityPID:
-            m_velocityPIDController.setInterval(interval);
-            m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
-            m_motor.setDutyCycle(m_velocityPIDController.compute());
+
+            if (m_velocityPIDController.getSetPoint() == 0.0f) {
+                m_velocityPIDController.reset();
+                m_motor.setDutyCycle(0.0f);
+            }
+            else {
+                m_velocityPIDController.setInterval(interval);
+                m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
+                m_motor.setDutyCycle(m_velocityPIDController.compute());
+            }
 
             break;
 
@@ -152,12 +158,14 @@ void ArmJointController::initializePIDControllers(void) {
     m_velocityPIDController.setOutputLimits(m_armJointConfig.minOutputMotorDutyCycle, m_armJointConfig.maxOutputMotorDutyCycle);
     m_velocityPIDController.setBias(m_armJointConfig.velocityPID.bias);
     m_velocityPIDController.setMode(PID_AUTO_MODE);
+    m_velocityPIDController.setDeadZoneError(0.05);
 
     // Configure position PID
     m_positionPIDController.setInputLimits(m_armJointConfig.encoder.minAngleDegrees, m_armJointConfig.encoder.maxAngleDegrees);
     m_positionPIDController.setOutputLimits(m_armJointConfig.minOutputMotorDutyCycle, m_armJointConfig.maxOutputMotorDutyCycle);
     m_positionPIDController.setBias(m_armJointConfig.positionPID.bias);
     m_positionPIDController.setMode(PID_AUTO_MODE);
+    m_velocityPIDController.setDeadZoneError(0.01);
 }
 
 float ArmJointController::getMotorDutyCycle() {
