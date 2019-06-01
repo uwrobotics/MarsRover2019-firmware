@@ -193,7 +193,7 @@ ArmJointController::t_jointControlMode handleSetControlMode(t_joint joint, CANMs
 
     MBED_WARN_ON_ERROR(p_armJointControllers[joint]->setControlMode(controlMode));
 
-    PRINT_INFO("Joint %d control mode set to %d\r\n", joint, controlMode);
+    PRINT_INFO("Set joint %d control mode to %d\r\n", joint, controlMode);
 
     return controlMode;
 }
@@ -216,14 +216,14 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             break;
     }
 
-    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
+//    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
 
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
 
-//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
 
     switch (p_newMsg->id) {
         case setTurnTableControlMode:
@@ -232,6 +232,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setTurnTableMotion:
             handleSetMotion(turnTable, p_newMsg);
+            break;
 
         case setShoulderControlMode:
             handleSetControlMode(shoulder, p_newMsg);
