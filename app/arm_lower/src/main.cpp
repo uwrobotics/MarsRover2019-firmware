@@ -272,12 +272,8 @@ void sendJointAngles() {
         txMsg.id = ROVER_JETSON_START_CANID_MSG_ARM_LOWER + i;
         txMsg << angle;
 
-        if(can.write(txMsg)) {
-            // pc.printf("Sent joint %d angle to jetson\r\n", i);
-        }
-        else {
-            pc.printf("ERROR: CAN not write!\r\n");
-        }
+        MBED_ASSERT_WARN(can.write(txMsg));
+
     }
 }
  
