@@ -316,17 +316,17 @@ void sendJetsonInfo() {
     txMsg.clear();
     txMsg.id = wristPitchDegrees;
     txMsg << wristController.getPitchAngleDegrees();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
     txMsg.clear();
     txMsg.id = wristRollDegrees;
     txMsg << wristController.getRollAngleDegrees();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
     txMsg.clear();
     txMsg.id = clawSeparationDistanceCm;
     txMsg << clawController.getSeparationDistanceCm();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
 }
 
