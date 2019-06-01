@@ -62,7 +62,7 @@ const ArmWristController::t_armWristConfig wristConfig = {
 
                 .encoder = {
                         .pwmPin = ENC_A2,
-                        .zeroAngleDutyCycle = 0.498f,
+                        .zeroAngleDutyCycle = 0.506f,
                         .minAngleDegrees = -170.0f,
                         .maxAngleDegrees = 170.0f,
                         .inverted = false
@@ -115,7 +115,7 @@ const ArmClawController::t_clawConfig clawConfig = {
                 .inverted = false
         },
 
-        .limitSwitchPin = LIM_3A,
+        .limitSwitchPin = LIM_3B,
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,

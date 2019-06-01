@@ -65,8 +65,8 @@ const ArmJointController::t_jointConfig shoulderConfig = {
                 .inverted = true
         },
 
-        .limSwitchMinPin = LIM_2A,
-        .limSwitchMaxPin = LIM_2B,
+        .limSwitchMinPin = LIM_2B,
+        .limSwitchMaxPin = LIM_2A,
 
         .velocityPID = {
                 .P    = 0.65f,
@@ -107,8 +107,8 @@ const ArmJointController::t_jointConfig elbowConfig = {
                 .inverted = false
         },
 
-        .limSwitchMinPin = LIM_3A,
-        .limSwitchMaxPin = LIM_3B,
+        .limSwitchMinPin = LIM_3B,
+        .limSwitchMaxPin = LIM_3A,
 
         .velocityPID = {
                 .P    = 0.7f,
