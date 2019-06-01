@@ -53,7 +53,6 @@ mbed_error_status_t ArmWristController::setRollVelocityDegreesPerSec(float veloc
 mbed_error_status_t ArmWristController::setPitchVelocityDegreesPerSec(float velocityDegreesPerSec) {
     m_pitchVelocityDegreesPerSec = velocityDegreesPerSec;
     return setVelocities();
-
 }
 
 mbed_error_status_t ArmWristController::setRollAngleDegrees(float angleDegrees) {

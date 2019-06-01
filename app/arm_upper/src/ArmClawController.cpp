@@ -49,9 +49,9 @@ mbed_error_status_t ArmClawController::setMotorDutyCycle(float dutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-//    if (m_limitSwitch == 0 && dutyCycle < 0.0f) {
-//        dutyCycle = 0.0f;
-//    }
+    if (m_limitSwitch == 0 && dutyCycle < 0.0f) {
+        dutyCycle = 0.0f;
+    }
 
     m_motor.setDutyCycle(dutyCycle);
 
@@ -103,9 +103,9 @@ void ArmClawController::update() {
 
     switch (m_controlMode) {
         case motorDutyCycle:
-//            if (false) {
-//                m_motor.setDutyCycle(0.0f);
-//            }
+            if (m_limitSwitch == 0 && m_motor.getDutyCycle() < 0.0f) {
+                setMotorDutyCycle(0.0f);
+            }
 
             break;
 

@@ -74,14 +74,12 @@ mbed_error_status_t ArmJointController::setMotorDutyCycle(float dutyCycle) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-//    if ((m_limSwitchMin == 0 && dutyCycle < 0.0f) ||
-//        (m_limSwitchMax == 0 && dutyCycle > 0.0f)) {
-//        dutyCycle = 0.0f;
-//    }
+    if ((m_limSwitchMin == 0 && dutyCycle < 0.0f) ||
+        (m_limSwitchMax == 0 && dutyCycle > 0.0f)) {
+        dutyCycle = 0.0f;
+    }
 
     m_motor.setDutyCycle(dutyCycle);
-
-//    printf("Set arm wrist motor duty cycle to %d");
 
     return MBED_SUCCESS;
 }
@@ -91,8 +89,8 @@ mbed_error_status_t ArmJointController::setVelocityDegreesPerSec(float velocityD
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if (((m_limSwitchMin == 0 || getAngleDegrees() < m_armJointConfig.encoder.minAngleDegrees) && velocityDegreesPerSec < 0.0f) ||
-        ((m_limSwitchMax == 0 || getAngleDegrees() > m_armJointConfig.encoder.maxAngleDegrees) && velocityDegreesPerSec > 0.0f)) {
+    if (((m_limSwitchMin == 0 || getAngleDegrees() <= m_armJointConfig.encoder.minAngleDegrees) && velocityDegreesPerSec < 0.0f) ||
+        ((m_limSwitchMax == 0 || getAngleDegrees() >= m_armJointConfig.encoder.maxAngleDegrees) && velocityDegreesPerSec > 0.0f)) {
         velocityDegreesPerSec = 0.0f;
     }
 
@@ -106,10 +104,10 @@ mbed_error_status_t ArmJointController::setAngleDegrees(float angleDegrees) {
         return MBED_ERROR_INVALID_OPERATION;
     }
 
-    if (angleDegrees < m_armJointConfig.encoder.minAngleDegrees) {
+    if (angleDegrees <= m_armJointConfig.encoder.minAngleDegrees) {
         angleDegrees = m_armJointConfig.encoder.minAngleDegrees;
     }
-    else if (angleDegrees > m_armJointConfig.encoder.maxAngleDegrees) {
+    else if (angleDegrees >= m_armJointConfig.encoder.maxAngleDegrees) {
         angleDegrees = m_armJointConfig.encoder.maxAngleDegrees;
     }
 
@@ -122,16 +120,12 @@ void ArmJointController::update() {
     float interval = timer.read();
     timer.reset();
 
-//    printf("Control mode is %d\r\n", m_controlMode);
-
     switch (m_controlMode) {
         case motorDutyCycle:
-//            if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
-//                (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
-//                m_motor.setDutyCycle(0.0f);
-//            }
-
-//            printf("Motor duty cycle set to %f by motor duty cycle\r\n", m_motor.getDutyCycle());
+            if ((m_limSwitchMin == 0 && m_motor.getDutyCycle() < 0.0f) ||
+                (m_limSwitchMax == 0 && m_motor.getDutyCycle() > 0.0f)) {
+                m_motor.setDutyCycle(0.0f);
+            }
 
             break;
 
@@ -140,16 +134,12 @@ void ArmJointController::update() {
             m_velocityPIDController.setProcessValue(getAngleVelocityDegreesPerSec());
             m_motor.setDutyCycle(m_velocityPIDController.compute());
 
-//            printf("Motor duty cycle set to %f by velocity PID\r\n"), m_motor.getDutyCycle();
-
             break;
 
         case positionPID:
             m_positionPIDController.setInterval(interval);
             m_positionPIDController.setProcessValue(getAngleDegrees());
             m_motor.setDutyCycle(m_positionPIDController.compute());
-
-//            printf("Motor duty cycle set to %f by position PID\r\n"), m_motor.getDutyCycle();
 
             break;
     }
