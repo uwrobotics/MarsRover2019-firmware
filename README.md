@@ -27,16 +27,18 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     
     `git clone https://github.com/uwrobotics/MarsRover2019-firmware.git`
 
-2. Download toolchain (gcc and make)
+2. Download toolchain (gcc and make) and serial interface
    
    For Ubuntu
-    - `sudo apt-get install gcc-arm-none-eabi`
+    - `sudo apt install gcc-arm-none-eabi`
+    - `udo apt install screen` for serial interfacing (or `minicom`)
 		
 	For Windows
     - Download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
     - Download [gcc-arm-none-eabi for windows](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) (windows 32 bit)
     - Add gcc .exe files to path (usually `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
     - Add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`)
+    - Install [PuTTy](https://www.chiark.greenend.org.uk/~sgtatham/putty/) for serial interfacing
 	
 	For Mac
     - Open Command Line
@@ -46,6 +48,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     	`brew tap ARMmbed/homebrew-formulae`
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
+    - Install [ZOC](https://www.emtec.com/zoc/index.html) for serial interfacing
 	
 3. Change directory into root directory
 
@@ -108,3 +111,14 @@ The ST-LINK debugger can then be connected via header CN4 (pins 1-5 with 1 neare
 ![](https://github.com/uwrobotics/MarsRover2019-firmware/blob/master/Nucleo_Labels.PNG)
 
 After deploying the binary to the board, the Nucleo's `LD1` LED will flash red and green. Programming is complete when the LED stays green, so don't powercycle the board before this.
+
+## Serial Communication
+
+The boards can be communicated with through the serial interface exposed through the debug pins. You can use the USB-serial interface built into the Nucleo dev boards to communicate with the control boards by connecting the TX pin to the board's RX pin and the RX pin to the board's TX pin (transmit to recieve and vice versa). 
+
+On Ubuntu
+- Run `screen /dev/serial/by-id/usb-STM* 115200` from the terminal
+
+On Windows
+- Device manager, go to Ports (COM & LPT) and find the name of the Nucleo port (ie COM4)
+- Open PuTTy, select the Serial radio button, enter the COM port name and the baud rate (default 115200) and click open
