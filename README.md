@@ -31,7 +31,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
    
    For Ubuntu
     - `sudo apt install gcc-arm-none-eabi`
-    - `udo apt install screen` for serial interfacing (or `minicom`)
+    - `sudo apt install screen` for serial interfacing (or `minicom`)
 		
 	For Windows
     - Download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
@@ -59,11 +59,16 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     Ex. Compile the science application for the science board:  
     `make APP=science BOARD=science`
 
-    Ex. Compile the CAN test application for the nucleo development board:  
-    `make APP=test_i2c BOARD=nucleo`
-
-    Ex. Compile the I2C test application for the safety board:  
+    Ex. Compile the CAN test application for the safety board:  
     `make APP=test_can BOARD=safety`
+    
+    Ex. Compile the Serial test application for the nucleo development board:  
+    `make APP=test_serial BOARD=nucleo`
+    
+    After compiling an application you should see a message similar to the following:  
+    `===== bin file ready to flash: ../build/test_serial/test_serial_nucleo.bin =====`
+    
+    *Note*: If you are going through this README as part of the firmware training tutorial you can now go back to where you left off in the document.
 
 5. Deploy onto board (see below for how to connect to a board)
 
