@@ -27,16 +27,18 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     
     `git clone https://github.com/uwrobotics/MarsRover2019-firmware.git`
 
-2. Download toolchain (gcc and make)
+2. Download toolchain (gcc and make) and serial interface
    
-   For Ubuntu 16.04
-    - `sudo apt-get install gcc-arm-none-eabi`
+   For Ubuntu
+    - `sudo apt install gcc-arm-none-eabi`
+    - `sudo apt install screen` for serial interfacing (or `minicom`)
 		
 	For Windows
     - Download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
     - Download [gcc-arm-none-eabi for windows](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) (windows 32 bit)
     - Add gcc .exe files to path (usually `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
     - Add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`)
+    - Install [PuTTy](https://www.chiark.greenend.org.uk/~sgtatham/putty/) for serial interfacing
 	
 	For Mac
     - Open Command Line
@@ -46,6 +48,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     	`brew tap ARMmbed/homebrew-formulae`
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
+    - Install [ZOC](https://www.emtec.com/zoc/index.html) for serial interfacing
 	
 3. Change directory into root directory
 
@@ -56,29 +59,35 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     Ex. Compile the science application for the science board:  
     `make APP=science BOARD=science`
 
-    Ex. Compile the CAN test application for the nucleo development board:  
-    `make APP=test_i2c BOARD=nucleo`
-
-    Ex. Compile the I2C test application for the safety board:  
+    Ex. Compile the CAN test application for the safety board:  
     `make APP=test_can BOARD=safety`
+    
+    Ex. Compile the Serial test application for the nucleo development board:  
+    `make APP=test_serial BOARD=nucleo`
+    
+    After compiling an application you should see a message similar to the following:  
+    `===== bin file ready to flash: ../build/test_serial/test_serial_nucleo.bin =====`
+    
+    *Note*: If you are going through this README as part of the firmware training tutorial you can now go back to where you left off in the document.
 
 5. Deploy onto board (see below for how to connect to a board)
 
     Find the application .bin file, located in the build/app directory.
 
-	For Ubuntu 16.04
+	For Ubuntu
 		
     - Install libusb `sudo apt install libusb-1.0-0-dev`
-    - Drag and Drop .bin file into NODE_F091RC folder
+    - Drag and Drop .bin file into NODE_F091RC device folder
 	
 	For Windows
     
+    - Drag and Drop .bin file into NODE_F091RC device folder OR if this does not work or debugging is required:
     - Download [st-link utility](http://www.st.com/content/st_com/en/products/development-tools/software-development-tools/stm32-software-development-tools/stm32-programmers/stsw-link004.html). Scroll down to Get Software
     - connect USB to nucleo board and open st-link utility
     - load code by going to Target->Program and browse for .bin file
 	
 	For Mac
-    - Drag and Drop .bin file into NODE_F091RC disk (Will show up like other usb devices after connecting) or run `cp build/blinky_out.bin /Volumes/NODE_F091RC/`
+    - Drag and Drop .bin file into NODE_F091RC disk
 
     After deploying, the Nucleo will begin to flash red and green. Once the LED stays green, power-cycle the board by unplugging and replugging the 5V connector on the Nucleo.
 
@@ -88,7 +97,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     
 ## Using the Nucleo Dev Board to Program the Rover Boards
 
-In order to use the Nucleo development board as a programmer, the two jumpers labelled NUCLEO - ST-LINK will need to be removed. This will sever the ST-LINK debugger portion of the Nucleo from the MCU side, allowing it to be used as a general debugger.
+In order to use the Nucleo development board as a programmer, the two jumpers (black caps) labelled NUCLEO - ST-LINK will need to be removed. This will sever the ST-LINK debugger portion of the Nucleo from the MCU side, allowing it to be used as a general debugger.
 
 The ST-LINK debugger can then be connected via header CN4 (pins 1-5 with 1 nearest to the SWD label) to a rover board debug header (pins should be labelled) to program it according to the following table:
 
@@ -104,5 +113,17 @@ The ST-LINK debugger can then be connected via header CN4 (pins 1-5 with 1 neare
 | 6 (SWO)               | Not Connected                     |
 +-----------------------+-----------------------------------+
 ```
+![](https://github.com/uwrobotics/MarsRover2019-firmware/blob/master/Nucleo_Labels.PNG)
 
 After deploying the binary to the board, the Nucleo's `LD1` LED will flash red and green. Programming is complete when the LED stays green, so don't powercycle the board before this.
+
+## Serial Communication
+
+The boards can be communicated with through the serial interface exposed through the debug pins. You can use the USB-serial interface built into the Nucleo dev boards to communicate with the control boards by connecting the TX pin to the board's RX pin and the RX pin to the board's TX pin (transmit to recieve and vice versa). 
+
+On Ubuntu
+- Run `screen /dev/serial/by-id/usb-STM* 115200` from the terminal
+
+On Windows
+- Device manager, go to Ports (COM & LPT) and find the name of the Nucleo port (ie COM4)
+- Open PuTTy, select the Serial radio button, enter the COM port name and the baud rate (default 115200) and click open

@@ -65,6 +65,12 @@ class PID {
 
 public:
 
+    typedef struct {
+        float P, I, D, bias;
+        float interval;
+
+    } t_pidConfig;
+
     /**
      * Constructor.
      *
@@ -148,6 +154,12 @@ public:
     void setBias(float bias);
 
     /**
+     * Set the dead zone error to allow error to round down if within +/- this value
+     * @param error Round error down to 0.0 if error is within +/- this value
+     */
+    void setDeadZoneError(float error);
+
+    /**
      * PID calculation.
      *
      * @return The controller output as a float between outMin and outMax.
@@ -163,6 +175,7 @@ public:
     float getPParam();
     float getIParam();
     float getDParam();
+    float getSetPoint();
 
 private:
 
@@ -199,6 +212,8 @@ private:
 
     //The accumulated error, i.e. integral.
     float accError_;
+    //The allowed error range for error to be rounded to 0.0
+    float deadZoneError_;
     //The controller output bias.
     float bias_;
 

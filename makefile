@@ -352,15 +352,19 @@ LD_SYS_LIBS := -Wl,--start-group -lstdc++ -lsupc++ -lm -lc -lgcc -lnosys  -Wl,--
 
 .PHONY: all
 
+ifneq ($(OS),Windows_NT)
 all: compile_flags $(APP_OUT_PATH)/$(PROJECT).bin # $(APP_OUT_PATH)/$(PROJECT).hex
+else
+all: $(APP_OUT_PATH)/$(PROJECT).bin # $(APP_OUT_PATH)/$(PROJECT).hex size
+endif
 
 .PHONY: force
 
-#ifneq($(OS),Windows_NT)
+ifneq ($(OS),Windows_NT)
 compile_flags: force
 	+@echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) | cmp -s - $@ && echo "Compile flags unmodified: No flag dependent files to recompile." \
 		|| (echo $(COMPILE_FLAGS_TO_TRIGGER_TOUCH) > $@ && touch $(TOUCH_ON_COMPILE_FLAGS_CHANGE))
-#endif
+endif
 
 .s.o:
 	+@$(call MAKE_DIR,$(dir $@))

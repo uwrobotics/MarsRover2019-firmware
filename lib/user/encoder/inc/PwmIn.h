@@ -23,8 +23,8 @@
 #ifndef MBED_PWMIN_H
 #define MBED_PWMIN_H
 
-#ifndef PWM_IN_AVERAGE_COUNT_DEFAULT
-#define PWM_IN_AVERAGE_COUNT_DEFAULT 4
+#ifndef PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE
+#define PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE 12
 #endif
 
 #include "mbed.h"
@@ -37,19 +37,23 @@
  * @note uses InterruptIn, so not available on p19/p20
  */
 class PwmIn {
+
 public:
-    /** Create a PwmIn with the default number of pulses for averaging
-     *
-     * @param pwmSense The pwm input pin (must support InterruptIn)
-     */ 
-    PwmIn(PinName pwmSense);
+
+    typedef struct {
+        PinName pwmPin;
+        float zeroAngleDutyCycle;
+        float minAngleDegrees;
+        float maxAngleDegrees;
+        bool inverted;
+    } t_absoluteEncoderConfig;
 
     /** Create a PwmIn with a specified number of pulses to average
      *
      * @param pwmSense           The pwm input pin (must support InterruptIn)
      * @param numSamplesToAverage The number of PWM measurements to sum before averaging
      */ 
-    PwmIn(PinName pwmSense, int numSamplesToAverage);
+    PwmIn(PinName pwmSense, int numSamplesToAverage = PWM_IN_DEFAULT_NUM_SAMPLES_TO_AVERAGE);
 
     ~PwmIn();
     
@@ -89,19 +93,25 @@ public:
      */
     float avgDutyCycle();
 
+    /** Read the average duty cycle velocity
+     *
+     * @returns the average duty cycle velocity as a 0.0-1.0 percentage/second
+     */
+    float avgDutyCycleVelocity();
+
 protected:
     
     InterruptIn _pwmSense;
     Timer _timer;
 
     float _pulseWidth, _period;
-    float _avgPulseWidth, _avgPeriod;
+    float _avgPulseWidth, _avgPeriod, _avgDutyCycle, _prevAvgDutyCycle, _avgDutyCycleVelocity;
     
     int _sampleCount;
     int _numSamplesToAverage; 
 
-    float * _pulseWidthSamples;
-    float * _periodSamples;
+    float * _p_pulseWidthSamples;
+    float * _p_periodSamples;
 
     float _pulseWidthSampleSum;
     float _periodSampleSum;
@@ -109,6 +119,7 @@ protected:
     void rise();
     void fall();
     float movingAvg(float * p_samples, float * p_sampleSum, float newSample, int newIndex);
+
 };
 
 #endif

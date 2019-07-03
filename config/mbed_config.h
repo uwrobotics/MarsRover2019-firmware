@@ -21,6 +21,40 @@
 #ifndef __MBED_CONFIG_DATA__
 #define __MBED_CONFIG_DATA__
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+
+// Macros
+#define PRINT_INFO(...) {                   \
+    printf("[%s] INFO: ", __FILENAME__); \
+    printf(__VA_ARGS__);                    \
+}                                           \
+
+#define PRINT_WARNING(...) {                \
+    printf("[%s] WARNING: ", __FILENAME__); \
+    printf(__VA_ARGS__);                    \
+}                                           \
+
+#define MBED_WARN_ON_ERROR(functionCall) {                                                      \
+    mbed_error_status_t result = functionCall;                                                  \
+    if (result != MBED_SUCCESS) {                                                               \
+        PRINT_WARNING("Operation '%s' failed with status code %d \r\n", #functionCall, result); \
+    }                                                                                           \
+}                                                                                               \
+
+#define MBED_WARN_AND_RETURN_STATUS_ON_ERROR(functionCall) {                                    \
+    mbed_error_status_t result = functionCall;                                                  \
+    if (result != MBED_SUCCESS) {                                                               \
+        PRINT_WARNING("Operation '%s' failed with status code %d \r\n", #functionCall, result); \
+        return result;                                                                          \
+    }                                                                                           \
+}                                                                                               \
+
+#define MBED_ASSERT_WARN(assertion) {                           \
+    if ((assertion) == false) {                                 \
+        PRINT_WARNING("Failed assertion: %s\r\n", #assertion);  \
+    }                                                           \
+}                                                               \
+
 // Configuration parameters
 #define CLOCK_SOURCE                                        USE_PLL_HSE_EXTC|USE_PLL_HSI            // set by target:NUCLEO_F091RC
 #define LPTICKER_DELAY_TICKS                                1                                       // set by target:NUCLEO_F091RC

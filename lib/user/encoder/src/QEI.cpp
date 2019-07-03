@@ -166,6 +166,10 @@ QEI::QEI(PinName channelA,
 
 }
 
+QEI::QEI(QEI::t_relativeEncoderConfig encoderConfig) :
+    QEI(encoderConfig.channelAPin, encoderConfig.channelBPin, encoderConfig.indexPin,
+    encoderConfig.pulsesPerRevolution, encoderConfig.encoding) {}
+
 void QEI::reset(void) {
 
     pulses_      = 0;

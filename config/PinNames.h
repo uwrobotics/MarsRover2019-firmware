@@ -33,6 +33,7 @@
 
 #include "cmsis.h"
 #include "PinNamesTypes.h"
+#include "mbed_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +52,9 @@ typedef enum {
 } ALTx;
 
 typedef enum {
+    // Not connected
+    NOT_CONNECTED = (int)0xFFFFFFFF,
+
     PA_0  = 0x00,
     PA_1  = 0x01,
     PA_2  = 0x02,
@@ -80,10 +84,10 @@ typedef enum {
     PB_3  = 0x13,
     PB_4  = 0x14,
     PB_5  = 0x15,
-    PB_6  = 0x16,
-    PB_7  = 0x17,
-    PB_8  = 0x18,
-    PB_9  = 0x19,
+    PB_6 = 0x16,
+    PB_7 = 0x17,
+    PB_8 = 0x18,
+    PB_9 = 0x19,
     PB_10 = 0x1A,
     PB_11 = 0x1B,
     PB_12 = 0x1C,
@@ -94,18 +98,18 @@ typedef enum {
     PB_15_ALT0 = PB_15 | ALT0,
     PB_15_ALT1 = PB_15 | ALT1,
 
-    PC_0  = 0x20,
+    PC_0 = 0x20,
     PC_0_ALT0 = PC_0 | ALT0,
-    PC_1  = 0x21,
+    PC_1 = 0x21,
     PC_1_ALT0 = PC_1 | ALT0,
-    PC_2  = 0x22,
-    PC_3  = 0x23,
-    PC_4  = 0x24,
-    PC_5  = 0x25,
-    PC_6  = 0x26,
-    PC_7  = 0x27,
-    PC_8  = 0x28,
-    PC_9  = 0x29,
+    PC_2 = 0x22,
+    PC_3 = 0x23,
+    PC_4 = 0x24,
+    PC_5 = 0x25,
+    PC_6 = 0x26,
+    PC_7 = 0x27,
+    PC_8 = 0x28,
+    PC_9 = 0x29,
     PC_10 = 0x2A,
     PC_10_ALT0 = PC_10 | ALT0,
     PC_11 = 0x2B,
@@ -115,10 +119,10 @@ typedef enum {
     PC_14 = 0x2E,
     PC_15 = 0x2F,
 
-    PD_2  = 0x32,
+    PD_2 = 0x32,
 
-    PF_0  = 0x50,
-    PF_1  = 0x51,
+    PF_0 = 0x50,
+    PF_1 = 0x51,
     PF_11 = 0x5B,
 
     // ADC internal channels
@@ -134,7 +138,7 @@ typedef enum {
     I2C_SDA = PB_7,
 
     // PWM Encoders
-    ENC_A3 = PC_9,
+    ENC_A3 = PA_8,
     ENC_A2 = PA_9,
     ENC_A1 = PA_10,
 
@@ -152,26 +156,63 @@ typedef enum {
     MOTOR3_DIR = PC_8,
 
     // Buttons
-    SW2 = PA_0,
-    SW3 = PA_1,
-    
-    // TODO: Add remaining pins
-    
+    BUTTON_1 = PA_0,
+    BUTTON_2 = PA_1,
+
+    // Limit switches
+    LIM_1A = PB_11,
+    LIM_1B = PB_12,
+    LIM_2A = PB_3,
+    LIM_2B = PB_4,
+    LIM_3A = PA_11,
+    LIM_3B = PA_12,
+
 #endif                              // ARM BOARD PIN MAPPINGS END
 
 
 #ifdef ROVERBOARD_SCIENCE_PINMAP    // SCIENCE BOARD PIN MAPPINGS BEGIN
 #define ROVERBOARD_COMMON_PINMAP
 
-    // Elevator encoders
-    E_E_CH1 = PB_0,
-    E_E_CH2 = PB_1,
-    E_E_INDEX = PB_2,
+    // PWM Output
+    MOTOR_A = PB_15,		// Auger
+    MOTOR_A_DIR = PC_6,
+    MOTOR_C = PC_7,			// Centrifuge
+    MOTOR_C_DIR = PC_8,
+    MOTOR_E = PB_13,		// Elevator
+    MOTOR_E_DIR = PB_14,
+	SERVO_F = PA_9,			// Funnel
+	SERVO_P = PC_9,			// Probe
 
-    // Centrifuge encoder,
-    E_C_CH1 = PA_7,
-    E_C_CH2 = PC_4,
-    E_C_INDEX = PC_5,
+    // Elevator encoders
+    ENC_E_CH1 = PB_0,
+    ENC_E_CH2 = PB_1,
+    ENC_E_INDEX = PB_2,
+
+	// Centrifuge encoder,
+	ENC_C_CH1 = PA_7,
+	ENC_C_CH2 = PC_4,
+	ENC_C_INDEX = PC_5,
+
+    // Limit Switches
+    E_LS_T = PA_11,
+    E_LS_B = PA_12,
+    C_LS = PA_8,
+
+    // Moisture sensor
+	MOIST_PWR = PA_4,
+	MOIST_DATA = PA_5,
+
+	// Temperature sensor
+	TEMP_DATA = PB_12,
+
+	// Ultrasonic sensors,
+	ULTRA_TRIG_1 = PB_10,
+	ULTRA_ECHO_1 = PB_11,
+	ULTRA_TRIG_2 = PA_2,
+	ULTRA_ECHO_2 = PA_3,
+
+	// Neopixel signal
+	NEO_PIXEL_SIGNAL = PB_5,
 
 #endif                              // SCIENCE BOARD PIN MAPPINGS END
 
@@ -217,8 +258,6 @@ typedef enum {
     STDIO_UART_RX = SERIAL_TX,
 #endif
 
-    // TODO: Add more!
-
 #endif                              // COMMON PIN MAPPINGS FOR ROVER BOARDS END
 
     
@@ -262,9 +301,9 @@ typedef enum {
 
     // Generic signals namings
     LED1        = PA_5,
-    LED2        = PA_5,
-    LED3        = PA_5,
-    LED4        = PA_5,
+    LED2        = NOT_CONNECTED,
+    LED3        = NOT_CONNECTED,
+    LED4        = NOT_CONNECTED,
     USER_BUTTON = PC_13,
     // Standardized button names
     BUTTON1 = USER_BUTTON,
@@ -299,7 +338,7 @@ typedef enum {
 #endif                              // NUCLEO BOARD PIN MAPPINGS END
 
     // Not connected
-    NC = (int)0xFFFFFFFF
+    NC = NOT_CONNECTED
     
 } PinName;
 

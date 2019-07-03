@@ -57,7 +57,7 @@ void printMsg(CANMessage& msg) {
  
 int main(void)
 {
-    can.frequency(1000000); // set bit rate to 1Mbps
+    can.frequency(500000); // set bit rate to 50kbps
 #if defined(BOARD1)
     led = 1;                // turn the LED on
     timer.start();          // start timer
@@ -68,7 +68,7 @@ int main(void)
 #endif
     while(1) {
         if(timer.read_ms() >= 1000) {    // check for timeout
-            timer.stop();                // stop timer
+//            timer.stop();                // stop timer
             timer.reset();               // reset timer
             counter++;                   // increment counter
             txMsg.clear();               // clear Tx message storage
