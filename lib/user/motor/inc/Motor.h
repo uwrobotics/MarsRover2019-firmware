@@ -60,16 +60,16 @@ public:
 
     /** Set the speed of the motor
      * 
-     * @param speed The speed of the motor as a normalised value between -1.0 and 1.0
+     * @param dutyCycle The speed of the motor as a normalised value between -1.0 and 1.0
      */
-    void setSpeed(float speed);
-    Motor& operator=(int speed);
+    void setDutyCycle(float dutyCycle);
+    Motor& operator=(int dutyCycle);
 
     /** Read the current speed of the motor
      * 
      * @return Current speed of motor
      */
-    float getSpeed();
+    float getDutyCycle();
  
 protected:
     PwmOut _pwm;

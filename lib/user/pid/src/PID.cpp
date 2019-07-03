@@ -47,6 +47,7 @@
 /**
  * Includes
  */
+
 #include "PID.h"
 
 PID::PID(float Kc, float tauI, float tauD, float interval) {
@@ -332,4 +333,8 @@ float PID::getDParam() {
 
     return dParam_;
 
+}
+
+float PID::getSetPoint() {
+    return setPoint_;
 }

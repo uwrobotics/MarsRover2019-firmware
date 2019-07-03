@@ -44,7 +44,7 @@ public:
      */
     template<class T>
     CANMsg &operator<<(const T val) {
-        MBED_ASSERT(len + sizeof(T) <= 8);
+        MBED_ASSERT_WARN(len + sizeof(T) <= 8);
         *reinterpret_cast<T*>(&data[len]) = val;
         len += sizeof(T);
         return *this;
@@ -54,7 +54,7 @@ public:
      */
     template<class T>
     CANMsg &operator>>(T& val) {
-        MBED_ASSERT(sizeof(T) <= len);
+        MBED_ASSERT_WARN(sizeof(T) <= len);
         val = *reinterpret_cast<T*>(&data[0]);
         len -= sizeof(T);
         memcpy(data, data + sizeof(T), len);

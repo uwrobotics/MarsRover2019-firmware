@@ -20,11 +20,14 @@ const ArmWristController::t_armWristConfig wristConfig = {
 
                 .encoder = {
                         .pwmPin = ENC_A1,
-                        .zeroAngleDutyCycle = 0.50f,
-                        .minAngleDegrees = -162.0f,
-                        .maxAngleDegrees = 162.0f,
+                        .zeroAngleDutyCycle = 0.497f,
+                        .minAngleDegrees = -170.0f,
+                        .maxAngleDegrees = 170.0f,
                         .inverted = true
                 },
+
+                .limSwitchMinPin = LIM_1A,
+                .limSwitchMaxPin = LIM_1B,
 
                 .velocityPID = {
                         .P    = 0.15f,
@@ -59,11 +62,14 @@ const ArmWristController::t_armWristConfig wristConfig = {
 
                 .encoder = {
                         .pwmPin = ENC_A2,
-                        .zeroAngleDutyCycle = 0.50f,
-                        .minAngleDegrees = -162.0f,
-                        .maxAngleDegrees = 162.0f,
+                        .zeroAngleDutyCycle = 0.506f,
+                        .minAngleDegrees = -170.0f,
+                        .maxAngleDegrees = 170.0f,
                         .inverted = false
                 },
+
+                .limSwitchMinPin = LIM_2A,
+                .limSwitchMaxPin = LIM_2B,
 
                 .velocityPID = {
                         .P    = 0.3f,
@@ -94,7 +100,7 @@ const ArmClawController::t_clawConfig clawConfig = {
         .motor = {
                 .pwmPin   = MOTOR3,
                 .dirPin   = MOTOR3_DIR,
-                .inverted = true,
+                .inverted = false,
                 .freqInHz = MOTOR_DEFAULT_FREQUENCY_HZ,
                 .limit = 1.0
         },
@@ -109,7 +115,7 @@ const ArmClawController::t_clawConfig clawConfig = {
                 .inverted = false
         },
 
-        .limitSwitchPin = LIM_1A, // CHECK
+        .limitSwitchPin = LIM_3B,
 
         .calibrationDutyCycle = 0.2f,
         .calibrationTimeoutSeconds = 7.0f,
@@ -183,6 +189,7 @@ ArmJointController::t_jointControlMode handleSetWristControlMode(CANMsg *p_newMs
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(wristController.setControlMode(controlMode));
+    PRINT_INFO("Set wrist control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -192,6 +199,7 @@ ArmClawController::t_clawControlMode handleSetClawControlMode(CANMsg *p_newMsg) 
     *p_newMsg >> controlMode;
 
     MBED_WARN_ON_ERROR(clawController.setControlMode(controlMode));
+    PRINT_INFO("Set claw control mode to %d\r\n", wristController.getControlMode());
 
     return controlMode;
 }
@@ -217,6 +225,7 @@ float handleSetWristPitchMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set wrist pitch motion data to %f with control mode %d\r\n", motionData, controlMode);
     return motionData;
 }
 
@@ -241,6 +250,8 @@ float handleSetWristRollMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set wrist roll motion data to %f with control mode %d\r\n", motionData, controlMode);
+
     return motionData;
 }
 
@@ -261,10 +272,15 @@ float handleSetClawMotion(CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set claw motion data to %f with control mode %d\r\n", motionData, controlMode);
+
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+
+//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+
     switch (p_newMsg->id) {
 
         case setWristControlMode:
@@ -277,6 +293,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setWristRollMotion:
             handleSetWristRollMotion(p_newMsg);
+            break;
 
         case setClawControlMode:
             handleSetClawControlMode(p_newMsg);
@@ -284,6 +301,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setClawMotion:
             handleSetClawMotion(p_newMsg);
+            break;
 
         default:
             pc.printf("Recieved unimplemented command\r\n");
@@ -298,27 +316,31 @@ void sendJetsonInfo() {
     txMsg.clear();
     txMsg.id = wristPitchDegrees;
     txMsg << wristController.getPitchAngleDegrees();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
     txMsg.clear();
     txMsg.id = wristRollDegrees;
     txMsg << wristController.getRollAngleDegrees();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
     txMsg.clear();
     txMsg.id = clawSeparationDistanceCm;
     txMsg << clawController.getSeparationDistanceCm();
-    MBED_ASSERT(can.write(txMsg) == true);
+    MBED_ASSERT_WARN(can.write(txMsg));
 
 }
 
 int main(void)
 {
-    pc.printf("Program Started\r\n\r\n");
+    PRINT_INFO("Upper arm program Started\r\n\r\n");
 
     initCAN();
-
     canSendTimer.start();
+
+    wristController.setControlMode(ArmJointController::motorDutyCycle);
+    clawController.setControlMode(ArmClawController::motorDutyCycle);
+
+//    MBED_WARN_ON_ERROR(clawController.runEndpointCalibration());
 
     while (1) {
 

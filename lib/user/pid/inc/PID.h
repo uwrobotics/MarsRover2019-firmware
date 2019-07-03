@@ -175,6 +175,7 @@ public:
     float getPParam();
     float getIParam();
     float getDParam();
+    float getSetPoint();
 
 private:
 

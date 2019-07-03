@@ -17,15 +17,18 @@ const ArmJointController::t_jointConfig turnTableConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A1,
-                .zeroAngleDutyCycle = 0.5f,
-                .minAngleDegrees = -90.0f,
-                .maxAngleDegrees = 90.0f,
+                .zeroAngleDutyCycle = 0.502f,
+                .minAngleDegrees = -100.0f,
+                .maxAngleDegrees = 100.0f,
                 .inverted = true
         },
 
+        .limSwitchMinPin = LIM_1A,
+        .limSwitchMaxPin = LIM_1B,
+
         .velocityPID = {
-                .P    = 0.4f,
-                .I    = 0.2f,
+                .P    = 1.0f,
+                .I    = 0.0f,
                 .D    = 0.0f,
                 .bias = 0.0f,
                 .interval = 0.05f
@@ -56,11 +59,14 @@ const ArmJointController::t_jointConfig shoulderConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A2,
-                .zeroAngleDutyCycle = 0.7281f,
-                .minAngleDegrees = -18.7f,
-                .maxAngleDegrees = 139.0f,
+                .zeroAngleDutyCycle = 0.752f,
+                .minAngleDegrees = -1.0f,
+                .maxAngleDegrees = 140.0f,
                 .inverted = true
         },
+
+        .limSwitchMinPin = LIM_2B,
+        .limSwitchMaxPin = LIM_2A,
 
         .velocityPID = {
                 .P    = 0.65f,
@@ -95,15 +101,18 @@ const ArmJointController::t_jointConfig elbowConfig = {
 
         .encoder = {
                 .pwmPin = ENC_A3,
-                .zeroAngleDutyCycle = 0.547f,
-                .minAngleDegrees = -160.9f,
-                .maxAngleDegrees = 1.1f,
+                .zeroAngleDutyCycle = 0.755f,
+                .minAngleDegrees = -160.0f,
+                .maxAngleDegrees = 1.0f,
                 .inverted = false
         },
 
+        .limSwitchMinPin = LIM_3B,
+        .limSwitchMaxPin = LIM_3A,
+
         .velocityPID = {
                 .P    = 0.7f,
-                .I    = 0.2f,
+                .I    = 0.05f,
                 .D    = 0.0f,
                 .bias = 0.0f,
                 .interval = 0.05f
@@ -137,6 +146,7 @@ ArmJointController elbowController(elbowConfig, ArmJointController::velocityPID)
 ArmJointController* p_armJointControllers[3];
 
 Timer              canSendTimer;
+Timer              canWatchDog;
 
 enum t_joint {
     turnTable,
@@ -181,7 +191,9 @@ ArmJointController::t_jointControlMode handleSetControlMode(t_joint joint, CANMs
     ArmJointController::t_jointControlMode controlMode;
     *p_newMsg >> controlMode;
 
-    p_armJointControllers[joint]->setControlMode(controlMode);
+    MBED_WARN_ON_ERROR(p_armJointControllers[joint]->setControlMode(controlMode));
+
+    PRINT_INFO("Set joint %d control mode to %d\r\n", joint, controlMode);
 
     return controlMode;
 }
@@ -204,10 +216,15 @@ float handleSetMotion(t_joint joint, CANMsg *p_newMsg) {
             break;
     }
 
+    PRINT_INFO("Set joint %d motion data to %f with control mode %d\r\n", joint, motionData, controlMode);
+
     return motionData;
 }
 
 void processCANMsg(CANMsg *p_newMsg) {
+
+//    PRINT_INFO("Recieved CAN message with ID %X\r\n", p_newMsg->id);
+
     switch (p_newMsg->id) {
         case setTurnTableControlMode:
             handleSetControlMode(turnTable, p_newMsg);
@@ -215,6 +232,7 @@ void processCANMsg(CANMsg *p_newMsg) {
 
         case setTurnTableMotion:
             handleSetMotion(turnTable, p_newMsg);
+            break;
 
         case setShoulderControlMode:
             handleSetControlMode(shoulder, p_newMsg);
@@ -254,12 +272,8 @@ void sendJointAngles() {
         txMsg.id = ROVER_JETSON_START_CANID_MSG_ARM_LOWER + i;
         txMsg << angle;
 
-        if(can.write(txMsg)) {
-            // pc.printf("Sent joint %d angle to jetson\r\n", i);
-        }
-        else {
-            pc.printf("ERROR: CAN now write!\r\n");
-        }
+        MBED_ASSERT_WARN(can.write(txMsg));
+
     }
 }
  
@@ -269,15 +283,21 @@ int main(void)
     p_armJointControllers[shoulder]  = &shoulderController;
     p_armJointControllers[elbow]     = &elbowController;
 
-    pc.printf("Program Started\r\n\r\n");
+    PRINT_INFO("Lower arm program Started\r\n\r\n");
 
     initCAN();
 
+    turnTableController.setControlMode(ArmJointController::motorDutyCycle);
+    shoulderController.setControlMode(ArmJointController::motorDutyCycle);
+    elbowController.setControlMode(ArmJointController::motorDutyCycle);
+
     canSendTimer.start();
+    canWatchDog.start();
 
     while (1) {
 
         if (can.read(rxMsg)) {
+            canWatchDog.reset();
             processCANMsg(&rxMsg);
             rxMsg.clear();
             ledCAN = !ledCAN;

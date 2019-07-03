@@ -25,6 +25,9 @@ public:
         // Joint encoder config
         PwmIn::t_absoluteEncoderConfig encoder;
 
+        // Limit switch config
+        PinName limSwitchMinPin, limSwitchMaxPin;
+
         // PID config
         PID::t_pidConfig velocityPID, positionPID;
 
@@ -52,6 +55,8 @@ public:
 
     t_jointControlMode getControlMode();
 
+    float getMotorDutyCycle();
+
     float getAngleDegrees();
 
     float getAngleVelocityDegreesPerSec();
@@ -67,6 +72,7 @@ private:
 
     Motor m_motor;
     PwmIn m_encoder;
+    DigitalIn m_limSwitchMax, m_limSwitchMin;
 
     PID m_velocityPIDController;
     PID m_positionPIDController;

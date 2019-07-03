@@ -22,7 +22,7 @@ Motor motor(MOTOR_E, MOTOR_E_DIR);
  
 int main() {
 
-    motor.setSpeed(0.2);
+    motor.setDutyCycle(0.2);
 
     while(1){
         wait(0.1);

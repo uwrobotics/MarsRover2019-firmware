@@ -53,7 +53,6 @@ mbed_error_status_t ArmWristController::setRollVelocityDegreesPerSec(float veloc
 mbed_error_status_t ArmWristController::setPitchVelocityDegreesPerSec(float velocityDegreesPerSec) {
     m_pitchVelocityDegreesPerSec = velocityDegreesPerSec;
     return setVelocities();
-
 }
 
 mbed_error_status_t ArmWristController::setRollAngleDegrees(float angleDegrees) {
@@ -86,6 +85,9 @@ void ArmWristController::update() {
 mbed_error_status_t ArmWristController::setMotorSpeeds(void) {
     MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_leftJointController.setMotorDutyCycle(-m_rollMotorSpeed + m_pitchMotorSpeed));
     MBED_WARN_AND_RETURN_STATUS_ON_ERROR(m_rightJointController.setMotorDutyCycle(m_rollMotorSpeed + m_pitchMotorSpeed));
+
+    PRINT_INFO("Set left wrist duty cycle to %f\r\n", m_leftJointController.getMotorDutyCycle());
+    PRINT_INFO("Set right wrist duty cycle to %f\r\n", m_leftJointController.getMotorDutyCycle());
 
     return MBED_SUCCESS;
 }
