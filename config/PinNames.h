@@ -198,6 +198,13 @@ typedef enum {
     E_LS_B = PA_12,
     C_LS = PA_8,
 
+    // Moisture sensor
+	MOIST_PWR = PA_4,
+	MOIST_DATA = PA_5,
+
+	// Temperature sensor
+	TEMP_DATA = PB_12,
+
 	// Ultrasonic sensors,
 	ULTRA_TRIG_1 = PB_10,
 	ULTRA_ECHO_1 = PB_11,
