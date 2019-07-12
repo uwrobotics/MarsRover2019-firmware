@@ -23,11 +23,7 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
 
 ## UWRT Firmware Development Instructions
 
-1. Download source code 
-    
-    `git clone https://github.com/uwrobotics/MarsRover2019-firmware.git`
-
-2. Download toolchain (gcc and make) and serial interface
+1. Download the development toolchain (gcc and make) and serial interface software
    
    For Ubuntu
     - `sudo apt install gcc-arm-none-eabi`
@@ -35,9 +31,11 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
 		
 	For Windows
     - Download [make for windows](http://gnuwin32.sourceforge.net/packages/make.htm) (choose Complete package, except sources)
+    - Run the setup package to install make
+    - Add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`). See [this tutoial](https://helpdeskgeek.com/windows-10/add-windows-path-environment-variable/) on how to add a folder to your 'path', which allows you to reference executable files in this folder from within any workspace.
     - Download [gcc-arm-none-eabi for windows](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads) (windows 32 bit)
-    - Add gcc .exe files to path (usually `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
-    - Add make.exe to path (usually `C:\Program Files (x86)\GnuWin32\bin`)
+    - Extract the ZIP to something like `C:\Program Files (x86)\GNU Tools ARM Embedded\<version>`
+    - Add gcc .exe files to path (`C:\Program Files (x86)\GNU Tools ARM Embedded\<version>\bin`)
     - Install [PuTTy](https://www.chiark.greenend.org.uk/~sgtatham/putty/) for serial interfacing
 	
 	For Mac
@@ -49,9 +47,17 @@ Firmware for the 2019 University of Waterloo Mars Rover. Contains:
     - Install <arm-none-eabi-gcc> via HomeBrew
     	`brew install arm-none-eabi-gcc`
     - Install [ZOC](https://www.emtec.com/zoc/index.html) for serial interfacing
-	
-3. Change directory into root directory
 
+2. Verify the the toolchains were installed correctly
+
+    Open a new Command Prompt / Terminal window and run the following commands:
+
+    `make --version`  
+    `arm-none-eabi-gcc --version`
+
+3. Download source code
+
+    `git clone https://github.com/uwrobotics/MarsRover2019-firmware.git`  
     `cd MarsRover2019-firmware`
 
 4. Run make with the target application and board
