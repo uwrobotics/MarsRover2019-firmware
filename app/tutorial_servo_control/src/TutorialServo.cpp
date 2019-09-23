@@ -19,8 +19,7 @@ void TutorialServo::setPositionInDegrees(float degrees) {
     	degrees = 0;
 
     // set position using pwm
-    // m_servoPwmOut.pulsewidth(minPulsewidthMs + ( (maxPulsewidthMs - minPulsewidthMs)*degrees/m_servoRangeInDegrees ) );
-    m_servoPwmOut.pulsewidth(0.000625 + 0.002*degrees/m_servoRangeInDegrees);
+    m_servoPwmOut.pulsewidth(minPulsewidthMs + ( (maxPulsewidthMs - minPulsewidthMs)*degrees/m_servoRangeInDegrees ) );
 }
 
 float TutorialServo::getRangeInDegrees() {

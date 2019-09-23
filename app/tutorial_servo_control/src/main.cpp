@@ -56,7 +56,6 @@ void processCANMsg(CANMsg *p_newMsg) {
     }
 }
 
-// CAN code
 int main() {
 	pc.baud(9600);
     servoPwmOut.period(0.020);
