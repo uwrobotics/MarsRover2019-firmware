@@ -2,6 +2,8 @@
 #define TUTORIAL_SERVO_H
 
 #include "mbed.h"
+#include "PinNames.h"
+
 
 class TutorialServo {
    public:

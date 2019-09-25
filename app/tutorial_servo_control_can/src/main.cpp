@@ -3,17 +3,20 @@
 #include "CANMsg.h"
 #include "TutorialServo.h"
 
+
 #define BOARD1
 #if defined(BOARD1)
 const unsigned int  RX_ID = 0x100; 
+#define CAN_RX PB_8
+#define CAN_TX PB_9
 #else
 const unsigned int  RX_ID = 0x101;
 #endif
 
-#define ROVERBOARD_COMMON_PINMAP
+// #define ROVERBOARD_COMMON_PINMAP
 
 Serial  pc(SERIAL_TX, SERIAL_RX); // Uses default baud rate defined in config/mbed_config.h
-CAN     can(CAN_RX, CAN_TX);
+CAN     can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 CANMsg  rxMsg;
 uint8_t pos = 0;
 
@@ -36,6 +39,7 @@ void printMsg(CANMessage& msg) {
 
 int main()
 {
+    pc.printf("HELLO WORLD\n\r");
     TutorialServo servo_1(PA_1, 180);
 
     while (1)
