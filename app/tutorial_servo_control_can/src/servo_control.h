@@ -12,8 +12,6 @@ public:
     void setAngleRangeInDegrees(float degrees);
     void setPulsewidthRangeInMs(float minPulsewidthMs, float maxPulsewidthMs);
     void setPositionInDegrees(float degrees);
-    void getServoMotionPercent();
-
 };
 
 #endif
