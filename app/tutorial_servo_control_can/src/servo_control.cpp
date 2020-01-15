@@ -1,6 +1,22 @@
 #include <servo_control.h>
 #include "mbed.h"
 
+TutorialServo::TutorialServo()
+{
+    m_servoRangeInDegrees = 270;
+    m_maxPulsewidthMs = 2;
+    m_minPulsewidthMs = 1;
+    mservoPwmOut(PA_1);
+}
+
+TutorialServo::TutorialServo(PinName servoPin, Float servoRangeInDegrees, float minPulsewidthInMs, float maxPulsewidthInMs)
+{
+    m_servoRangeInDegrees = servoRangeInDegrees;
+    m_maxPulsewidthMs = maxPulsewidthInMs;
+    m_minPulsewidthMs = minPulsewidthInMs;
+    mservoPwmOut(servoPin);
+}
+
 TutorialServo::setAngleRangeInDegrees(float degrees)
 {
     m_servoRangeInDegrees = degrees;
@@ -13,19 +29,13 @@ TutorialServo::setPositionInDegrees(float degrees)
         //exit beforing attempting to set position greater than set max
         return;
     }
-    //convert degrees into pulse width
-    float pulseWidth = 0.001 + 0.001*degrees;
-    
-    //need to compare in units of Ms not s
-    if (pulseWidth*1000 > maxPulsewidthInMs || pulseWidth*1000 < minPulsewidthInMs)
-    {
-        return;
-    }
+    //convert degree percentage into pulse width
+    float pulseWidth = m_minPulsewidthMs + (m_maxPulsewidthMs - m_minPulsewidthMs)*degrees;
     mservoPwmOut.pulsewidth(pulseWidth);
 }
 
 TutorialServo::setPulsewidthRangeInMs(float minPulsewidthms, float maxPulsewidthMs)
 {
-    minPulsewidthInMs = minPulsewidthms;
-    maxPulsewidthInMs = maxPulsewidthMs;
+    m_minPulsewidthMs = minPulsewidthms;
+    m_maxPulsewidthMs = maxPulsewidthMs;
 }

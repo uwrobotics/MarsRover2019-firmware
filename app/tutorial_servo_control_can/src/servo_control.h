@@ -5,7 +5,10 @@
 class TutorialServo{
 private:
     float m_servoRangeInDegrees;
-    PwmOut mservoPwmOut(PA_1);
+    float m_minPulsewidthMs;
+    float m_maxPulsewidthMs;
+    PwmOut mservoPwmOut;
+    
 public:
     TutorialServo(PinName servoPin, Float servoRangeInDegrees = 180.0,
         float minPulsewidthInMs = 1, float maxPulsewidthInMs = 2);

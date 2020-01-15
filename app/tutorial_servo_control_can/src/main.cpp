@@ -4,7 +4,6 @@
 #include "servo_control.cpp"
 
 AnalogIn potVoltageIN(PA_0);
-PwmOut servoPwmOut(PA_1);
 
 CAN can(CAN_RX, CAN_TX, ROVER_CANBUS_FREQUENCY);
 CANMsg txMsg;
@@ -19,13 +18,12 @@ void initCAN()
 }
 
 int main() {
-    
     initCAN();
 
     // initialize servo parameters
-    TutorialServo();
-    TutorialServo.setAngleRangeInDegrees(ANGLERANGE);
-    TutorialServo.setPulsewidthRangeInMs(PULSEWIDTHRANGEMIN, PULSEWIDTHRANGEMAX);
+    TutorialServo(PA_1, ANGLERANGE, PULSEWIDTHRANGEMIN, PULSEWIDTHRANGEMAX);
+    // TutorialServo.setAngleRangeInDegrees(ANGLERANGE);
+    // TutorialServo.setPulsewidthRangeInMs(PULSEWIDTHRANGEMIN, PULSEWIDTHRANGEMAX);
 
     while(1) {
         if(can.read(txMsg))
