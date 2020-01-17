@@ -1,33 +1,6 @@
-#ifndef TUTORIAL_SERVO_H
-#define TUTORIAL_SERVO_H
-
-class TutorialServo {
-public:
-   // Constructor: Takes a servo pin name (ex. PA_1), and optionally a servo range
-   // that has a default value of 180.0 degrees, a minimum pulsewidth of 1ms, and a     
-   // maximum pulsewidth of 2ms.
-   TutorialServo(PinName servoPin, float servoRangeInDegrees = 180.0, 
-                 float minPulsewidthInMs = 1, float maxPulsewidthInMs = 2); 
-
-   // Set servo range (ex. 270 deg)
-   void setAngleRangeInDegrees(float degrees); 
-
-   // Set servo pulse width range (ex. 1ms, 2ms
-   void setPulsewidthRangeInMs(float minPulsewidthMs, float maxPulsewidthMs);
-
-   // Set servo position (ex. 45 deg)
-   void setPositionInDegrees(float degrees); 
-
-    // I needed this function for the second part of the challenge
-   // Get the servo range in degrees
-   float getServoRangeInDegrees();
-
-private:
-   float  m_servoRangeInDegrees;
-   PwmOut m_servoPwmOut;
-   float m_minPulsewidthInMs;
-   float m_maxPulsewidthInMs;
-};
+#include "mbed.h"
+#include "rover_config.h"
+#include <TutorialServo.h>
 
 TutorialServo::TutorialServo(PinName servoPin, float servoRangeInDegrees, float minPulsewidthInMs, float maxPulsewidthInMs) 
                             : m_servoPwmOut(servoPin){
@@ -61,5 +34,3 @@ void TutorialServo::setPositionInDegrees(float degrees){
 float TutorialServo::getServoRangeInDegrees(){
     return m_servoRangeInDegrees;
 }
-
-#endif
